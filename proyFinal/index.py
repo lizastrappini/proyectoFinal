@@ -19,6 +19,27 @@ def index():
 def calendario():
     return render_template('inicio/calendario.html')
 
+@app.route('/cuenta')
+def cuenta():
+    return render_template('inicio/cuenta.html')
+
+@app.route('/pagos')
+def pago():
+    return render_template('inicio/pago.html')
+
+@app.route('/deportistas')
+def dedortista():
+    return render_template('inicio/deportista.html')
+
+@app.route('/entrenadores')
+def entrenador():
+    return render_template('inicio/entrenador.html')
+
+@app.route('/estadisticas')
+def estadistica():
+    return render_template('inicio/estadistica.html')
+
 if __name__=='__main__':
     app.run(debug=True)
+    
     
