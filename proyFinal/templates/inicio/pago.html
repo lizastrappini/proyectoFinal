@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <!-- Content -->
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Basic Bootstrap Table -->
+    <div class="card">
+      <h2 class="card-header">Cuotas</h2>
+      <div class="card-body">
+        <div class="d-flex row mb-5 gx-5">
+          <div class="col d-flex justify-content-end">
+            <button class="btn btn-secondary btn-label-primary btn-lg waves-effect waves-light">
+              Filtrar
+            </button>
+          </div>
+          <div class="col">
+            <select id="categoria" class="select2 form-select" data-placeholder="Categoria">
+              <option value=""></option>
+              <option value="sub18">Sub 18</option>
+              <option value="sub21">Sub 21</option>
+              <option value="primera">Primera</option>
+            </select>
+          </div>
+          <div class="col">
+            <select id="estado" class="select2 form-select" data-placeholder="Estado">
+              <option value=""></option>
+              <option value="Pago">Pago</option>
+              <option value="No Pago">No Pago</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
+          <div class="d-flex justify-content-between align-items-center px-3 mt-5">
+            <div class="d-flex align-items-center w-100">
+              <i class="ri-menu-line ri-24px cursor-pointer d-block d-lg-none me-4 mb-5" data-bs-toggle="search"></i>
+              <div class="mb-4 w-100">
+                <div class="input-group input-group-merge shadow-none">
+                  <span class="input-group-text border-6 ps-1 py-1" id="players-search">
+                    <i class="ri-search-line ri-22px"></i>
+                  </span>
+                  <input type="text" class="form-control search-input border-6 py-1" placeholder="Buscar Deportistas" aria-label="Buscar deportistas" aria-describedby="players-search">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" type="button">
+            <span><i class="ri-external-link-line me-sm-1"></i> 
+              <span class="d-none d-sm-inline-block">Exportar</span>
+            </span>
+          </button>
+
+          <a href="javascript:;" class="btn btn-primary" data-bs-target="#editUser" data-bs-toggle="modal">
+            Agregar Pago
+          </a>
+        </div>
+
+        <div class="table-responsive text-nowrap">
+          <table id="tablaPagos" class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th> 
+                <th>Categoría</th> 
+                <th>Valor Cuota</th> 
+                <th>Periodo</th>                        
+                <th>Fecha Pago</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              <tr>
+                <td>Lara</td>
+                <td>Del Coro</td>
+                <td>Primera</td>
+                <td>$1500</td>
+                <td>Mayo 2025</td>
+                <td>10/05/2025</td>
+                <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>       
+              </tr>
+              <tr>
+                <td>Liza</td>
+                <td>Strappini</td>
+                <td>Primera</td>
+                <td>$1500</td>
+                <td>Mayo 2025</td>
+                <td>12/05/2025</td>
+                <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>       
+              </tr>
+              <tr>
+                <td>Mora</td>
+                <td>Kopech</td>
+                <td>Sub 21</td>
+                <td>$1200</td>
+                <td>Abril 2025</td>
+                <td>04/04/2025</td>
+                <td><span class="badge rounded-pill bg-label-warning me-1">Pendiente</span></td>       
+              </tr>
+              <tr>
+                <td>Candela</td>
+                <td>Poratti</td>
+                <td>Sub 12</td>
+                <td>$500</td>
+                <td>Junio 2025</td>
+                <td>06/05/2025</td>
+                <td><span class="badge rounded-pill bg-label-danger me-1">No Pago</span></td>       
+              </tr>
+            </tbody>
+          </table>
+        </div>
+<!-- Modal -->
+              <!-- Edit User Modal -->
+              <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                  <div class="modal-content">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body p-0">
+                      <div class="text-center mb-6">
+                        <h4 class="mb-2">Agregar Pago Cuota</h4>
+                        
+                      </div>
+                      <form id="editUserForm" class="row g-5" onsubmit="return false">
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input 
+                              type="text"
+                              id="modalEditUserFirstName"
+                              name="modalEditUserFirstName"
+                              class="form-control"
+                              value=""
+                              placeholder="" />
+                            <label for="modalEditUserFirstName">Nombre</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              type="text"
+                              id="modalEditUserLastName"
+                              name="modalEditUserLastName"
+                              class="form-control"
+                              value=""
+                              placeholder="" />
+                            <label for="modalEditUserLastName">Apellido</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <select
+                              id="modalEditUserCountry"
+                              name="modalEditUserCountry"
+                              class="select2 form-select"
+                              data-allow-clear="true">
+                              <option value="">Selecciona Categoria</option>
+                              <option value="sub12">Sub 12</option>
+                              <option value="sub13">Sub 13</option>
+                              <option value="sub14">Sub 14</option>
+                              <option value="sub16">Sub 16</option>
+                              <option value="sub18">Sub 18</option>
+                              <option value="sub21">Sub 21</option>
+                              <option value="primera">Primera</option>
+                              
+                            </select>
+                            <label for="modalEditUserCountry">Categoría</label>
+                          </div>
+                        </div> 
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              type="text"
+                              id="modalEditUserName"
+                              name="modalEditUserName"
+                              class="form-control"
+                              value=""
+                              placeholder="" />
+                            <label for="modalEditUserName">Valor</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline mb-6">
+                          <input class="form-control" type="month" id="html5-month-input">
+                          <label for="html5-month-input">Periodo</label>
+                           </div> 
+                            </div>
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline mb-6">
+                              <input class="form-control" type="date" id="html5-date-input">
+                              <label for="html5-date-input">Fecha Pago</label>
+                            </div>
+                             </div>                       
+                        <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                          <button type="submit" class="btn btn-primary">Crear</button>
+                          <button
+                            type="reset"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--/ Edit User Modal -->
+              <!-- /Modal -->
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
