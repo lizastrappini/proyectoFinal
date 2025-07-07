@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "5001:5000"
+    volumes:
+      - .:/workspace:cached
+    depends_on:
+      - db
+    command: python ./index.py --host=0.0.0.0 --port=5000 --debug
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: proyecto_db
+      MYSQL_USER: usuarioapp
+      MYSQL_PASSWORD: clave123
+    ports:
+      - "3310:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
