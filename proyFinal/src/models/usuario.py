@@ -1,12 +1,17 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from src import db
 
 class Usuario(db.Model):
     __tablename__ = 'Usuario'
-    id = db.Column(db.Integer, primary_key=True)
-    dni = db.Column(db.Integer)
-    nombre = db.Column(db.String(50))
-    apellido = db.Column(db.String(50))
-    email = db.Column(db.String(50))
-    password = db.Column(db.String(50))
+    Id = db.Column(db.Integer, primary_key=True)
+    Dni = db.Column(db.Integer)
+    Nombre = db.Column(db.String(50))
+    Apellido = db.Column(db.String(50))
+    Email = db.Column(db.String(50))
+    Password = db.Column(db.String(50))
+    NombreUsuario = db.Column(db.String(50))
+    IdCategoria = db.Column(db.Integer)
+    IdLocalidad = db.Column(db.Integer)
+    IdEstado = db.Column(db.Integer)
+    Direccion = db.Column(db.String(50))
+    Telefono = db.Column(db.String(50))
+    IdRol = db.Column(db.Integer)

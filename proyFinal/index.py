@@ -1,8 +1,8 @@
 from config import config
-from flask import Flask, render_template,redirect
+from flask import Flask, render_template,redirect,session
 from flask_sqlalchemy import SQLAlchemy 
 
-from src.models.usuario import db
+from src import db
 from src.routes.usuarioRoutes import usuarios_bp
 
 app = Flask(__name__)

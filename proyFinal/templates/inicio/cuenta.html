@@ -23,8 +23,8 @@
                             width="120"
                             alt="User avatar" />
                           <div class="user-info text-center">
-                            <h5>Lara Del Coro</h5>
-                            <span class="badge bg-label-hover-info rounded-pill">Deportista</span>
+                            <h5>{{ usuario.nombre }} {{ usuario.apellido }}</h5>
+                            <span class="badge bg-label-hover-info rounded-pill">{{usuario.rol}}</span>
                           </div>
                         </div>
                       </div>
@@ -57,49 +57,51 @@
                         <ul class="list-unstyled mb-6">
                              <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Nombre:</span>
-                            <span>Lara</span>
+                            <span>{{ usuario.nombre }}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Apellido:</span>
-                            <span>Del Coro</span>
+                            <span>{{ usuario.apellido }}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Usuario:</span>
-                            <span>laradelcoro</span>
+                            <span>{{usuario.usuario}}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Email:</span>
-                            <span>laradelcoro@gmail.com</span>
+                            <span>{{ usuario.email }}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Estado:</span>
-                            <span class="badge bg-label-success rounded-pill">Activo</span>
+                            <span class="badge rounded-pill {{ 'bg-label-success' if usuario.estado == 1 else 'bg-label-danger' }}">
+                              {{ usuario.estado }}
+                            </span>
                           </li>
                            <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Categoria:</span>
-                            <span>Sub 21</span>
+                            <span>{{usuario.categoria}}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Rol:</span>
-                            <span>Deportista</span>
+                            <span>{{usuario.rol}}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Dirección:</span>
-                            <span>Maipu 1937</span>
+                            <span>{{usuario.direccion}}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Localidad:</span>
-                            <span>Rosario</span>
+                            <span>{{usuario.localidad}}</span>
                           </li>
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Telefono:</span>
-                            <span>3471-607768</span>
+                            <span>{{usuario.telefono}}</span>
                           </li>
                           
                         </ul>
                         <div class="d-flex justify-content-center">
                           <a
-                            href="javascript:;"
+                            href="javascript;;"
                             class="btn btn-primary me-4"
                             data-bs-target="#editUser"
                             data-bs-toggle="modal"
@@ -300,16 +302,16 @@
                         <h4 class="mb-2">Editar Información</h4>
                         
                       </div>
-                      <form id="editUserForm" class="row g-5" onsubmit="return false">
+                      <form id="editUserForm" class="row g-5" action="/editUsuario" method="post">
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input 
                               type="text"
-                              id="modalEditUserFirstName"
-                              name="modalEditUserFirstName"
+                              id="Nombre"
+                              name="Nombre"
                               class="form-control"
-                              value="Lara"
-                              placeholder="Lara" />
+                              value="{{ usuario.nombre }}"
+                              placeholder="Nombre" />
                             <label for="modalEditUserFirstName">Nombre</label>
                           </div>
                         </div>
@@ -317,10 +319,10 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditUserLastName"
-                              name="modalEditUserLastName"
+                              id="Apellido"
+                              name="Apellido"
                               class="form-control"
-                              value="Del Coro"
+                              value="{{ usuario.apellido }}"
                               placeholder="Apellido" />
                             <label for="modalEditUserLastName">Apellido</label>
                           </div>
@@ -329,10 +331,10 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditUserName"
-                              name="modalEditUserName"
+                              id="Usuario"
+                              name="Usuario"
                               class="form-control"
-                              value="laradelcoro"
+                              value="{{ usuario.usuario }}"
                               placeholder="laradelcoro" />
                             <label for="modalEditUserName">Usuario</label>
                           </div>
@@ -341,10 +343,10 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditUserEmail"
-                              name="modalEditUserEmail"
+                              id="Email"
+                              name="Email"
                               class="form-control"
-                              value="laradelcoro@gmail.com"
+                              value="{{ usuario.email }}"
                               placeholder="laradelcoro@gmail.com" />
                             <label for="modalEditUserEmail">Email</label>
                           </div>
@@ -353,20 +355,21 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditUserDireccion"
-                              name="modalEditUserDireccion"
+                              id="Direccion"
+                              name="Direccion"
                               class="form-control"
-                              value="Maipu 1837"
+                              value="{{ usuario.direccion }}"
                               placeholder="Maipu 1837" />
-                            <label for="modalEditUserDireccion">Direccón</label>
+                            <label for="modalEditUserDireccion">Dirección</label>
                           </div>
                         </div>
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditTaxID"
-                              name="modalEditTaxID  "
+                              id="Localidad"
+                              name="Localidad"
+                              value="{{ usuario.localidad }}"
                               class="form-control modal-edit-tax-id"
                               placeholder="Localidad" />
                             <label for="modalEditTaxID">Localidad</label>
@@ -378,10 +381,10 @@
                             <div class="form-floating form-floating-outline">
                               <input
                                 type="text"
-                                id="modalEditUserPhone"
-                                name="modalEditUserPhone"
+                                id="Telefono"
+                                name="Telefono"
                                 class="form-control phone-number-mask"
-                                value="3471-607768"
+                                value="{{ usuario.telefono }}"
                                 placeholder="3471-607768" />
                               <label for="modalEditUserPhone">Telefono</label>
                             </div>
