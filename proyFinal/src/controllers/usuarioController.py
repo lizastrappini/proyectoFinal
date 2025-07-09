@@ -22,7 +22,9 @@ def miCuenta(id):
             'estado': generalEnum.EstadoEnum(usuario.IdEstado).name ,
             'direccion': usuario.Direccion,
             'telefono': usuario.Telefono,
-            'rol': generalEnum.RolEnum(usuario.IdRol).name 
+            'rol': generalEnum.RolEnum(usuario.IdRol).name ,
+            'idEstado': usuario.IdEstado,
+            'idRol': usuario.IdRol,
         }
     
 

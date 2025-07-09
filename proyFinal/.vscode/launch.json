@@ -2,22 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Flask",
+      "name": "Python: index.py",
       "type": "debugpy",
       "request": "launch",
-      "module": "flask",
-      "env": {
-        "FLASK_APP": "index.py",
-        "FLASK_ENV": "development"
-      },
-      "args": [
-        "run",
-        "--no-debugger",
-        "--no-reload",
-        "--port=5001"
-      ],
+      "program": "${workspaceFolder}/index.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
       "jinja": true,
-      "justMyCode": true
+      "exceptionOptions": [
+        {
+          "path": ["SystemExit"],
+          "breakMode": "never"
+        }
+      ]
     }
   ]
 }

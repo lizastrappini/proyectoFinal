@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
     <html
     lang="en"
@@ -80,6 +81,7 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     
 <body>
+
     <script src="../static/js/dropdown-hover.js"></script>
     <script src="../static/js/mega-dropdown.js"></script>
 
@@ -149,12 +151,14 @@
                 </li>
 
                 <!-- Entrenadores -->
-                <li class="menu-item">
-                  <a href="/entrenadores" class="menu-link ">
-                    <i class="menu-icon tf-icons ri-admin-line"></i>
-                    <div data-i18n="Entrenadores">Entrenadores</div>
-                  </a>
-                </li>
+                 {% if session.user and session.user.IdRol == RolEnum.Entrenador %}
+                  <li class="menu-item">
+                    <a href="/entrenadores" class="menu-link ">
+                      <i class="menu-icon tf-icons ri-admin-line"></i>
+                      <div data-i18n="Entrenadores">Entrenadores</div>
+                    </a>
+                  </li>
+                {% endif %}
     
                 <!-- Seccion entrenadores -->
                 <li class="menu-header mt-5">
@@ -509,8 +513,8 @@
                                 </div>
                               </div>
                               <div class="flex-grow-1">
-                                <span class="fw-medium d-block small">Lara</span>
-                                <small class="text-muted">Admin</small>
+                                <span class="fw-medium d-block small">{{session.user.Nombre}}</span>
+                                <small class="text-muted">{{session.user.Rol}}</small>
                               </div>
                             </div>
                           </a>
@@ -519,7 +523,7 @@
                           <div class="dropdown-divider"></div>
                         </li>
                         <li>
-                          <a class="dropdown-item waves-effect" href="cuenta.html">
+                          <a class="dropdown-item waves-effect" href="/miCuenta">
                             <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">Mi Perfil</span>
                           </a>
                         </li>
@@ -572,7 +576,30 @@
               </nav>
 
               <div class="content-wrapper">
-                
+                <div id="alerta-container" style="
+                        position: fixed;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        z-index: 1050;  
+                        width: 90%;
+                        max-width: 200px;
+                        text-align: center;
+                    ">
+                    {% with mensajes = get_flashed_messages(with_categories=true) %}
+                      {% if mensajes %}
+                        <div class="container mt-3">
+                          {% for categoria, mensaje in mensajes %}
+                            <div class="alert alert-{{ categoria }} alert-dismissible fade show" role="alert">
+                              {{ mensaje }}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    {% endwith %}
+                </div>
+
                   {% block content %}{% endblock %}
               
               </div>
@@ -635,6 +662,16 @@
     <!-- Page JS -->
     <script src="../static/js/app-calendar-events.js"></script>
     <script src="../static/js/app-calendar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      setTimeout(() => {
+        $("#alerta-container").each(function() {
+          $(this).removeClass('show').addClass('hide');
+          setTimeout(() => $(this).remove(), 500);
+        });
+      }, 2000);
+    </script>
+
 
 </body>
 </html>

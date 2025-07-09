@@ -4,6 +4,7 @@ class RolEnum(enum.IntEnum):
     Admin = 1
     Deportista = 2
     SubComision = 3
+    Entrenador = 4
 
 
 class EstadoEnum(enum.IntEnum): 
