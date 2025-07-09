@@ -1,5 +1,5 @@
 from config import config
-from flask import Flask, render_template, redirect,session
+from flask import Flask, render_template, redirect,session,url_for
 from flask_sqlalchemy import SQLAlchemy 
 from src import db
 from src.routes.usuarioRoutes import usuario_bp
@@ -10,7 +10,9 @@ from src.routes.entrenadorRoutes import entrenador_bp
 import src.utils.enums
 import inspect
 import enum
-
+from flask_login import LoginManager
+import src.controllers.usuarioController as usuarioController
+from src.models.usuario import Usuario
 
 app = Flask(__name__)
 
@@ -24,16 +26,29 @@ app.register_blueprint(usuario_bp)
 app.register_blueprint(calendario_bp)
 app.register_blueprint(pago_bp)
 app.register_blueprint(inicio_bp)
-app.register_blueprint(entrenador_bp)
+app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 
 #para exportar los enums a cualquier template
 @app.context_processor
-def inject_enums():
-    enums_dict = {}
+def inject_enums_and_functions():
+    context_items = {}
     for name, obj in inspect.getmembers(src.utils.enums):
         if inspect.isclass(obj) and issubclass(obj, enum.Enum):
-            enums_dict[name] = obj
-    return enums_dict
+            context_items[name] = obj
+    for name, obj in inspect.getmembers(src.utils.enums):
+        if callable(obj) and not inspect.isclass(obj) and not name.startswith('_'):
+            context_items[name] = obj
+
+    return context_items
+
+
+login_manager = LoginManager()
+login_manager.login_view = 'usuario_bp.login' 
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
 
 #en lugar de poner las rutas aca, las dividimos por funcionalidad en calendarioRoutes, usuarioRoutes, etc.
 """ 

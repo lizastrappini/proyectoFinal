@@ -1,6 +1,7 @@
 from src import db
+from flask_login import UserMixin
 
-class Usuario(db.Model):
+class Usuario(UserMixin, db.Model):
     __tablename__ = 'Usuario'
     Id = db.Column(db.Integer, primary_key=True)
     Dni = db.Column(db.Integer)
@@ -15,3 +16,6 @@ class Usuario(db.Model):
     Direccion = db.Column(db.String(50))
     Telefono = db.Column(db.String(50))
     IdRol = db.Column(db.Integer)
+
+    def get_id(self):
+        return str(self.Id)

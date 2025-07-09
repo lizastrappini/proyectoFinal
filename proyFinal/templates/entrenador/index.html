@@ -9,26 +9,25 @@
     <div class="card">
       <h2 class="card-header">Entrenadores</h2>
       <div class="card-body">
+
+        
         <div class="d-flex row mb-5 gx-5">
           <div class="col d-flex justify-content-end">
-            <button class="btn btn-secondary btn-label-primary btn-lg waves-effect waves-light">
+            <button class="btn btn-secondary btn-label-primary btn-lg waves-effect waves-light" onclick="filtrar()">
               Filtrar
             </button>
           </div>
           <div class="col-12 col-md-3">
             <select id="categoria" class="select2 form-select" data-placeholder="Categoria">
               <option value=""></option>
-               <option value="sub18">Sub 12</option>
-                <option value="sub18">Sub 13</option>
-                 <option value="sub18">Sub 14</option>
-                  <option value="sub18">Sub 16</option>
-              <option value="sub18">Sub 18</option>
-              <option value="sub21">Sub 21</option>
-              <option value="primera">Primera</option>
+              {% for cat in categorias %}
+                  <option value="{{ cat.value }}">{{ cat.text }}</option>
+              {% endfor %}
             </select>
           </div>
           
         </div>
+        
 
         <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
           <div class="d-flex justify-content-between align-items-center px-3 mt-5">
@@ -67,100 +66,10 @@
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody class="table-border-bottom-0">
-              <tr>
-                <td>Lara</td>
-                <td>Del Coro</td>
-                <td><span class="badge rounded-pill bg-label-success me-1">Primera A Femenino</span></td>
-                <td>10/05/2025</td>
-                <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-pencil-line me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-delete-bin-7-line me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>      
-              </tr>
-              <tr>
-                <td>Liza</td>
-                <td>Strappini</td>
-                <td><span class="badge rounded-pill bg-label-success me-1">Primera B Femenino</span>
-                <span class="badge rounded-pill bg-label-success me-1">Sub 21 B Femenino</span></td>
-                
-                <td>10/05/2025</td>
-                <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-pencil-line me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-delete-bin-7-line me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>      
-              </tr>
-              <tr>
-                <td>Mora</td>
-                <td>Kopech</td>
-                <td><span class="badge rounded-pill bg-label-info me-1">Sub 21 A Femenino</span></td>
-                
-                <td>10/05/2025</td>
-                <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-pencil-line me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-delete-bin-7-line me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>      
-              </tr>
-              <tr>
-                <td>Candela</td>
-                <td>Poratti</td>
-                <td><span class="badge rounded-pill bg-label-primary me-1">Sub 12 B Masculino</span></td>
-                
-                <td>10/05/2025</td>
-                <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-pencil-line me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-delete-bin-7-line me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>      
-              </tr>
-              
-            </tbody>
+            
           </table>
         </div>
-<!-- Modal -->
+              <!-- Modal -->
               <!-- Edit User Modal -->
               <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-simple modal-edit-user">
@@ -267,3 +176,89 @@
 </div>
 
 {% endblock %}
+
+{% block scripts %}
+<script>
+  let tabla = null;
+
+  function filtrar() {
+    const categoria = $('#categoria').val();
+    console.log("Categoría seleccionada:", categoria);
+    if (tabla) {
+      tabla.ajax.url(`/entrenador/filtrar?categoria=${categoria}`).load();
+    } else {
+      tabla = $('#tablaDeportistas').DataTable({
+        ajax: {
+          url: `/entrenador/filtrar?categoria=${categoria}`,
+          dataSrc: 'data'
+        },
+        columns: [
+        { data: 'nombre' },
+        { data: 'apellido' },
+        { data: 'categoria' },
+        { data: 'fecha_ingreso' },
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          render: function(data, type, row, meta) {
+            return `
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ri-more-2-line"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                    <i class="ri-delete-bin-7-line me-1"></i> Delete
+                  </a>
+                </div>
+              </div>
+            `;
+          }
+        }
+        ],
+        paging: false,
+        info: false,
+        searching: false,
+        ordering: true,
+        drawCallback: function () {
+          // Reaplicá estilos de tu template si hace falta
+        },
+        initComplete: function () {
+          $('#tablaDeportistas')
+            .removeClass('dataTable no-footer stripe hover')
+            .addClass('table');
+        }
+      });
+    }
+  }
+    
+  $(document).ready(function() {
+    filtrar();
+
+    
+  });
+
+    function editarFila(rowIndex) {
+    var tabla = $('#tabla-entrenadores').DataTable();
+    var data = tabla.row(rowIndex).data();
+    alert('Editar a ' + data[0] + ' ' + data[1]);
+    // Abrí modal, redirigí, etc.
+    }
+
+    function eliminarFila(rowIndex) {
+      var tabla = $('#tabla-entrenadores').DataTable();
+      var data = tabla.row(rowIndex).data();
+      if (confirm('Eliminar a ' + data[0] + ' ' + data[1] + '?')) {
+        // Lógica para eliminar (AJAX, etc.)
+        alert('Eliminado: ' + data[0]);
+      }
+    }
+
+
+</script>
+{% endblock %}
+

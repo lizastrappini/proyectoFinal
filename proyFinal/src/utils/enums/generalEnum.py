@@ -28,3 +28,10 @@ class CategoriaEnum(enum.IntEnum):
     Sub18 = 5
     Sub21 = 6
     Primera = 7
+
+
+def obtenerNombreRol(valor_int):
+    try:
+        return RolEnum(valor_int).name
+    except ValueError:
+        return None 

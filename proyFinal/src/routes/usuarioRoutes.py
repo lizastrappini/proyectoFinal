@@ -2,6 +2,8 @@ from flask import Blueprint, request, render_template,flash
 import src.controllers.usuarioController as usuarioController
 from flask import session
 import src.utils.enums.generalEnum  as generalEnum
+from flask_login import logout_user, login_required, current_user, login_user
+
 
 usuario_bp = Blueprint('usuarios', __name__)
 
@@ -11,13 +13,7 @@ def login():
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(email, password)
     if(usuario is not None):   
-        session['user'] = {
-                'Id': usuario.Id,
-                'Email': usuario.Email,
-                'IdRol': usuario.IdRol,
-                'Rol': generalEnum.RolEnum(usuario.IdRol).name ,
-                'Nombre': usuario.Nombre,
-            }
+        login_user(usuario)
         flash("Bienvenido!", "success")
         return render_template('inicio/index.html', usuario=usuario)
     else:
@@ -26,7 +22,7 @@ def login():
 
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():
-    id = session.get('user_id')
+    id = current_user.Id
     usuario = usuarioController.miCuenta(id)
     if(usuario is not None):   
         return render_template('usuario/cuenta.html', usuario=usuario)
@@ -35,7 +31,7 @@ def miCuenta():
 
 @usuario_bp.route('/editUsuario', methods=['POST'])
 def editUsuario():
-    id = session.get('user_id') 
+    id = current_user.Id
     usuarioModel = {
         'Nombre': request.form.get('Nombre'),
         'Apellido': request.form.get('Apellido'),
@@ -59,3 +55,10 @@ def editUsuario():
 @usuario_bp.route('/deportistas')
 def deportistas():
     return render_template('inicio/deportista.html')
+
+
+@login_required
+@usuario_bp.route('/logout')
+def logout():
+    logout_user()  
+    return render_template('usuario/index.html')
