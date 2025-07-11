@@ -125,6 +125,7 @@
               <ul class="menu-inner py-1 ps ps--active-y">
 
                 <!-- Secciones menu -->
+                 
                 <li class="menu-item">
                   <a href="/miCuenta" class="menu-link">
                     <i class="menu-icon tf-icons ri-home-smile-line"></i>
@@ -142,20 +143,25 @@
                 </li>
     
                 <!-- Pagos -->
+                 {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
                 <li class="menu-item">
                   <a href="/pagos" class="menu-link ">
                     <i class="menu-icon tf-icons ri-bank-card-2-line"></i>
                     <div data-i18n="Pagos">Pagos</div>
                   </a>
                 </li>
+                {% endif %}
 
                 <!-- Deportistas -->
+                {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
                 <li class="menu-item">
                   <a href="/deportistas" class="menu-link ">
                     <i class="menu-icon tf-icons ri-group-line"></i>
                     <div data-i18n="Deportistas">Deportistas</div>
                   </a>
                 </li>
+                {% endif %}
+
 
                 <!-- Entrenadores -->
                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Entrenador %}
@@ -512,7 +518,7 @@
                       </a>
                       <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                          <a class="dropdown-item waves-effect" href="cuenta.html">
+                          <a class="dropdown-item waves-effect" href="/miCuenta">
                             <div class="d-flex">
                               <div class="flex-shrink-0 me-2">
                                 <div class="avatar avatar-online">

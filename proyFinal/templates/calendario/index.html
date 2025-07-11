@@ -11,14 +11,16 @@
                   <!-- Calendar Sidebar -->
                   <div class="col app-calendar-sidebar border-end" id="app-calendar-sidebar">
                     <div class="p-5 my-sm-0 mb-4 border-bottom">
-                      <button
-                        class="btn btn-primary btn-toggle-sidebar w-100"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#addEventSidebar"
-                        aria-controls="addEventSidebar">
-                        <i class="ri-add-line ri-16px me-1_5"></i>
-                        <span class="align-middle">Nuevo Evento</span>
-                      </button>
+                      {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
+                        <button
+                          class="btn btn-primary btn-toggle-sidebar w-100"
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#addEventSidebar"
+                          aria-controls="addEventSidebar">
+                          <i class="ri-add-line ri-16px me-1_5"></i>
+                          <span class="align-middle">Nuevo Evento</span>
+                        </button>
+                        {% endif %}
                     </div>
                     <div class="px-4">
                       <!-- inline calendar (flatpicker) -->
@@ -106,6 +108,7 @@
                       tabindex="-1"
                       id="addEventSidebar"
                       aria-labelledby="addEventSidebarLabel">
+                      {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
                       <div class="offcanvas-header border-bottom">
                         <h5 class="offcanvas-title" id="addEventSidebarLabel">Nuevo Evento</h5>
                         <button
@@ -114,6 +117,8 @@
                           data-bs-dismiss="offcanvas"
                           aria-label="Close"></button>
                       </div>
+                      {% endif %}
+                      {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
                       <div class="offcanvas-body">
                         <form class="event-form pt-0" id="eventForm" onsubmit="return false">
                           <div class="form-floating form-floating-outline mb-5">
@@ -212,6 +217,8 @@
                           </div>
                         </form>
                       </div>
+                      {% endif %}
+  
                     </div>
                   </div>
                   <!-- /Calendar & Modal -->

@@ -3,8 +3,7 @@ import enum
 class RolEnum(enum.IntEnum): 
     Admin = 1
     Deportista = 2
-    SubComision = 3
-    Entrenador = 4
+    Entrenador = 3
 
 
 class EstadoEnum(enum.IntEnum): 
