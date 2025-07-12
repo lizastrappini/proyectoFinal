@@ -1,10 +1,13 @@
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from src import db
+from werkzeug.security import generate_password_hash
 
 def loginUser(email,password):
     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
     return usuario
+
+
 
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
@@ -19,7 +22,7 @@ def miCuenta(id):
             'usuario': usuario.NombreUsuario,
             'categoria': generalEnum.CategoriaEnum(usuario.IdCategoria).name,
             'localidad': generalEnum.LocalidadEnum(usuario.IdLocalidad).name,
-            'estado': generalEnum.EstadoEnum(usuario.IdEstado).name ,
+            'estado': generalEnum.EstadoEnum(usuario.IdEstado).name,
             'direccion': usuario.Direccion,
             'telefono': usuario.Telefono,
             'rol': generalEnum.RolEnum(usuario.IdRol).name ,
@@ -57,3 +60,11 @@ def update(id, datos):
         return usuario
 
     return None
+
+# def cambiar_password(id, nueva_password):
+#     usuario = Usuario.query.filter_by(Id=id).first()
+#     if usuario:
+#         usuario.Password = generate_password_hash(nueva_password)
+#         db.session.commit()
+#         return True
+#     return False

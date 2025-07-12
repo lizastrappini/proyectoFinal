@@ -50,32 +50,6 @@ login_manager.init_app(app)
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
-#en lugar de poner las rutas aca, las dividimos por funcionalidad en calendarioRoutes, usuarioRoutes, etc.
-""" 
-@app.route('/cuenta/pagos')
-def cuenta():
-    return render_template('inicio/cuenta.html')
-
-
-@app.route('/pagos')
-def pago():
-    return render_template('inicio/pago.html')
-
-@app.route('/deportistas')
-def dedortista():
-    return render_template('inicio/deportista.html')
-
-@app.route('/entrenadores')
-def entrenador():
-    return render_template('inicio/entrenador.html')
-
-@app.route('/estadisticas')
-def estadistica():
-    return render_template('inicio/estadistica.html')
-
-@app.route('/restaurarContraseña')
-def contraseña():
-    return render_template('login/forgot-password.html') """
     
 
     
