@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template,flash
+from flask import Blueprint, redirect, request, render_template,flash, url_for
 import src.controllers.usuarioController as usuarioController
 from flask import session
 import src.utils.enums.generalEnum  as generalEnum
@@ -12,9 +12,11 @@ def login():
     email = request.form.get('email-username')  
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(email, password)
+    remember = True if request.form.get('remember') == 'on' else False  # 👈
+    usuario = usuarioController.loginUser(email, password)
+    
     if(usuario is not None):   
-        recordarme = request.form.get('recordarme') == 'on'
-        login_user(usuario, remember=recordarme)
+        login_user(usuario, remember=remember)  # 👈 pasa el parámetro
         flash("Bienvenido!", "success")
         return render_template('inicio/index.html', usuario=usuario)
     else:
@@ -29,7 +31,7 @@ def miCuenta():
     if(usuario is not None):   
         return render_template('usuario/cuenta.html', usuario=usuario)
     else:
-        return render_template('iusuario/index.html')
+        return render_template('usuario/index.html')
 
 @login_required
 @usuario_bp.route('/editUsuario', methods=['POST'])
@@ -43,6 +45,7 @@ def editUsuario():
         'Direccion': request.form.get('Direccion'),
         'Localidad': request.form.get('Localidad'),
         'Telefono': request.form.get('Telefono'),
+        'Categoria': request.form.get('Categoria'),
     }
 
     usuario = usuarioController.getUsuarioById(id)

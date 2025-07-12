@@ -10,9 +10,9 @@
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row gy-6 gy-md-0">
                 <!-- User Sidebar -->
-                <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                <div class="col-xl-4 col-lg-5 col-md-5">
                   <!-- User Card -->
-                  <div class="card mb-6">
+                  <div class="card mb-4">
                     <div class="card-body pt-12">
                       <div class="user-avatar-section">
                         <div class="d-flex align-items-center flex-column">
@@ -28,30 +28,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="d-flex justify-content-around flex-wrap my-6 gap-0 gap-md-3 gap-lg-4">
-                        <div class="d-flex align-items-center me-5 gap-4">
-                          <div class="avatar">
-                            <div class="avatar-initial bg-label-primary rounded-3">
-                              <i class="ri-check-line ri-24px"></i>
-                            </div>
-                          </div>
-                          <div>
-                            <h5 class="mb-0">25</h5>
-                            <span>Partidos jugados</span>
-                          </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-4">
-                          <div class="avatar">
-                            <div class="avatar-initial bg-label-primary rounded-3">
-                              <i class="ri-close-line ri-24px"></i>
-                            </div>
-                          </div>
-                          <div>
-                            <h5 class="mb-0">2</h5>
-                            <span>Ausencias</span>
-                          </div>
-                        </div>
-                      </div>
+                     
                       <h5 class="pb-4 border-bottom mb-4">Datos</h5>
                       <div class="info-container">
                         <ul class="list-unstyled mb-6">
@@ -116,178 +93,126 @@
                 <!--/ User Sidebar -->
 
                 <!-- User Content -->
-                <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-                  <!-- User Tabs -->
-                  <div class="nav-align-top">
-                    <ul class="nav nav-pills flex-column flex-md-row mb-6 row-gap-2">
-                     
-                      <li class="nav-item">
-                        <a class="nav-link active" href="/cuenta/pagos"
-                          ><i class="ri-money-dollar-circle-line me-2"></i>Pagos</a
-                        >
-                      </li>
-                       <li class="nav-item">
-                        <a class="nav-link" href="app-user-view-notifications.html"
-                          ><i class="ri-notification-4-line me-2"></i>Notificaciones</a
-                        >
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="app-user-view-billing.html"
-                          ><i class="ri-lock-2-line me-2"></i>Seguridad</a
-                        >
-                      </li>
-                    
-                      
-                    </ul>
-                  </div>
-                  <!--/ User Tabs -->
-
+                <div class="col-xl-8 col-lg-7 col-md-7">
                   <!-- Tabla que muestra los pagos filtrados para ese usuario -->
-              <div class="card">
-                <h5 class="card-header">Estado de Cuotas</h5>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Mes</th>                        
-                        <th>Estado</th>
-                        <th>Fecha pago</th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                      <tr>
-                        <td>
-                          Enero 2025
-                        </td>
-                        <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                        <td>10/01/2025</td>         
-                      </tr>
-                      <tr>
-                        <td>
-                          Febrero 2025
-                        </td>
-                        <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                        <td>11/02/2025</td>         
-                      </tr>
-                      <tr>
-                        <td>
-                          Marzo 2025
-                        </td>
-                        <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                        <td>10/03/2025</td>         
-                      </tr>
-                      <tr>
-                        <td>
-                          Abril 2025
-                        </td>
-                        <td><span class="badge rounded-pill bg-label-danger me-1">No Pago</span></td>
-                        <td>10/04/2025</td>         
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <!--/ Basic Bootstrap Table -->
-
-                  <!-- Activity Timeline 
-                  <div class="card mb-6">
-                    <h5 class="card-header">User Activity Timeline</h5>
-                    <div class="card-body pt-0">
-                      <ul class="timeline mb-0 mt-2">
-                        <li class="timeline-item timeline-item-transparent">
-                          <span class="timeline-point timeline-point-primary"></span>
-                          <div class="timeline-event">
-                            <div class="timeline-header mb-3">
-                              <h6 class="mb-0">12 Invoices have been paid</h6>
-                              <small class="text-muted">12 min ago</small>
-                            </div>
-                            <p class="mb-2">Invoices have been paid to the company</p>
-                            <div class="d-flex align-items-center mb-1">
-                              <div class="badge bg-lighter rounded-3 mb-1_5">
-                                <img src="../../static//img/icons/misc/pdf.png" alt="img" width="15" class="me-2" />
-                                <span class="h6 mb-0 text-secondary">invoices.pdf</span>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li class="timeline-item timeline-item-transparent">
-                          <span class="timeline-point timeline-point-success"></span>
-                          <div class="timeline-event">
-                            <div class="timeline-header mb-3">
-                              <h6 class="mb-0">Client Meeting</h6>
-                              <small class="text-muted">45 min ago</small>
-                            </div>
-                            <p class="mb-2">Project meeting with john @10:15am</p>
-                            <div class="d-flex justify-content-between flex-wrap gap-2 mb-1_5">
-                              <div class="d-flex flex-wrap align-items-center">
-                                <div class="avatar avatar-sm me-2">
-                                  <img src="../../static/img/avatars/4.png" alt="Avatar" class="rounded-circle" />
-                                </div>
-                                <div>
-                                  <p class="mb-0 small fw-medium">Lester McCarthy (Client)</p>
-                                  <small>CEO of Pixinvent</small>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li class="timeline-item timeline-item-transparent">
-                          <span class="timeline-point timeline-point-info"></span>
-                          <div class="timeline-event">
-                            <div class="timeline-header mb-3">
-                              <h6 class="mb-0">Create a new project for client</h6>
-                              <small class="text-muted">2 Day Ago</small>
-                            </div>
-                            <p class="mb-2">6 team members in a project</p>
-                            <ul class="list-group list-group-flush">
-                              <li
-                                class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-top-0 p-0">
-                                <div class="d-flex flex-wrap align-items-center">
-                                  <ul class="list-unstyled users-list d-flex align-items-center avatar-group m-0 me-2">
-                                    <li
-                                      data-bs-toggle="tooltip"
-                                      data-popup="tooltip-custom"
-                                      data-bs-placement="top"
-                                      title="Vinnie Mostowy"
-                                      class="avatar pull-up">
-                                      <img class="rounded-circle" src="../../static/img/avatars/5.png" alt="Avatar" />
-                                    </li>
-                                    <li
-                                      data-bs-toggle="tooltip"
-                                      data-popup="tooltip-custom"
-                                      data-bs-placement="top"
-                                      title="Allen Rieske"
-                                      class="avatar pull-up">
-                                      <img class="rounded-circle" src="../../static/img/avatars/12.png" alt="Avatar" />
-                                    </li>
-                                    <li
-                                      data-bs-toggle="tooltip"
-                                      data-popup="tooltip-custom"
-                                      data-bs-placement="top"
-                                      title="Julee Rossignol"
-                                      class="avatar pull-up">
-                                      <img class="rounded-circle" src="../../static/img/avatars/6.png" alt="Avatar" />
-                                    </li>
-                                    <li class="avatar">
-                                      <span
-                                        class="avatar-initial rounded-circle pull-up text-heading"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="bottom"
-                                        title="3 more"
-                                        >+3</span
-                                      >
-                                    </li>
-                                  </ul>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-                        </li>
-                      </ul>
+                  <div class="card mb-4">
+                    <h5 class="card-header">Estado de Cuotas</h5>
+                    <div class="table-responsive text-nowrap">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Mes</th>                        
+                            <th>Estado</th>
+                            <th>Fecha pago</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                          <tr>
+                            <td>
+                              Enero 2025
+                            </td>
+                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
+                            <td>10/01/2025</td>         
+                          </tr>
+                          <tr>
+                            <td>
+                              Febrero 2025
+                            </td>
+                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
+                            <td>11/02/2025</td>         
+                          </tr>
+                          <tr>
+                            <td>
+                              Marzo 2025
+                            </td>
+                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
+                            <td>10/03/2025</td>         
+                          </tr>
+                          <tr>
+                            <td>
+                              Abril 2025
+                            </td>
+                            <td><span class="badge rounded-pill bg-label-danger me-1">No Pago</span></td>
+                            <td>10/04/2025</td>         
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                /Activity Timeline -->   
+
+                  <div class="card">
+                    <!-- Cambiar contraseña -->
+                    <h5 class="card-header">Cambiar Contraseña</h5>
+                    <div class="card-body">
+
+                    <form id="formChangePassword" method="POST" action="/cambiar_contraseña">
+                    <div class="alert alert-warning alert-dismissible" role="alert">
+                      <h5 class="alert-heading mb-1">Asegúrese de que se cumplan estos requisitos: </h5>
+                      <span>Mínimo 8 caracteres de largo, mayúsculas y símbolo</span>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row gx-5">
+                      <!-- Nueva contraseña -->
+                      <div class="mb-3 col-12 col-sm-6 form-password-toggle">
+                        <div class="input-group input-group-merge">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              class="form-control {% if errors and errors.newPassword %}is-invalid{% endif %}"
+                              type="password"
+                              id="newPassword"
+                              name="newPassword"
+                              placeholder="••••••••••••" />
+                            <label for="newPassword">Nueva Contraseña</label>
+                          </div>
+                          <span class="input-group-text cursor-pointer text-heading">
+                            <i class="ri-eye-off-line"></i>
+                          </span>
+                        </div>
+                        {% if errors and errors.newPassword %}
+                          <div class="invalid-feedback d-block">
+                            {{ errors.newPassword }}
+                          </div>
+                        {% endif %}
+                      </div>
+
+                      <!-- Confirmar contraseña -->
+                      <div class="mb-3 col-12 col-sm-6 form-password-toggle">
+                        <div class="input-group input-group-merge">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              class="form-control {% if errors and errors.confirmPassword %}is-invalid{% endif %}"
+                              type="password"
+                              name="confirmPassword"
+                              id="confirmPassword"
+                              placeholder="••••••••••••" />
+                            <label for="confirmPassword">Confirmar nueva contraseña</label>
+                          </div>
+                          <span class="input-group-text cursor-pointer text-heading">
+                            <i class="ri-eye-off-line"></i>
+                          </span>
+                        </div>
+                        {% if errors and errors.confirmPassword %}
+                          <div class="invalid-feedback d-block">
+                            {{ errors.confirmPassword }}
+                          </div>
+                        {% endif %}
+                      </div>
+
+                      <div>
+                        <button type="submit" class="btn btn-primary me-2">Cambiar Contraseña</button>
+                      </div>
+                    </div>
+                  </form>
+
+                    </div>
+                  </div>
                 </div>
+                
+                  
+
+                </div>
+                
                 <!--/ User Content -->
               </div>
 
@@ -355,6 +280,18 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
+                              id="Categoria"
+                              name="Categoria"
+                              class="form-control"
+                              value="{{ usuario.categoria }}"
+                              placeholder="" />
+                            <label for="modalEditUserCategoria">Categoria</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              type="text"
                               id="Direccion"
                               name="Direccion"
                               class="form-control"
@@ -390,59 +327,6 @@
                             </div>
                           </div>
                         </div>
-                        <!--<div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              id="TagifyLanguageSuggestion"
-                              name="TagifyLanguageSuggestion"
-                              class="form-control h-auto"
-                              placeholder="select language"
-                              value="English" />
-                            <label for="TagifyLanguageSuggestion">Language</label>
-                          </div>
-                        </div> -->
-                        <!--<div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <select
-                              id="modalEditUserCountry"
-                              name="modalEditUserCountry"
-                              class="select2 form-select"
-                              data-allow-clear="true">
-                              <option value="">Select</option>
-                              <option value="Australia">Australia</option>
-                              <option value="Bangladesh">Bangladesh</option>
-                              <option value="Belarus">Belarus</option>
-                              <option value="Brazil">Brazil</option>
-                              <option value="Canada">Canada</option>
-                              <option value="China">China</option>
-                              <option value="France">France</option>
-                              <option value="Germany">Germany</option>
-                              <option value="India" selected>India</option>
-                              <option value="Indonesia">Indonesia</option>
-                              <option value="Israel">Israel</option>
-                              <option value="Italy">Italy</option>
-                              <option value="Japan">Japan</option>
-                              <option value="Korea">Korea, Republic of</option>
-                              <option value="Mexico">Mexico</option>
-                              <option value="Philippines">Philippines</option>
-                              <option value="Russia">Russian Federation</option>
-                              <option value="South Africa">South Africa</option>
-                              <option value="Thailand">Thailand</option>
-                              <option value="Turkey">Turkey</option>
-                              <option value="Ukraine">Ukraine</option>
-                              <option value="United Arab Emirates">United Arab Emirates</option>
-                              <option value="United Kingdom">United Kingdom</option>
-                              <option value="United States">United States</option>
-                            </select>
-                            <label for="modalEditUserCountry">Pais</label>
-                          </div>
-                        </div> -->
-                       <!-- <div class="col-12">
-                          <div class="form-check form-switch">
-                            <input type="checkbox" class="form-check-input" id="editBillingAddress" />
-                            <label for="editBillingAddress" class="text-heading">Use as a billing address?</label>
-                          </div>
-                        </div> -->
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                           <button type="submit" class="btn btn-primary">Guardar</button>
                           <button

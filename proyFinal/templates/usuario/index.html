@@ -82,6 +82,16 @@
           class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative py-sm-12 px-12 py-6">
           <div class="w-px-400 mx-auto pt-5 pt-lg-0">
             <h4 class="mb-1">Bienvenido! 👋</h4>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
 
             <form id="formAuthentication" class="mb-5" action="/listar_usuarios" method="post">
               <div class="form-floating form-floating-outline mb-5">
@@ -113,8 +123,9 @@
               </div>
               <div class="mb-5 d-flex justify-content-between mt-5">
                 <div class="form-check mt-2">
-                  <input class="form-check-input" type="checkbox" id="recordarme" name="recordarme" />
-                  <label class="form-check-label" for="recordarme"> Recordarme </label>
+                  <!-- <input class="form-check-input" type="checkbox" id="remember-me" /> -->
+                   <input class="form-check-input" type="checkbox" id="remember-me" name="remember">
+                  <label class="form-check-label" for="remember-me"> Recordarme </label>
                 </div>
                 <a href="/ingresarEmailPass" class="float-end mb-1 mt-2">
                   <span>Olvidaste tu contraseña?</span>
@@ -179,6 +190,31 @@
     <script src="../static/js/main.js"></script>
 
     <!-- <script src="../static/js/pages-auth.js"></script> -->
+    <script>
+  // Cargar los datos almacenados si existen
+  window.onload = function() {
+    if (localStorage.getItem("remember") === "true") {
+      document.getElementById("email").value = localStorage.getItem("email");
+      document.getElementById("password").value = localStorage.getItem("password");
+      document.getElementById("remember-me").checked = true;
+    }
+  }
+
+  // Guardar datos si el usuario marca "Recordarme"
+  document.getElementById("formAuthentication").addEventListener("submit", function () {
+    const rememberMe = document.getElementById("remember-me").checked;
+    if (rememberMe) {
+      localStorage.setItem("email", document.getElementById("email").value);
+      
+      localStorage.setItem("remember", "true");
+    } else {
+      localStorage.removeItem("email");
+     
+      localStorage.setItem("remember", "false");
+    }
+  });
+</script>
+
     <script>
 
       setTimeout(() => {
