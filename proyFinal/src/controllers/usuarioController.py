@@ -1,6 +1,14 @@
+import datetime
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from src import db
+import secrets
+import smtplib
+from email.message import EmailMessage
+from flask_mail import Message
+from src.utils.Mail import mail
+from datetime import datetime, timezone, timedelta
+from flask import render_template
 
 def loginUser(email,password):
     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
@@ -56,4 +64,87 @@ def update(id, datos):
         db.session.commit()
         return usuario
 
+    return None
+
+
+
+def ocultar_email_parcial(email, porcentaje=0.60):
+    if '@' not in email:
+        return email
+
+    usuario, dominio = email.split('@')
+    longitud = len(usuario)
+    cantidad_a_ocultar = int(longitud * porcentaje)
+
+    parte_visible = usuario[:longitud - cantidad_a_ocultar]
+    oculto = parte_visible + '*' * cantidad_a_ocultar
+
+    return f"{oculto}@{dominio}"
+
+
+def generar_token():
+    return secrets.token_urlsafe(32)
+
+def enviar_mail_recuperacion(email, token, nombre):
+    link = f"http://127.0.0.1:5051/ingresarNuevaPass?token={token}"
+
+    msg = Message("Voley App - Recuperación de contraseña",
+                  sender="lizaotrascosas@gmail.com",
+                  recipients=[email])
+    msg.html = render_template("usuario/emailRecuperacion.html", nombre=nombre, link=link)
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"[ERROR] No se pudo enviar el correo: {e}")
+        return False
+
+
+def enviarMailRecuperarPass(email):
+    usuario = Usuario.query.filter_by(Email= email).first()
+    if usuario:
+        token = secrets.token_urlsafe(32)
+        usuario.Token = token
+        usuario.TokenEnviado = True
+        usuario.FechaVencimientoToken = datetime.now(timezone.utc) + timedelta(hours=1)
+        enviar_mail_recuperacion(usuario.Email, token, usuario.Nombre)
+        db.session.commit()
+        email = ocultar_email_parcial(usuario.Email)
+        return email
+
+    return None
+
+
+def recuperar_contraseña(token):
+    rec = Usuario.query.filter_by(Token=token, TokenEnviado=True).first()
+    if not rec or rec.FechaVencimientoToken < datetime.now():
+        return None
+    return rec
+
+def cambiarContraseña(token, nueva_contraseña):
+    usuario = Usuario.query.filter_by(Token=token).first()
+    usuario.Password = nueva_contraseña
+    usuario.Token = None
+    usuario.TokenEnviado = False
+    usuario.FechaVencimientoToken = None
+    db.session.commit()
+    return True
+
+def verificarPass(token,password):
+    usuario = Usuario.query.filter_by(Token=token).first()
+    if usuario:
+        if usuario.Password == password:
+            return True
+        else:
+            return False
+    return False
+
+def verificarTokenEnviado(email):
+    usuario = Usuario.query.filter_by(Email = email).first()
+    if usuario:
+        if usuario.Token is not None and usuario.TokenEnviado is True:
+            return usuario.Token
+        else:
+            return None
     return None

@@ -13,6 +13,7 @@ import enum
 from flask_login import LoginManager
 import src.controllers.usuarioController as usuarioController
 from src.models.usuario import Usuario
+from src.utils.Mail import mail
 
 app = Flask(__name__)
 
@@ -49,6 +50,9 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
+  # ✅ importar desde config
+
+mail.init_app(app)
 
 #en lugar de poner las rutas aca, las dividimos por funcionalidad en calendarioRoutes, usuarioRoutes, etc.
 """ 

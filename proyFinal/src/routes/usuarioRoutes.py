@@ -13,13 +13,15 @@ def login():
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(email, password)
     if(usuario is not None):   
-        login_user(usuario)
+        recordarme = request.form.get('recordarme') == 'on'
+        login_user(usuario, remember=recordarme)
         flash("Bienvenido!", "success")
         return render_template('inicio/index.html', usuario=usuario)
     else:
         flash("Usuario o contraseña incorrectos","danger")
         return render_template('usuario/index.html')
 
+@login_required
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():
     id = current_user.Id
@@ -27,8 +29,9 @@ def miCuenta():
     if(usuario is not None):   
         return render_template('usuario/cuenta.html', usuario=usuario)
     else:
-        return render_template('iusuario/index.html', error='Usuario o contraseña incorrectos')
+        return render_template('iusuario/index.html')
 
+@login_required
 @usuario_bp.route('/editUsuario', methods=['POST'])
 def editUsuario():
     id = current_user.Id
@@ -62,3 +65,56 @@ def deportistas():
 def logout():
     logout_user()  
     return render_template('usuario/index.html')
+
+@usuario_bp.route('/ingresarEmailPass', methods=['GET'])
+def ingresarEmailPass():  
+    return render_template('usuario/forgot-password.html')
+    
+@usuario_bp.route('/recuperarPass', methods=['POST'])
+def recuperarPass():
+    email = request.form.get('email')  
+    token = usuarioController.verificarTokenEnviado(email)
+    if token is not None:
+        return render_template('usuario/nuevaPass.html', token=token)
+    
+    email = usuarioController.enviarMailRecuperarPass(email)
+    if(email is not None):   
+        return render_template('usuario/recuperarPass.html', email=email)
+    
+
+@usuario_bp.route('/ingresarNuevaPass', methods=['GET'])
+def ingresarNuevaPass():
+    token = request.args.get('token')
+    recuperar = usuarioController.recuperar_contraseña(token)
+    if recuperar is None:
+        flash("Token inválido o expirado", "danger")
+        return render_template('usuario/forgot-password.html')
+    else:
+        return render_template('usuario/nuevaPass.html', token=token)
+    
+
+@usuario_bp.route('/cambiarPass', methods=['POST'])
+def cambiarPass():
+    token = request.form.get('token')
+    password = request.form.get('password')
+    confirmarPassword = request.form.get('confirmarPassword')
+    yaUsada = usuarioController.verificarPass(token, password)
+
+    if yaUsada is True:
+        flash("La contraseña ya ha sido utilizada", "danger")
+        return render_template('usuario/nuevaPass.html', token=token)
+
+    if password != confirmarPassword:
+        flash("Las contraseñas no coinciden", "danger")
+        return render_template('usuario/nuevaPass.html', token=token)
+    
+    recuperar = usuarioController.cambiarContraseña(token, password)
+
+    if recuperar is True:
+        flash("Contraseña cambiada", "success")
+        return render_template('usuario/index.html')
+ 
+    else:
+        flash("Ocurrio un error", "danger")
+        return render_template('usuario/index.html')
+

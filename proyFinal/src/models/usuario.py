@@ -16,6 +16,9 @@ class Usuario(UserMixin, db.Model):
     Direccion = db.Column(db.String(50))
     Telefono = db.Column(db.String(50))
     IdRol = db.Column(db.Integer)
+    Token = db.Column(db.String(50))
+    TokenEnviado = db.Column(db.Boolean, default=False)
+    FechaVencimientoToken = db.Column(db.DateTime)
 
     def get_id(self):
         return str(self.Id)

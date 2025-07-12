@@ -14,4 +14,9 @@ def index():
 
 @inicio_bp.route('/')
 def login():
-    return render_template('usuario/index.html')
+    if current_user.is_authenticated:
+        id = current_user.Id
+        usuario = usuarioController.getUsuarioById(id)
+        return render_template('inicio/index.html', usuario=usuario)
+    else:
+        return render_template('usuario/index.html')
