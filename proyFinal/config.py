@@ -1,5 +1,6 @@
 from decouple import config
 import os
+from datetime import timedelta
 
 class Config():
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+pymysql://usuarioapp:clave123@db:3306/proyecto_db')
@@ -11,6 +12,7 @@ class Config():
     MAIL_PASSWORD = 'pvbukucydnvgskye'  # usar contraseña de aplicación en Gmail
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)
 
 class DevelopmentConfig(Config):
     DEBUG = True
