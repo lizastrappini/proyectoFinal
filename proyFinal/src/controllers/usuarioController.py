@@ -98,7 +98,7 @@ def generar_token():
     return secrets.token_urlsafe(32)
 
 def enviar_mail_recuperacion(email, token, nombre):
-    link = f"http://127.0.0.1:5051/ingresarNuevaPass?token={token}"
+    link = f"http://127.0.0.1:5001/ingresarNuevaPass?token={token}"
 
     msg = Message("Voley App - Recuperación de contraseña",
                   sender="lizaotrascosas@gmail.com",
