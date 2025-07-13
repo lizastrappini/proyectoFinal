@@ -16,7 +16,6 @@ def loginUser(email,password):
     return usuario
 
 
-
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
     if(usuario is not None):
@@ -37,7 +36,8 @@ def miCuenta(id):
             'idEstado': usuario.IdEstado,
             'idRol': usuario.IdRol,
         }
-    
+
+
 
 def getUsuarioById(id):
     return Usuario.query.filter_by(Id=id).first()
@@ -68,16 +68,6 @@ def update(id, datos):
         return usuario
 
     return None
-
-# def cambiar_password(id, nueva_password):
-#     usuario = Usuario.query.filter_by(Id=id).first()
-#     if usuario:
-#         usuario.Password = generate_password_hash(nueva_password)
-#         db.session.commit()
-#         return True
-#     return False
-
-
 
 
 def ocultar_email_parcial(email, porcentaje=0.60):
@@ -160,3 +150,18 @@ def verificarTokenEnviado(email):
         else:
             return None
     return None
+
+
+def actualizar_contraseña(usuario_id, nueva_contraseña):
+    try:
+        usuario = Usuario.query.get(usuario_id)
+        if usuario:
+            usuario.Password = nueva_contraseña
+            db.session.commit()
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error al actualizar contraseña: {e}")
+        db.session.rollback()
+        return False

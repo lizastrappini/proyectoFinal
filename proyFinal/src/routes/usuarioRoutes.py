@@ -1,9 +1,10 @@
 from flask import Blueprint, redirect, request, render_template,flash, url_for
 import src.controllers.usuarioController as usuarioController
 from flask import session
+from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from flask_login import logout_user, login_required, current_user, login_user
-
+from src import db
 
 usuario_bp = Blueprint('usuarios', __name__)
 
@@ -120,4 +121,31 @@ def cambiarPass():
     else:
         flash("Ocurrio un error", "danger")
         return render_template('usuario/index.html')
+     
 
+
+@login_required   
+@usuario_bp.route('/cambiar_contraseña', methods=['POST'])
+def cambiar_contraseña():
+    nueva = request.form.get('newPassword')
+    confirmar = request.form.get('confirmPassword')
+
+    errors = {}
+
+    if not nueva or len(nueva) < 8:
+        errors['newPassword'] = 'La contraseña debe tener al menos 8 caracteres.'
+    if nueva != confirmar:
+        errors['confirmPassword'] = 'Las contraseñas no coinciden.'
+
+    if errors:
+        usuario = usuarioController.miCuenta(current_user.Id)
+        return render_template('usuario/cuenta.html', usuario=usuario, errors=errors)
+
+    exito = usuarioController.actualizar_contraseña(current_user.Id, nueva)
+
+    if exito:
+        flash('Contraseña actualizada correctamente.', 'success')
+    else:
+        flash('Ocurrió un error al cambiar la contraseña.', 'danger')
+
+    return redirect(url_for('usuarios.miCuenta'))

@@ -145,7 +145,7 @@
                     <h5 class="card-header">Cambiar Contraseña</h5>
                     <div class="card-body">
 
-                    <form id="formChangePassword" method="POST" action="/cambiar_contraseña">
+                    <form id="formChangePassword" method="POST" action="{{ url_for('usuarios.cambiar_contraseña') }}">
                     <div class="alert alert-warning alert-dismissible" role="alert">
                       <h5 class="alert-heading mb-1">Asegúrese de que se cumplan estos requisitos: </h5>
                       <span>Mínimo 8 caracteres de largo, mayúsculas y símbolo</span>

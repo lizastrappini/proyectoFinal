@@ -27,8 +27,7 @@
           </div>
           
         </div>
-        
-
+      
         <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
           <div class="d-flex justify-content-between align-items-center px-3 mt-5">
             <div class="d-flex align-items-center w-100">
@@ -50,37 +49,49 @@
             </span>
           </button>
 
-          <a href="javascript:;" class="btn btn-primary" data-bs-target="#editUser" data-bs-toggle="modal">
+          <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
             Agregar
           </a>
         </div>
-
         <div class="table-responsive text-nowrap">
-          <table id="tablaDeportistas" class="table">
+          <table id="tablaEntrenador" class="table">
             <thead>
               <tr>
+                <th>DNI</th>
                 <th>Nombre</th>
                 <th>Apellido</th> 
                 <th>Categorías</th>                        
-                <th>Fecha Ingreso</th>
                 <th>Acciones</th>
               </tr>
             </thead>
-            
           </table>
         </div>
               <!-- Modal -->
-              <!-- Edit User Modal -->
-              <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
+              <!-- Agregar User Modal -->
+
+              
+              <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-simple modal-edit-user">
                   <div class="modal-content">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="modal-body p-0">
                       <div class="text-center mb-6">
-                        <h4 class="mb-2">Agregar Entrenador</h4>
+                        <h4 class="mb-2" id="tituloAdd">Agregar Entrenador</h4>
                         
                       </div>
-                      <form id="editUserForm" class="row g-5" onsubmit="return false">
+                      <form id="editEntrenadorForm" class="row g-5" action="{{ url_for('entrenador.add_entrenador') }}" method="post">
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input 
+                              type="int"
+                              id="modalEditUserDNI"
+                              name="modalEditUserDNI"
+                              class="form-control"
+                              value=""
+                              placeholder="" />
+                            <label for="modalEditUserFirstName">DNI</label>
+                          </div>
+                        </div>
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input 
@@ -93,6 +104,7 @@
                             <label for="modalEditUserFirstName">Nombre</label>
                           </div>
                         </div>
+
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input
@@ -112,48 +124,17 @@
                                 class="select2 form-select select2-hidden-accessible" multiple="" 
                                 data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true">
                               
-                                <option value="sub12" data-select2-id="140">Sub 12</option>
-                                <option value="sub13" data-select2-id="141">Sub 13</option>
-                                <option value="sub14" data-select2-id="142">Sub 14</option>
-                                <option value="sub16" data-select2-id="143">Sub 16</option>
-                                <option value="sub18" data-select2-id="144">Sub 18</option>
-                                <option value="sub21" data-select2-id="145">Sub 21</option>
-                                <option value="primera" data-select2-id="146">Primera</option>
+                                  <option value=""></option>
+                                  {% for cat in categorias %}
+                                      <option value="{{ cat.value }}">{{ cat.text }}</option>
+                                  {% endfor %}
                             </select>
                             </div>
                             <label for="select2Multiple">Categorias</label>
                           </div>
-                        </div>
-
-                       <!-- <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <select
-                              id="modalEditUserCountry"
-                              name="modalEditUserCountry"
-                              class="select2 form-select"
-                              data-allow-clear="true">
-                              <option value="">Selecciona Categoria</option>
-                              <option value="sub12">Sub 12</option>
-                              <option value="sub13">Sub 13</option>
-                              <option value="sub14">Sub 14</option>
-                              <option value="sub16">Sub 16</option>
-                              <option value="sub18">Sub 18</option>
-                              <option value="sub21">Sub 21</option>
-                              <option value="primera">Primera</option>  
-                            </select>
-                            <label for="modalEditUserCountry">Categoría</label>
-                          </div>
-                        </div>--> 
-                        
-                        
-                          <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline mb-6">
-                              <input class="form-control" type="date" id="html5-date-input">
-                              <label for="html5-date-input">Fecha Ingreso</label>
-                            </div>
-                             </div>                       
+                        </div>                       
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                          <button type="submit" class="btn btn-primary">Crear</button>
+                          <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
                           <button
                             type="reset"
                             class="btn btn-outline-secondary"
@@ -182,21 +163,22 @@
   let tabla = null;
 
   function filtrar() {
-    const categoria = $('#categoria').val();
+    const categoriaRaw = $('#categoria').val();
+    const categoria = categoriaRaw ? categoriaRaw.toUpperCase() : '';
     console.log("Categoría seleccionada:", categoria);
     if (tabla) {
       tabla.ajax.url(`/entrenador/filtrar?categoria=${categoria}`).load();
     } else {
-      tabla = $('#tablaDeportistas').DataTable({
+      tabla = $('#tablaEntrenador').DataTable({
         ajax: {
           url: `/entrenador/filtrar?categoria=${categoria}`,
           dataSrc: 'data'
         },
         columns: [
+        { data: 'dni' },
         { data: 'nombre' },
         { data: 'apellido' },
         { data: 'categoria' },
-        { data: 'fecha_ingreso' },
         {
           data: null,
           orderable: false,
@@ -209,10 +191,10 @@
                 </button>
                 <div class="dropdown-menu">
                   <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
-                    <i class="ri-pencil-line me-1"></i> Edit
+                    <i class="ri-pencil-line me-1"></i> Editar
                   </a>
                   <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
-                    <i class="ri-delete-bin-7-line me-1"></i> Delete
+                    <i class="ri-delete-bin-7-line me-1"></i> Eliminar
                   </a>
                 </div>
               </div>
@@ -228,11 +210,11 @@
           // Reaplicá estilos de tu template si hace falta
         },
         initComplete: function () {
-          $('#tablaDeportistas')
+          $('#tablaEntrenador')
             .removeClass('dataTable no-footer stripe hover')
             .addClass('table');
         }
-      });
+      }); 
     }
   }
     
@@ -242,21 +224,40 @@
     
   });
 
-    function editarFila(rowIndex) {
-    var tabla = $('#tabla-entrenadores').DataTable();
-    var data = tabla.row(rowIndex).data();
-    alert('Editar a ' + data[0] + ' ' + data[1]);
-    // Abrí modal, redirigí, etc.
-    }
+            function editarFila(rowIndex) {
+            const tabla = $('#tablaEntrenador').DataTable();
+            const data = tabla.row(rowIndex).data();
+
+            // Llenar inputs
+            $('#modalEditUserDNI').val(data.dni);
+            $('#modalEditUserFirstName').val(data.nombre);
+            $('#modalEditUserLastName').val(data.apellido);
+
+            $('#select2Multiple').val([data.idCategoria]).trigger('change');
+
+             $('#submitBtn').text('Actualizar');
+             $('#tituloAdd').text('Editar Entrenador');
+
+            // Mostrar el modal
+            $('#addUser').modal('show');
+          }
+
 
     function eliminarFila(rowIndex) {
-      var tabla = $('#tabla-entrenadores').DataTable();
+      var tabla = $('#tablaEntrenador').DataTable();
       var data = tabla.row(rowIndex).data();
       if (confirm('Eliminar a ' + data[0] + ' ' + data[1] + '?')) {
         // Lógica para eliminar (AJAX, etc.)
         alert('Eliminado: ' + data[0]);
       }
     }
+
+        $('#addUser').on('hidden.bs.modal', function () {
+        $('#submitBtn').text('Crear');
+        $('#tituloAdd').text('Agregar Entrenador');
+        $('#editEntrenadorForm')[0].reset();
+        $('#select2Multiple').val(null).trigger('change');
+      });
 
 
 </script>
