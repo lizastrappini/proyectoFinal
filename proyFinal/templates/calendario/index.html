@@ -37,58 +37,40 @@
                           class="form-check-input select-all"
                           type="checkbox"
                           id="selectAll"
-                          data-value="all"
+                          data-value="0"
                           checked />
                         <label class="form-check-label" for="selectAll">Todos</label>
                       </div>
-
+                      
                       <div class="app-calendar-events-filter text-heading">
                         <div class="form-check form-check-danger mb-5 ms-3">
-                          <input
-                            class="form-check-input input-filter"
-                            type="checkbox"
-                            id="select-partido"
-                            data-value="partido"
-                            checked />
-                          <label class="form-check-label" for="select-partido">Partido</label>
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-vacaciones" value="{{ TipoEventoEnum.Vacaciones.value }}" checked />
+                          <label class="form-check-label" for="select-personal">Vacaciones</label>
                         </div>
                         <div class="form-check mb-5 ms-3">
-                          <input
-                            class="form-check-input input-filter"
-                            type="checkbox"
-                            id="select-evento"
-                            data-value="evento"
-                            checked />
-                          <label class="form-check-label" for="select-evento">Evento</label>
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-entrenamiento" value="{{ TipoEventoEnum.Entrenamiento.value }}" checked />
+                          <label class="form-check-label" for="select-business">Entrenamiento</label>
                         </div>
                         <div class="form-check form-check-warning mb-5 ms-3">
-                          <input
-                            class="form-check-input input-filter"
-                            type="checkbox"
-                            id="select-Entrenamiento"
-                            data-value="Entrenamiento"
-                            checked />
-                          <label class="form-check-label" for="select-Entrenamiento">Entrenamiento</label>
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-suspension" value="{{ TipoEventoEnum.SuspensionEntrenamiento.value }}" checked />
+                          <label class="form-check-label" for="select-family">Suspension Entrenamiento</label>
                         </div>
                         <div class="form-check form-check-success mb-5 ms-3">
-                          <input
-                            class="form-check-input input-filter"
-                            type="checkbox"
-                            id="select-holiday"
-                            data-value="holiday"
-                            checked />
-                          <label class="form-check-label" for="select-holiday">Holiday</label>
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-partido" value="{{ TipoEventoEnum.Partido.value }}" checked />
+                          <label class="form-check-label" for="select-holiday">Partido</label>
                         </div>
-                        <div class="form-check form-check-info ms-3">
-                          <input
-                            class="form-check-input input-filter"
-                            type="checkbox"
-                            id="select-etc"
-                            data-value="etc"
-                            checked />
-                          <label class="form-check-label" for="select-etc">ETC</label>
+                        <div class="form-check form-check-info mb-5 ms-3">
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-torneo" value="{{ TipoEventoEnum.Torneo.value }}" checked />
+                          <label class="form-check-label" for="select-etc">Torneo</label>
+                        </div>
+                        <div class="form-check mb-5 ms-3 form-check-recaudacion">
+                          <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" checked />
+                          <label class="form-check-label" for="select-recaudacion">Recaudacion</label>
                         </div>
                       </div>
+
+
+
                     </div>
                   </div>
                   <!-- /Calendar Sidebar -->
@@ -120,32 +102,34 @@
                       {% endif %}
                       {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
                       <div class="offcanvas-body">
-                        <form class="event-form pt-0" id="eventForm" onsubmit="return false">
+                        <form class="event-form pt-0" id="eventForm" action="/nuevoEvento" method="POST">
                           <div class="form-floating form-floating-outline mb-5">
                             <input
                               type="text"
                               class="form-control"
-                              id="eventTitle"
-                              name="eventTitle"
+                              id="titulo"
+                              name="titulo"
                               placeholder="Titulo Evento" />
-                            <label for="eventTitle">Titulo</label>
+                            <label for="titulo">Titulo</label>
                           </div>
                           <div class="form-floating form-floating-outline mb-5">
-                            <select class="select2 select-event-label form-select" id="eventLabel" name="eventLabel">
-                              <option data-label="primary" value="Todos" selected>Partido</option>
-                              <option data-label="danger" value="Personal">Evento</option>
-                              <option data-label="warning" value="Family">Entrenamiento</option>
-                              <option data-label="success" value="Holiday">Holiday</option>
-                              <option data-label="info" value="ETC">ETC</option>
+                            <select id="tipoEvento" 
+                                name="tipoEvento"
+                                class="select2 form-select select2-hidden-accessible" multiple="" 
+                                data-select2-id="select2" tabindex="-1" aria-hidden="true">
+                                  <option value=""></option>
+                                  {% for evento in tipoeventos %}
+                                      <option value="{{ evento.value }}">{{ evento.text }}</option>
+                                  {% endfor %}
                             </select>
-                            <label for="eventLabel">Tipo</label>
+                            <label for="tipoEvento">Tipo</label>
                           </div>
                           <div class="form-floating form-floating-outline mb-5">
                             <input
                               type="text"
                               class="form-control"
                               id="eventStartDate"
-                              name="eventStartDate"
+                              name="fechaInicio"
                               placeholder="Fecha Inicio" />
                             <label for="eventStartDate">Fecha Inicio</label>
                           </div>
@@ -154,52 +138,39 @@
                               type="text"
                               class="form-control"
                               id="eventEndDate"
-                              name="eventEndDate"
+                              name="fechaFin"
                               placeholder="Fecha Fin" />
                             <label for="eventEndDate">Fecha Fin</label>
                           </div>
                           <div class="mb-5">
                             <div class="form-check form-switch">
-                              <input type="checkbox" class="form-check-input allDay-switch" id="allDaySwitch" />
-                              <label class="form-check-label" for="allDaySwitch">Todo el día</label>
+                              <input type="checkbox" class="form-check-input allDay-switch" id="todoElDia" name="todoElDia" />
+                              <label class="form-check-label" for="todoElDia">Todo el día</label>
                             </div>
                           </div>
                           <div class="form-floating form-floating-outline mb-5">
-                            <input
-                              type="url"
-                              class="form-control"
-                              id="eventURL"
-                              name="eventURL"
-                              placeholder="https://www.google.com" />
-                            <label for="eventURL">Event URL</label>
-                          </div> 
-                          <div class="form-floating form-floating-outline mb-5 select2-primary">
-                            <select
-                              class="select2 select-event-guests form-select"
-                              id="eventGuests"
-                              name="eventGuests"
-                              multiple>
-                              <option data-avatar="1.png" value="Jane Foster">Jane Foster</option>
-                              <option data-avatar="3.png" value="Donna Frank">Donna Frank</option>
-                              <option data-avatar="5.png" value="Gabrielle Robertson">Gabrielle Robertson</option>
-                              <option data-avatar="7.png" value="Lori Spears">Lori Spears</option>
-                              <option data-avatar="9.png" value="Sandy Vega">Sandy Vega</option>
-                              <option data-avatar="11.png" value="Cheryl May">Cheryl May</option>
+                            <select id="categoria" name="categoria"
+                                    class="select2 form-select"
+                                    multiple>
+                              <option value=""></option>
+                              {% for categoria in categorias %}
+                                  <option value="{{ categoria.value }}">{{ categoria.text }}</option>
+                              {% endfor %}
                             </select>
-                            <label for="eventGuests">Add Guests</label>
+                            <label for="categoria">Categoría</label>
                           </div>
                           <div class="form-floating form-floating-outline mb-5">
                             <input
                               type="text"
                               class="form-control"
-                              id="eventLocation"
-                              name="eventLocation"
+                              id="localidad"
+                              name="localidad"
                               placeholder="Localidad" />
-                            <label for="eventLocation">Localidad</label>
+                            <label for="localidad">Localidad</label>
                           </div>
                           <div class="form-floating form-floating-outline mb-5">
-                            <textarea class="form-control" name="eventDescription" id="eventDescription"></textarea>
-                            <label for="eventDescription">Descripción</label>
+                            <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+                            <label for="descripcion">Descripción</label>
                           </div>
                           <div class="mb-5 d-flex justify-content-sm-between justify-content-start my-6 gap-2">
                             <div class="d-flex">

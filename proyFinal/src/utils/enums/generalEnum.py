@@ -34,3 +34,12 @@ def obtenerNombreRol(valor_int):
         return RolEnum(valor_int).name
     except ValueError:
         return None 
+    
+
+class TipoEventoEnum(enum.IntEnum):
+    Entrenamiento = 1
+    Partido = 2
+    Vacaciones = 3
+    SuspensionEntrenamiento = 4
+    Torneo = 5
+    Recaudacion = 6

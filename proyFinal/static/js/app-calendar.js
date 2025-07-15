@@ -23,96 +23,40 @@ document.addEventListener('DOMContentLoaded', function () {
       appCalendarSidebar = document.querySelector('.app-calendar-sidebar'),
       addEventSidebar = document.getElementById('addEventSidebar'),
       appOverlay = document.querySelector('.app-overlay'),
-      calendarsColor = {
-        Business: 'primary',
-        Holiday: 'success',
-        Personal: 'danger',
-        Family: 'warning',
-        ETC: 'info'
-      },
+       tipoEventoColor = {
+            1: 'primary',
+            2: 'success',
+            3: 'danger',
+            4: 'warning',
+            5: 'info',
+            6: 'recaudacion',
+          },
       offcanvasTitle = document.querySelector('.offcanvas-title'),
       btnToggleSidebar = document.querySelector('.btn-toggle-sidebar'),
       btnSubmit = document.querySelector('#addEventBtn'),
       btnDeleteEvent = document.querySelector('.btn-delete-event'),
       btnCancel = document.querySelector('.btn-cancel'),
-      eventTitle = document.querySelector('#eventTitle'),
+      eventTitle = document.querySelector('#titulo'),
+      tipoEvento = document.querySelector('#tipoEvento'),
+      categoria = document.querySelector('#categoria'),
+      localidad = document.querySelector('#localidad'),
       eventStartDate = document.querySelector('#eventStartDate'),
       eventEndDate = document.querySelector('#eventEndDate'),
-      eventUrl = document.querySelector('#eventURL'),
-      eventLabel = $('#eventLabel'), // ! Using jquery vars due to select2 jQuery dependency
-      eventGuests = $('#eventGuests'), // ! Using jquery vars due to select2 jQuery dependency
+    
       eventLocation = document.querySelector('#eventLocation'),
-      eventDescription = document.querySelector('#eventDescription'),
-      allDaySwitch = document.querySelector('.allDay-switch'),
+      eventDescription = document.querySelector('#descripcion'),
+      allDaySwitch = document.querySelector('#todoElDia'),
       selectAll = document.querySelector('.select-all'),
       filterInput = [].slice.call(document.querySelectorAll('.input-filter')),
       inlineCalendar = document.querySelector('.inline-calendar');
 
     let eventToUpdate,
-      currentEvents = events, // Assign app-calendar-events.js file events (assume events from API) to currentEvents (browser store/object) to manage and update calender events
+      //currentEvents = events, // Assign app-calendar-events.js file events (assume events from API) to currentEvents (browser store/object) to manage and update calender events
       isFormValid = false,
       inlineCalInstance;
 
     // Init event Offcanvas
     const bsAddEventSidebar = new bootstrap.Offcanvas(addEventSidebar);
-
-    //! TODO: Update Event label and guest code to JS once select removes jQuery dependency
-    // Event Label (select2)
-    if (eventLabel.length) {
-      function renderBadges(option) {
-        if (!option.id) {
-          return option.text;
-        }
-        var $badge =
-          "<span class='badge badge-dot bg-" + $(option.element).data('label') + " me-2'> " + '</span>' + option.text;
-
-        return $badge;
-      }
-      select2Focus(eventLabel);
-      eventLabel.wrap('<div class="position-relative"></div>').select2({
-        placeholder: 'Select value',
-        dropdownParent: eventLabel.parent(),
-        templateResult: renderBadges,
-        templateSelection: renderBadges,
-        minimumResultsForSearch: -1,
-        escapeMarkup: function (es) {
-          return es;
-        }
-      });
-    }
-
-    // Event Guests (select2)
-    if (eventGuests.length) {
-      function renderGuestAvatar(option) {
-        if (!option.id) {
-          return option.text;
-        }
-        var $avatar =
-          "<div class='d-flex flex-wrap align-items-center'>" +
-          "<div class='avatar avatar-xs me-2'>" +
-          "<img src='" +
-          assetsPath +
-          'img/avatars/' +
-          $(option.element).data('avatar') +
-          "' alt='avatar' class='rounded-circle' />" +
-          '</div>' +
-          option.text +
-          '</div>';
-
-        return $avatar;
-      }
-      select2Focus(eventGuests);
-      eventGuests.wrap('<div class="position-relative"></div>').select2({
-        placeholder: 'Select value',
-        dropdownParent: eventGuests.parent(),
-        closeOnSelect: false,
-        templateResult: renderGuestAvatar,
-        templateSelection: renderGuestAvatar,
-        escapeMarkup: function (es) {
-          return es;
-        }
-      });
-    }
 
     // Event start (flatpicker)
     if (eventStartDate) {
@@ -171,13 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
       eventToUpdate.end !== null
         ? end.setDate(eventToUpdate.end, true, 'Y-m-d')
         : end.setDate(eventToUpdate.start, true, 'Y-m-d');
-      eventLabel.val(eventToUpdate.extendedProps.calendar).trigger('change');
-      eventToUpdate.extendedProps.location !== undefined
-        ? (eventLocation.value = eventToUpdate.extendedProps.location)
-        : null;
-      eventToUpdate.extendedProps.guests !== undefined
-        ? eventGuests.val(eventToUpdate.extendedProps.guests).trigger('change')
-        : null;
       eventToUpdate.extendedProps.description !== undefined
         ? (eventDescription.value = eventToUpdate.extendedProps.description)
         : null;
@@ -260,7 +197,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // ------------------------------------------------
     let calendar = new Calendar(calendarEl, {
       initialView: 'dayGridMonth',
-      events: fetchEvents,
+       displayEventTime: false,
+       events: {
+          url: '/eventos',
+          method: 'GET',
+          extraParams: function() {
+            const checkedBoxes = document.querySelectorAll('input[name="tipoEventos[]"]:checked');
+            const params = {};
+            params['tipoEventos[]'] = [];
+            checkedBoxes.forEach(cb => {
+              params['tipoEventos[]'].push(cb.value);
+            });
+            return params;
+          }
+        },
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
       editable: true,
       dragScroll: true,
@@ -279,9 +229,9 @@ document.addEventListener('DOMContentLoaded', function () {
       initialDate: new Date(),
       navLinks: true, // can click day/week names to navigate views
       eventClassNames: function ({ event: calendarEvent }) {
-        const colorName = calendarsColor[calendarEvent._def.extendedProps.calendar];
-        // Background Color
-        return ['fc-event-' + colorName];
+        const tipo = calendarEvent.extendedProps.calendar; // ← ahora es un número
+        const colorClass = tipoEventoColor[tipo];
+        return colorClass ? ['fc-event-' + colorClass] : [];
       },
       dateClick: function (info) {
         let date = moment(info.date).format('YYYY-MM-DD');
@@ -343,16 +293,13 @@ document.addEventListener('DOMContentLoaded', function () {
       plugins: {
         trigger: new FormValidation.plugins.Trigger(),
         bootstrap5: new FormValidation.plugins.Bootstrap5({
-          // Use this for enabling/changing valid/invalid class
           eleValidClass: '',
           rowSelector: function (field, ele) {
-            // field is the field name & ele is the field element
             return '.mb-5';
           }
         }),
         submitButton: new FormValidation.plugins.SubmitButton(),
-        // Submit the form when all fields are valid
-        // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        defaultSubmit: new FormValidation.plugins.DefaultSubmit(), // ✅ Esto envía el form
         autoFocus: new FormValidation.plugins.AutoFocus()
       }
     })
@@ -463,17 +410,16 @@ document.addEventListener('DOMContentLoaded', function () {
             end: eventEndDate.value,
             startStr: eventStartDate.value,
             endStr: eventEndDate.value,
+            categoria: categoria.value,
+            tipoEvento: tipoEvento.value,
+            localidad: localidad.value,
             display: 'block',
             extendedProps: {
-              location: eventLocation.value,
-              guests: eventGuests.val(),
-              calendar: eventLabel.val(),
+              calendar: tipoEvento.value,
               description: eventDescription.value
             }
           };
-          if (eventUrl.value) {
-            newEvent.url = eventUrl.value;
-          }
+          
           if (allDaySwitch.checked) {
             newEvent.allDay = true;
           }
@@ -489,11 +435,11 @@ document.addEventListener('DOMContentLoaded', function () {
             title: eventTitle.value,
             start: eventStartDate.value,
             end: eventEndDate.value,
-            url: eventUrl.value,
+            categoria: categoria.value,
+            tipoEvento: tipoEvento.value,
+            localidad: localidad.value,
             extendedProps: {
-              location: eventLocation.value,
-              guests: eventGuests.val(),
-              calendar: eventLabel.val(),
+              calendar: tipoEvento.value,
               description: eventDescription.value
             },
             display: 'block',
@@ -517,12 +463,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // ------------------------------------------------
     function resetValues() {
       eventEndDate.value = '';
-      eventUrl.value = '';
       eventStartDate.value = '';
       eventTitle.value = '';
-      eventLocation.value = '';
       allDaySwitch.checked = false;
-      eventGuests.val('').trigger('change');
       eventDescription.value = '';
     }
 
@@ -576,4 +519,32 @@ document.addEventListener('DOMContentLoaded', function () {
       appOverlay.classList.remove('show');
     });
   })();
+});
+
+
+document.getElementById('eventForm').addEventListener('submit', function (e) {
+  e.preventDefault(); // evitar que se envíe el form de forma tradicional
+
+  const formData = new FormData(this);
+
+  document.querySelectorAll('input[name="tipoEventos[]"]:checked').forEach(input => {
+    formData.append('tipoEventos[]', input.value);
+    });
+    for (let pair of formData.entries()) {
+      console.log(pair[0]+ ': ' + pair[1]);
+    }
+  fetch('/calendario/nuevoEvento', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      // Ocultás el modal y recargás eventos
+      calendar.refetchEvents();
+      // Ocultar el sidebar si querés
+      bsAddEventSidebar.hide();
+    } else {
+      alert('Error al guardar el evento');
+    }
+  });
 });
