@@ -7,6 +7,7 @@ from src.routes.calendarioRoutes import calendario_bp
 from src.routes.pagoRoutes import pago_bp
 from src.routes.inicioRoutes import inicio_bp
 from src.routes.entrenadorRoutes import entrenador_bp
+from src.routes.estadisticasRoutes import estadisticas_bp
 import src.utils.enums
 import inspect
 import enum
@@ -28,6 +29,7 @@ app.register_blueprint(calendario_bp)
 app.register_blueprint(pago_bp)
 app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
+app.register_blueprint(estadisticas_bp)
 
 #para exportar los enums a cualquier template
 @app.context_processor
