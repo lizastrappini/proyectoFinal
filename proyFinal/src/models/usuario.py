@@ -10,7 +10,7 @@ class Usuario(UserMixin, db.Model):
     Email = db.Column(db.String(50))
     Password = db.Column(db.String(50))
     NombreUsuario = db.Column(db.String(50))
-    IdCategoria = db.Column(db.Integer)
+    Categoria = db.Column(db.String(50), nullable=True)
     IdLocalidad = db.Column(db.Integer)
     IdEstado = db.Column(db.Integer)
     Direccion = db.Column(db.String(50))

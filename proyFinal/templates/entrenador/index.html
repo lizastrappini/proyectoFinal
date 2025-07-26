@@ -13,42 +13,34 @@
         
         <div class="d-flex row mb-5 gx-5">
           <div class="col d-flex justify-content-end">
-            <button class="btn btn-secondary btn-label-primary btn-lg waves-effect waves-light" onclick="filtrar()">
-              Filtrar
+            <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
+              Limpiar 
             </button>
           </div>
           <div class="col-12 col-md-3">
-            <select id="categoria" class="select2 form-select" data-placeholder="Categoria">
+            <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
               <option value=""></option>
               {% for cat in categorias %}
                   <option value="{{ cat.value }}">{{ cat.text }}</option>
               {% endfor %}
             </select>
           </div>
-          
+          <div class="col-12 col-md-3">
+            <select id="entrenadorFiltro" class="select2 form-select" data-placeholder="Entrenador">
+              <option value=""></option>
+              {% for entrenador in entrenadores %}
+                  <option value="{{ entrenador.dni }}">{{ entrenador.nombre }} {{ entrenador.apellido }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
       
         <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-          <div class="d-flex justify-content-between align-items-center px-3 mt-5">
-            <div class="d-flex align-items-center w-100">
-              <i class="ri-menu-line ri-24px cursor-pointer d-block d-lg-none me-4 mb-5" data-bs-toggle="search"></i>
-              <div class="mb-4 w-100">
-                <div class="input-group input-group-merge shadow-none">
-                  <span class="input-group-text border-6 ps-1 py-1" id="players-search">
-                    <i class="ri-search-line ri-22px"></i>
-                  </span>
-                  <input type="text" class="form-control search-input border-6 py-1" placeholder="Buscar Entrenador" aria-label="Buscar deportistas" aria-describedby="players-search">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" type="button">
+          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
             <span><i class="ri-external-link-line me-sm-1"></i> 
               <span class="d-none d-sm-inline-block">Exportar</span>
             </span>
-          </button>
-
+          </button> 
           <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
             Agregar
           </a>
@@ -59,7 +51,9 @@
               <tr>
                 <th>DNI</th>
                 <th>Nombre</th>
-                <th>Apellido</th> 
+                <th>Apellido</th>
+                <th>Email</th> 
+                <th>Teléfono</th> 
                 <th>Categorías</th>                        
                 <th>Acciones</th>
               </tr>
@@ -68,8 +62,6 @@
         </div>
               <!-- Modal -->
               <!-- Agregar User Modal -->
-
-              
               <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-simple modal-edit-user">
                   <div class="modal-content">
@@ -79,16 +71,18 @@
                         <h4 class="mb-2" id="tituloAdd">Agregar Entrenador</h4>
                         
                       </div>
-                      <form id="editEntrenadorForm" class="row g-5" action="{{ url_for('entrenador.add_entrenador') }}" method="post">
+                      <!-- action="{{ url_for('entrenador.agregar_entrenador') }}" -->
+                      <form id="editEntrenadorForm" class="row g-5" method="POST" action="{{ url_for('entrenador.agregar_entrenador') }}">
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input 
                               type="int"
-                              id="modalEditUserDNI"
-                              name="modalEditUserDNI"
+                              id="dni"
+                              name="dni"
                               class="form-control"
                               value=""
-                              placeholder="" />
+                              placeholder=""
+                              required />
                             <label for="modalEditUserFirstName">DNI</label>
                           </div>
                         </div>
@@ -96,11 +90,12 @@
                           <div class="form-floating form-floating-outline">
                             <input 
                               type="text"
-                              id="modalEditUserFirstName"
-                              name="modalEditUserFirstName"
+                              id="nombre"
+                              name="nombre"
                               class="form-control"
                               value=""
-                              placeholder="" />
+                              placeholder=""
+                              required />
                             <label for="modalEditUserFirstName">Nombre</label>
                           </div>
                         </div>
@@ -109,28 +104,55 @@
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
-                              id="modalEditUserLastName"
-                              name="modalEditUserLastName"
+                              id="apellido"
+                              name="apellido"
                               class="form-control"
                               value=""
-                              placeholder="" />
+                              placeholder=""
+                              required />
                             <label for="modalEditUserLastName">Apellido</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              type="text"
+                              id="email"
+                              name="email"
+                              class="form-control"
+                              value=""
+                              placeholder=""
+                              required />
+                            <label for="modalEditUserLastName">Email</label>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline">
+                            <input
+                              type="text"
+                              id="telefono"
+                              name="telefono"
+                              class="form-control"
+                              value=""
+                              placeholder="" 
+                              required/>
+                            <label for="modalEditUserLastName">Teléfono</label>
                           </div>
                         </div>
                     <div class="col-12 col-md-6">
                         <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="137">
                             <div class="position-relative" data-select2-id="136">
-                                <select id="select2Multiple" 
-                                class="select2 form-select select2-hidden-accessible" multiple="" 
-                                data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true">
+                                <select id="categoria" name="categoria"  
+                                class="select2 form-select select2-hidden-accessible" 
+                                data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true" multiple required>
                               
                                   <option value=""></option>
-                                  {% for cat in categorias %}
-                                      <option value="{{ cat.value }}">{{ cat.text }}</option>
+                                  {% for categoria in categorias %}
+                                      <option value="{{ categoria.text }}">{{ categoria.text }}</option>
                                   {% endfor %}
                             </select>
                             </div>
-                            <label for="select2Multiple">Categorias</label>
+                            <label for="categoria">Categorias</label>
                           </div>
                         </div>                       
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
@@ -163,21 +185,26 @@
   let tabla = null;
 
   function filtrar() {
-    const categoriaRaw = $('#categoria').val();
-    const categoria = categoriaRaw ? categoriaRaw.toUpperCase() : '';
-    console.log("Categoría seleccionada:", categoria);
+    const categoria = $('#categoriaFiltro').val();
+    const dni = $('#entrenadorFiltro').val(); 
+    console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
+    
+    const url = `/entrenador/filtrar?categoria=${categoria}&dni=${dni}`;
+
     if (tabla) {
-      tabla.ajax.url(`/entrenador/filtrar?categoria=${categoria}`).load();
+      tabla.ajax.url(url).load();
     } else {
       tabla = $('#tablaEntrenador').DataTable({
         ajax: {
-          url: `/entrenador/filtrar?categoria=${categoria}`,
+          url: url,
           dataSrc: 'data'
         },
         columns: [
         { data: 'dni' },
         { data: 'nombre' },
         { data: 'apellido' },
+        { data: 'email' },
+        { data: 'telefono' },
         { data: 'categoria' },
         {
           data: null,
@@ -206,9 +233,19 @@
         info: false,
         searching: false,
         ordering: true,
-        drawCallback: function () {
-          // Reaplicá estilos de tu template si hace falta
-        },
+        dom: 'frtip',  // <-- importante para mostrar botones
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text: 'Exportar a Excel',
+            title: 'Entrenadores',
+            className: 'buttons-excel',
+            exportOptions: {
+              columns: ':not(:last-child)' // Excluir columna acciones
+            }
+          }
+        ],
+        
         initComplete: function () {
           $('#tablaEntrenador')
             .removeClass('dataTable no-footer stripe hover')
@@ -218,48 +255,161 @@
     }
   }
     
-  $(document).ready(function() {
-    filtrar();
+ $(document).ready(function () {
+  filtrar(); // carga inicial
 
-    
+  $('#categoriaFiltro, #entrenadorFiltro').on('change', function () {
+    filtrar(); // recarga con nuevos filtros
+    });
+    $('.btn-export').on('click', function() {
+   tabla.button('.buttons-excel').trigger();
+    });
   });
+
 
             function editarFila(rowIndex) {
             const tabla = $('#tablaEntrenador').DataTable();
             const data = tabla.row(rowIndex).data();
 
             // Llenar inputs
-            $('#modalEditUserDNI').val(data.dni);
-            $('#modalEditUserFirstName').val(data.nombre);
-            $('#modalEditUserLastName').val(data.apellido);
+            $('#dni').val(data.dni);
+            $('#nombre').val(data.nombre);
+            $('#apellido').val(data.apellido);
+            $('#email').val(data.email);
+            $('#telefono').val(data.telefono);
+            $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
 
-            $('#select2Multiple').val([data.idCategoria]).trigger('change');
-
-             $('#submitBtn').text('Actualizar');
-             $('#tituloAdd').text('Editar Entrenador');
+            // Cambiar modo y texto del botón
+            $('#editEntrenadorForm').attr('action', `/entrenador/editar/${data.dni}`);  // O data.id si tenés otro ID
+            $('#submitBtn').text('Actualizar');
+            $('#tituloAdd').text('Editar Entrenador');
 
             // Mostrar el modal
             $('#addUser').modal('show');
           }
+            $('#addUser').on('hidden.bs.modal', function () {
+            $('#editEntrenadorForm')[0].reset();
+            $('#categoria').val(null).trigger('change');
+            $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
+            $('#submitBtn').text('Crear');
+            $('#tituloAdd').text('Agregar Entrenador');
+          });
+
+          $('#editEntrenadorForm').on('submit', function(e) {
+              e.preventDefault(); // Evita el envío tradicional
+
+              const form = this;
+              const actionUrl = $(form).attr('action');
+              const formData = new FormData(form);
+
+              fetch(actionUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+              .then(async response => {
+                if (!response.ok) {
+                  const error = await response.json();
+                  throw new Error(error.message || 'Error al actualizar');
+                }
+                return response.json();
+              })
+              .then(data => {
+                Swal.fire({
+                  icon: 'success',
+                  title: data.message.includes('creado') ? 'Entrenador creado' : 'Entrenador actualizado',
+                  text: data.message,
+                  showConfirmButton: false,
+                  timer: 2000
+                });
+                $('#addUser').modal('hide');
+                $('#editEntrenadorForm')[0].reset();
+                $('#categoria').val(null).trigger('change');
+                $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
+                $('#submitBtn').text('Crear');
+                $('#tituloAdd').text('Agregar Entrenador');
+                if (tabla) tabla.ajax.reload();
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message
+                });
+              });
+            });
 
 
-    function eliminarFila(rowIndex) {
-      var tabla = $('#tablaEntrenador').DataTable();
-      var data = tabla.row(rowIndex).data();
-      if (confirm('Eliminar a ' + data[0] + ' ' + data[1] + '?')) {
-        // Lógica para eliminar (AJAX, etc.)
-        alert('Eliminado: ' + data[0]);
-      }
-    }
 
-        $('#addUser').on('hidden.bs.modal', function () {
-        $('#submitBtn').text('Crear');
-        $('#tituloAdd').text('Agregar Entrenador');
-        $('#editEntrenadorForm')[0].reset();
-        $('#select2Multiple').val(null).trigger('change');
-      });
+
+         function eliminarFila(rowIndex) {
+          const tabla = $('#tablaEntrenador').DataTable();
+          const data = tabla.row(rowIndex).data();
+
+          Swal.fire({
+            title: '¿Estás segura/o?',
+            text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              fetch(`/entrenador/eliminar/${data.dni}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+              .then(async response => {
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(errorData.message || 'Error desconocido');
+                }
+                return response.json();
+              })
+              .then(data => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Eliminado',
+                  text: data.message,
+                  showConfirmButton: false,
+                  timer: 2000
+                });
+                tabla.ajax.reload();
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message || 'Hubo un error al intentar eliminar el entrenador.'
+                });
+              });
+            }
+          });
+        }
+function limpiar() {
+  $('#categoriaFiltro').val('').trigger('change');
+  $('#entrenadorFiltro').val('').trigger('change');
+  filtrar(); // recargar la tabla sin filtros
+
+ 
+}
+
+
 
 
 </script>
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+<!-- DataTables y Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 {% endblock %}
 
