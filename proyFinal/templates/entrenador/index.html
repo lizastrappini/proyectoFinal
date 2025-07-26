@@ -54,7 +54,8 @@
                 <th>Apellido</th>
                 <th>Email</th> 
                 <th>Teléfono</th> 
-                <th>Categorías</th>                        
+                <th>Categorías</th> 
+                <th>Estado</th> 
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -69,9 +70,8 @@
                     <div class="modal-body p-0">
                       <div class="text-center mb-6">
                         <h4 class="mb-2" id="tituloAdd">Agregar Entrenador</h4>
-                        
                       </div>
-                      <!-- action="{{ url_for('entrenador.agregar_entrenador') }}" -->
+                      
                       <form id="editEntrenadorForm" class="row g-5" method="POST" action="{{ url_for('entrenador.agregar_entrenador') }}">
                         <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
@@ -154,7 +154,9 @@
                             </div>
                             <label for="categoria">Categorias</label>
                           </div>
-                        </div>                       
+                        </div>
+                        
+                        
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                           <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
                           <button
@@ -206,27 +208,34 @@
         { data: 'email' },
         { data: 'telefono' },
         { data: 'categoria' },
+        { data: 'estado' },
+    
         {
           data: null,
           orderable: false,
           searchable: false,
           render: function(data, type, row, meta) {
-            return `
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="ri-more-2-line"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
-                    <i class="ri-pencil-line me-1"></i> Editar
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
-                    <i class="ri-delete-bin-7-line me-1"></i> Eliminar
-                  </a>
-                </div>
+          const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
+          return `
+            <div class="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ri-more-2-line"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
+                  <i class="ri-pencil-line me-1"></i> Editar
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                  <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+                </a>
+                <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
+                  <i class="ri-refresh-line me-1"></i> ${accion}
+                </a>
               </div>
-            `;
-          }
+            </div>
+          `;
+        }
+
         }
         ],
         paging: false,
@@ -391,13 +400,50 @@
             }
           });
         }
-function limpiar() {
-  $('#categoriaFiltro').val('').trigger('change');
-  $('#entrenadorFiltro').val('').trigger('change');
-  filtrar(); // recargar la tabla sin filtros
+        function limpiar() {
+          $('#categoriaFiltro').val('').trigger('change');
+          $('#entrenadorFiltro').val('').trigger('change');
+          filtrar(); // recargar la tabla sin filtros
 
- 
-}
+        
+        }
+        $('#tablaEntrenador').on('click', '.cambiar-estado', function () {
+          const dni = $(this).data('dni');
+          const boton = $(this);
+           
+          fetch(`/entrenador/cambiarEstado/${dni}`, {
+              method: 'POST',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            })
+              .then(async response => {
+                if (!response.ok) {
+                  const error = await response.json();
+                  throw new Error(error.message || 'Error desconocido');
+                }
+                return response.json();
+              })
+              .then(data => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Estado actualizado',
+                  text: `Nuevo estado: ${data.nuevo_estado}`,
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+                tabla.ajax.reload(null, false);
+              })
+              .catch(err => {
+                console.error('Error:', err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error al cambiar estado',
+                  text: err.message || 'Ocurrió un error inesperado'
+                });
+              });    
+                    });
+
 
 
 

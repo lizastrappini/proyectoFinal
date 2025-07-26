@@ -10,11 +10,16 @@ from flask_mail import Message
 from src.utils.Mail import mail
 from datetime import datetime, timezone, timedelta
 from flask import render_template
+from werkzeug.security import check_password_hash
 
 def loginUser(email,password):
     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
     return usuario
-
+# def loginUser(email, password):
+#     usuario = Usuario.query.filter_by(Email=email).first()
+#     if usuario and check_password_hash(usuario.Password, password):
+#         return usuario
+#     return None
 
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
@@ -29,7 +34,7 @@ def miCuenta(id):
             'usuario': usuario.NombreUsuario,
             'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
             'localidad': generalEnum.LocalidadEnum(usuario.IdLocalidad).name,
-            'estado': generalEnum.EstadoEnum(usuario.IdEstado).name,
+            'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
             'direccion': usuario.Direccion,
             'telefono': usuario.Telefono,
             'rol': generalEnum.RolEnum(usuario.IdRol).name ,

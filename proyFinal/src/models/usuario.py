@@ -12,7 +12,7 @@ class Usuario(UserMixin, db.Model):
     NombreUsuario = db.Column(db.String(50))
     Categoria = db.Column(db.String(50), nullable=True)
     IdLocalidad = db.Column(db.Integer)
-    IdEstado = db.Column(db.Integer)
+    IdEstado = db.Column(db.String(50), nullable=True)
     Direccion = db.Column(db.String(50))
     Telefono = db.Column(db.String(50))
     IdRol = db.Column(db.Integer)

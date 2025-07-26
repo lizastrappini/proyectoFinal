@@ -1,3 +1,4 @@
+import secrets
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
 from src.controllers import entrenadorController
 from src.models.usuario import Usuario
@@ -56,14 +57,16 @@ def agregar_entrenador():
             raise ValueError("Categoría inválida o no seleccionada")
 
         categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
-
+        password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
+        
         nuevo_entrenador = Usuario(
             Dni= dni,
             Nombre=nombre,
             Apellido=apellido,
             Email= email,
             Categoria = categoria_id,
-            Password= generate_password_hash("12345678"),  # Contraseña default
+            Password =  password_plana,
+            # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"entrenador_{dni}",
             IdLocalidad= 1,
             IdEstado=1,
@@ -75,6 +78,7 @@ def agregar_entrenador():
             FechaVencimientoToken=None
         )
         entrenadorController.agregarEntrenador(nuevo_entrenador)
+        entrenadorController.enviar_mail_alta_entrenador(nuevo_entrenador, password_plana)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Entrenador creado exitosamente'}), 200
@@ -94,9 +98,6 @@ def agregar_entrenador():
 @entrenador_bp.route('/editar/<int:dni>', methods=['POST'])
 def editar_entrenador(dni):
     entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
-    # if not entrenador:
-    #     flash('Entrenador no encontrado', 'danger')
-    #     return redirect(url_for('entrenador.index'))
     if not entrenador:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': False, 'message': 'Entrenador no encontrado'}), 400
@@ -120,8 +121,6 @@ def editar_entrenador(dni):
     entrenador.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
 
     entrenadorController.actualizar_entrenador(entrenador)
-    # flash('Entrenador actualizado exitosamente', 'success')
-    # return redirect(url_for('entrenador.index'))
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({'success': True, 'message': 'Entrenador actualizado exitosamente'}), 200
@@ -129,17 +128,6 @@ def editar_entrenador(dni):
         flash('Entrenador actualizado exitosamente', 'success')
         return redirect(url_for('entrenador.index'))
 
-
-# @entrenador_bp.route('/eliminar/<int:dni>', methods=['POST'])
-# def eliminar_entrenador(dni):
-#     entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
-#     if not entrenador:
-#         flash('Entrenador no encontrado', 'danger')
-#         return redirect(url_for('entrenador.index'))
-    
-#     entrenadorController.borrar_entrenador(entrenador)
-#     flash('Entrenador eliminado exitosamente', 'success')
-#     return redirect(url_for('entrenador.index'))
 
 
 @entrenador_bp.route('/eliminar/<int:dni>', methods=['POST'])
@@ -159,3 +147,28 @@ def eliminar_entrenador(dni):
     else:
         flash('Entrenador eliminado exitosamente', 'success')
         return redirect(url_for('entrenador.index'))
+    
+    
+@entrenador_bp.route('/cambiarEstado/<int:dni>', methods=['POST'])
+def cambiar_estado(dni):
+    entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
+
+    if not entrenador:
+        return jsonify({'success': False, 'message': 'Entrenador no encontrado'}), 404
+
+    # Alternar estado
+    if int(entrenador.IdEstado) == generalEnum.EstadoEnum.Activo:
+        entrenador.IdEstado = generalEnum.EstadoEnum.Inactivo
+    else:
+        entrenador.IdEstado = generalEnum.EstadoEnum.Activo
+
+    entrenadorController.actualizar_entrenador(entrenador)
+
+    return jsonify({
+        'success': True,
+        'message': 'Estado actualizado',
+        'nuevo_estado': generalEnum.EstadoEnum(int(entrenador.IdEstado)).name,
+   
+    })
+
+

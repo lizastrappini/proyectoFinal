@@ -13,11 +13,11 @@ def login():
     email = request.form.get('email-username')  
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(email, password)
-    remember = True if request.form.get('remember') == 'on' else False  
+    # remember = True if request.form.get('remember') == 'on' else False  
     usuario = usuarioController.loginUser(email, password)
     
     if(usuario is not None):   
-        login_user(usuario, remember=remember) 
+        login_user(usuario) 
         flash("Bienvenido!", "success")
         return render_template('inicio/index.html', usuario=usuario)
     else:
