@@ -27,7 +27,7 @@ def miCuenta(id):
             'email': usuario.Email,
             'password': usuario.Password,
             'usuario': usuario.NombreUsuario,
-            'categoria': generalEnum.CategoriaEnum(usuario.IdCategoria).name,
+            'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
             'localidad': generalEnum.LocalidadEnum(usuario.IdLocalidad).name,
             'estado': generalEnum.EstadoEnum(usuario.IdEstado).name,
             'direccion': usuario.Direccion,
