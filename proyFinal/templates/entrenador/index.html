@@ -17,7 +17,7 @@
               Limpiar 
             </button>
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-2">
             <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
               <option value=""></option>
               {% for cat in categorias %}
@@ -25,7 +25,7 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-2">
             <select id="entrenadorFiltro" class="select2 form-select" data-placeholder="Entrenador">
               <option value=""></option>
               {% for entrenador in entrenadores %}
@@ -208,7 +208,13 @@
         { data: 'email' },
         { data: 'telefono' },
         { data: 'categoria' },
-        { data: 'estado' },
+        {
+            data: 'estado',
+            render: function (data, type, row) {
+              let badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
+              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
+            }
+          },
     
         {
           data: null,

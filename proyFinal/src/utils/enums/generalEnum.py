@@ -27,6 +27,14 @@ class CategoriaEnum(enum.IntEnum):
     Sub18 = 5
     Sub21 = 6
     Primera = 7
+    
+class DivisionEnum(enum.IntEnum):
+    A = 1
+    B= 2
+    
+class RamaEnum(enum.IntEnum):
+    Femenino = 1
+    Masculino= 2
 
 
 def obtenerNombreRol(valor_int):
