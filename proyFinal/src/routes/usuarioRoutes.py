@@ -59,11 +59,6 @@ def editUsuario():
         return render_template('usuario/index.html', error='Usuario o contraseña incorrectos')
 
 
-# @usuario_bp.route('/deportistas')
-# def deportistas():
-#     return render_template('deportista/index.html')
-
-
 @login_required
 @usuario_bp.route('/logout')
 def logout():

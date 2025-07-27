@@ -27,7 +27,7 @@ db.init_app(app)
 # Registra blueprints (rutas)
 app.register_blueprint(usuario_bp)
 app.register_blueprint(calendario_bp)
-app.register_blueprint(pago_bp)
+app.register_blueprint(pago_bp, url_prefix='/pago')
 app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')
@@ -58,8 +58,6 @@ def load_user(user_id):
 
 mail.init_app(app)
 
-    
 
-    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True, use_reloader=True)

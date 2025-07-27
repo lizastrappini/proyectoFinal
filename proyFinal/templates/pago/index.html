@@ -1,217 +1,520 @@
-{% extends "base.html" %}
+  {% extends "base.html" %}
 
-{% block content %}
+  {% block content %}
 
-<div class="content-wrapper">
-  <!-- Content -->
-  <div class="container-xxl flex-grow-1 container-p-y">
-    <!-- Basic Bootstrap Table -->
-    <div class="card">
-      <h2 class="card-header">Cuotas</h2>
-      <div class="card-body">
-        <div class="d-flex row mb-5 gx-5">
-          <div class="col d-flex justify-content-end">
-            <button class="btn btn-secondary btn-label-primary btn-lg waves-effect waves-light">
-              Filtrar
-            </button>
-          </div>
-          <div class="col">
-            <select id="categoria" class="select2 form-select" data-placeholder="Categoria">
-              <option value=""></option>
-              <option value="sub18">Sub 18</option>
-              <option value="sub21">Sub 21</option>
-              <option value="primera">Primera</option>
-            </select>
-          </div>
-          <div class="col">
-            <select id="estado" class="select2 form-select" data-placeholder="Estado">
-              <option value=""></option>
-              <option value="Pago">Pago</option>
-              <option value="No Pago">No Pago</option>
-            </select>
-          </div>
-        </div>
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <!-- Basic Bootstrap Table -->
+      <div class="card">
+        <h2 class="card-header">Cuotas Deportivas</h2>
+        <div class="card-body">
 
-        <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-          <div class="d-flex justify-content-between align-items-center px-3 mt-5">
-            <div class="d-flex align-items-center w-100">
-              <i class="ri-menu-line ri-24px cursor-pointer d-block d-lg-none me-4 mb-5" data-bs-toggle="search"></i>
-              <div class="mb-4 w-100">
-                <div class="input-group input-group-merge shadow-none">
-                  <span class="input-group-text border-6 ps-1 py-1" id="players-search">
-                    <i class="ri-search-line ri-22px"></i>
-                  </span>
-                  <input type="text" class="form-control search-input border-6 py-1" placeholder="Buscar Deportistas" aria-label="Buscar deportistas" aria-describedby="players-search">
-                </div>
-              </div>
+          
+          <div class="d-flex row mb-5 gx-5">
+            <div class="col d-flex justify-content-end">
+              <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
+                Limpiar 
+              </button>
+            </div>
+            <div class="col-12 col-md-2">
+              <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
+                <option value=""></option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.value }}">{{ cat.text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-2">
+              <select id="ramaFiltro" class="select2 form-select" data-placeholder="Rama" >
+                <option value=""></option>
+                {% for rama in ramas %}
+                    <option value="{{ rama.value }}">{{ rama.text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-2">
+              <select id="deportistaFiltro" class="select2 form-select" data-placeholder="Deportista">
+                <option value=""></option>
+                {% for deportista in deportistas %}
+                    <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
+                {% endfor %}
+              </select>
             </div>
           </div>
-
-          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" type="button">
-            <span><i class="ri-external-link-line me-sm-1"></i> 
-              <span class="d-none d-sm-inline-block">Exportar</span>
-            </span>
-          </button>
-
-          <a href="javascript:;" class="btn btn-primary" data-bs-target="#editUser" data-bs-toggle="modal">
-            Agregar Pago
-          </a>
-        </div>
-
-        <div class="table-responsive text-nowrap">
-          <table id="tablaPagos" class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Apellido</th> 
-                <th>Categoría</th> 
-                <th>Valor Cuota</th> 
-                <th>Periodo</th>                        
-                <th>Fecha Pago</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              <tr>
-                <td>Lara</td>
-                <td>Del Coro</td>
-                <td>Primera</td>
-                <td>$1500</td>
-                <td>Mayo 2025</td>
-                <td>10/05/2025</td>
-                <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>       
-              </tr>
-              <tr>
-                <td>Liza</td>
-                <td>Strappini</td>
-                <td>Primera</td>
-                <td>$1500</td>
-                <td>Mayo 2025</td>
-                <td>12/05/2025</td>
-                <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>       
-              </tr>
-              <tr>
-                <td>Mora</td>
-                <td>Kopech</td>
-                <td>Sub 21</td>
-                <td>$1200</td>
-                <td>Abril 2025</td>
-                <td>04/04/2025</td>
-                <td><span class="badge rounded-pill bg-label-warning me-1">Pendiente</span></td>       
-              </tr>
-              <tr>
-                <td>Candela</td>
-                <td>Poratti</td>
-                <td>Sub 12</td>
-                <td>$500</td>
-                <td>Junio 2025</td>
-                <td>06/05/2025</td>
-                <td><span class="badge rounded-pill bg-label-danger me-1">No Pago</span></td>       
-              </tr>
-            </tbody>
-          </table>
-        </div>
-<!-- Modal -->
-              <!-- Edit User Modal -->
-              <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-simple modal-edit-user">
-                  <div class="modal-content">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="modal-body p-0">
-                      <div class="text-center mb-6">
-                        <h4 class="mb-2">Agregar Pago Cuota</h4>
+        
+          <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
+            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
+              <span><i class="ri-external-link-line me-sm-1"></i> 
+                <span class="d-none d-sm-inline-block">Exportar</span>
+              </span>
+            </button> 
+            <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
+              Agregar Pago
+            </a>
+          </div>
+          <div class="table-responsive text-nowrap">
+            <table id="tablaDeportista" class="table">
+              <thead>
+                <tr>
+                  <th>DNI</th>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Email</th> 
+                  <th>Teléfono</th> 
+                  <th>Categorías</th> 
+                  <th>Division</th> 
+                  <th>Rama</th> 
+                  <th>Estado</th> 
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+                <!-- Modal -->
+                <!-- Agregar User Modal -->
+                <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                    <div class="modal-content">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-body p-0">
+                        <div class="text-center mb-6">
+                          <h4 class="mb-2" id="tituloAdd">Agregar Pago</h4>
+                        </div>
                         
-                      </div>
-                      <form id="editUserForm" class="row g-5" onsubmit="return false">
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input 
-                              type="text"
-                              id="modalEditUserFirstName"
-                              name="modalEditUserFirstName"
-                              class="form-control"
-                              value=""
-                              placeholder="" />
-                            <label for="modalEditUserFirstName">Nombre</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="modalEditUserLastName"
-                              name="modalEditUserLastName"
-                              class="form-control"
-                              value=""
-                              placeholder="" />
-                            <label for="modalEditUserLastName">Apellido</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <select
-                              id="modalEditUserCountry"
-                              name="modalEditUserCountry"
-                              class="select2 form-select"
-                              data-allow-clear="true">
-                              <option value="">Selecciona Categoria</option>
-                              <option value="sub12">Sub 12</option>
-                              <option value="sub13">Sub 13</option>
-                              <option value="sub14">Sub 14</option>
-                              <option value="sub16">Sub 16</option>
-                              <option value="sub18">Sub 18</option>
-                              <option value="sub21">Sub 21</option>
-                              <option value="primera">Primera</option>
-                              
-                            </select>
-                            <label for="modalEditUserCountry">Categoría</label>
-                          </div>
-                        </div> 
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="modalEditUserName"
-                              name="modalEditUserName"
-                              class="form-control"
-                              value=""
-                              placeholder="" />
-                            <label for="modalEditUserName">Valor</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline mb-6">
-                          <input class="form-control" type="month" id="html5-month-input">
-                          <label for="html5-month-input">Periodo</label>
-                           </div> 
-                            </div>
+                        <form id="editDeportistaForm" class="row g-5" method="POST" action="{{ url_for('deportista.agregar_deportista') }}">
                           <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline mb-6">
-                              <input class="form-control" type="date" id="html5-date-input">
-                              <label for="html5-date-input">Fecha Pago</label>
+                            <div class="form-floating form-floating-outline">
+                              <input 
+                                type="int"
+                                id="dni"
+                                name="dni"
+                                class="form-control"
+                                value=""
+                                placeholder=""
+                                required />
+                              <label for="modalEditUserFirstName">DNI</label>
                             </div>
-                             </div>                       
-                        <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                          <button type="submit" class="btn btn-primary">Crear</button>
-                          <button
-                            type="reset"
-                            class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                            Cancelar
-                          </button>
-                        </div>
-                      </form>
+                          </div>
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                              <input 
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                class="form-control"
+                                value=""
+                                placeholder=""
+                                required />
+                              <label for="modalEditUserFirstName">Nombre</label>
+                            </div>
+                          </div>
+
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                              <input
+                                type="text"
+                                id="apellido"
+                                name="apellido"
+                                class="form-control"
+                                value=""
+                                placeholder=""
+                                required />
+                              <label for="modalEditUserLastName">Apellido</label>
+                            </div>
+                          </div>
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                              <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                value=""
+                                placeholder=""
+                                required />
+                              <label for="modalEditUserLastName">Email</label>
+                            </div>
+                          </div>
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                              <input
+                                type="text"
+                                id="telefono"
+                                name="telefono"
+                                class="form-control"
+                                value=""
+                                placeholder="" 
+                                required/>
+                              <label for="modalEditUserLastName">Teléfono</label>
+                            </div>
+                          </div>
+                      <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="137">
+                              <div class="position-relative" data-select2-id="136">
+                                  <select id="categoria" name="categoria"  
+                                  class="select2 form-select select2-hidden-accessible " 
+                                  data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true" multiple required>
+                                
+                                    <option value=""></option>
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria.text }}">{{ categoria.text }}</option>
+                                    {% endfor %}
+                              </select>
+                              </div>
+                              <label for="categoria">Categorias</label>
+                            </div>
+                          </div>
+
+                          <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="138">
+                              <div class="position-relative" data-select2-id="137">
+                                  <select id="division" name="division"  
+                                  class="select2 form-select select2-hidden-accessible " 
+                                  data-select2-id="select2Multiple1" tabindex="-1" aria-hidden="true" required>
+                                
+                                    <option value=""></option>
+                                    {% for div in divisiones %}
+                                        <option value="{{ div.text }}">{{ div.text }}</option>
+                                    {% endfor %}
+                              </select>
+                              </div>
+                              <label for="division">Division</label>
+                            </div>
+                          </div>
+                          <div class="col-12 col-md-6">
+                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="139">
+                              <div class="position-relative" data-select2-id="138">
+                                  <select id="rama" name="rama"  
+                                  class="select2 form-select select2-hidden-accessible " 
+                                   data-select2-id="select2Multiple2" tabindex="-1" aria-hidden="true" required>
+                                
+                                    <option value=""></option>
+                                    {% for rama in ramas %}
+                                        <option value="{{ rama.text }}">{{ rama.text }}</option>
+                                    {% endfor %}
+                              </select>
+                              </div>
+                              <label for="rama">Rama</label>
+                            </div>
+                          </div>
+                          
+                          
+                          <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
+                            <button
+                              type="reset"
+                              class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              aria-label="Close">
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <!--/ Edit User Modal -->
-              <!-- /Modal -->
-        
+                <!--/ Edit User Modal -->
+                <!-- /Modal -->
+          
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-{% endblock %}
+  {% endblock %}
+
+  {% block scripts %}
+  <script>
+    let tabla = null;
+
+    function filtrar() {
+      const categoria = $('#categoriaFiltro').val();
+      const rama = $('#ramaFiltro').val();
+      const dni = $('#deportistaFiltro').val(); 
+      console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
+      
+      const url = `/deportista/filtrar?categoria=${categoria}&dni=${dni}&rama=${rama}`;
+
+      if (tabla) {
+        tabla.ajax.url(url).load();
+      } else {
+        tabla = $('#tablaDeportista').DataTable({
+          ajax: {
+            url: url,
+            dataSrc: 'data'
+          },
+          columns: [
+          { data: 'dni' },
+          { data: 'nombre' },
+          { data: 'apellido' },
+          { data: 'email' },
+          { data: 'telefono' },
+          { data: 'categoria' },
+          { data: 'division' },
+          { data: 'rama'},
+          {
+            data: 'estado',
+            render: function (data, type, row) {
+              let badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
+              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
+            }
+          },
+      
+          {
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row, meta) {
+            const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
+            return `
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ri-more-2-line"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
+                    <i class="ri-pencil-line me-1"></i> Editar
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                    <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+                  </a>
+                  <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
+                    <i class="ri-refresh-line me-1"></i> ${accion}
+                  </a>
+                </div>
+              </div>
+            `;
+          }
+
+          }
+          ],
+          paging: false,
+          info: false,
+          searching: false,
+          ordering: true,
+          dom: 'frtip',  // <-- importante para mostrar botones
+          buttons: [
+            {
+              extend: 'excelHtml5',
+              text: 'Exportar a Excel',
+              title: 'Deportista',
+              className: 'buttons-excel',
+              exportOptions: {
+                columns: ':not(:last-child)' // Excluir columna acciones
+              }
+            }
+          ],
+          
+          initComplete: function () {
+            $('#tablaDeportista')
+              .removeClass('dataTable no-footer stripe hover')
+              .addClass('table');
+          }
+        }); 
+      }
+    }
+      
+  $(document).ready(function () {
+    filtrar(); // carga inicial
+
+    $('#categoriaFiltro,#ramaFiltro, #deportistaFiltro').on('change', function () {
+      filtrar(); // recarga con nuevos filtros
+      });
+      $('.btn-export').on('click', function() {
+    tabla.button('.buttons-excel').trigger();
+      });
+    });
+
+
+              function editarFila(rowIndex) {
+              const tabla = $('#tablaDeportista').DataTable();
+              const data = tabla.row(rowIndex).data();
+
+              // Llenar inputs
+              $('#dni').val(data.dni);
+              $('#nombre').val(data.nombre);
+              $('#apellido').val(data.apellido);
+              $('#email').val(data.email);
+              $('#telefono').val(data.telefono);
+              $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+              $('#division').val(data.division).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+              $('#rama').val(data.rama).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+
+              // Cambiar modo y texto del botón
+              $('#editDeportistaForm').attr('action', `/deportista/editar/${data.dni}`);  // O data.id si tenés otro ID
+              $('#submitBtn').text('Actualizar');
+              $('#tituloAdd').text('Editar Deportista');
+
+              // Mostrar el modal
+              $('#addUser').modal('show');
+            }
+              $('#addUser').on('hidden.bs.modal', function () {
+              $('#editDeportistaForm')[0].reset();
+              $('#categoria').val(null).trigger('change');
+              $('#rama').val(null).trigger('change');
+              $('#division').val(null).trigger('change');
+              $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+              $('#submitBtn').text('Crear');
+              $('#tituloAdd').text('Agregar Deportista');
+            });
+
+            $('#editDeportistaForm').on('submit', function(e) {
+                e.preventDefault(); // Evita el envío tradicional
+
+                const form = this;
+                const actionUrl = $(form).attr('action');
+                const formData = new FormData(form);
+
+                fetch(actionUrl, {
+                  method: 'POST',
+                  body: formData,
+                  headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                  }
+                })
+                .then(async response => {
+                  if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al actualizar');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  Swal.fire({
+                    icon: 'success',
+                    title: data.message.includes('creado') ? 'Deportista creado' : 'Deportista actualizado',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+                  $('#addUser').modal('hide');
+                  $('#editDeportistaForm')[0].reset();
+                  $('#categoria').val(null).trigger('change');
+                  $('#rama').val(null).trigger('change');
+                  $('#division').val(null).trigger('change');
+                  $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+                  $('#submitBtn').text('Crear');
+                  $('#tituloAdd').text('Agregar Deportista');
+                  if (tabla) tabla.ajax.reload();
+                })
+                .catch(error => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                  });
+                });
+              });
+
+
+
+
+          function eliminarFila(rowIndex) {
+            const tabla = $('#tablaDeportista').DataTable();
+            const data = tabla.row(rowIndex).data();
+
+            Swal.fire({
+              title: '¿Estás segura/o?',
+              text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                fetch(`/deportista/eliminar/${data.dni}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                  }
+                })
+                .then(async response => {
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error desconocido');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Eliminado',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+                  tabla.ajax.reload();
+                })
+                .catch(error => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Hubo un error al intentar eliminar el deportista.'
+                  });
+                });
+              }
+            });
+          }
+          function limpiar() {
+            $('#categoriaFiltro').val('').trigger('change');
+            $('#ramaFiltro').val('').trigger('change');
+            $('#deportistaFiltro').val('').trigger('change');
+            filtrar(); // recargar la tabla sin filtros
+
+          
+          }
+          $('#tablaDeportista').on('click', '.cambiar-estado', function () {
+            const dni = $(this).data('dni');
+            const boton = $(this);
+            
+            fetch(`/deportista/cambiarEstado/${dni}`, {
+                method: 'POST',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+                .then(async response => {
+                  if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error desconocido');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Estado actualizado',
+                    text: `Nuevo estado: ${data.nuevo_estado}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                  });
+                  tabla.ajax.reload(null, false);
+                })
+                .catch(err => {
+                  console.error('Error:', err);
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error al cambiar estado',
+                    text: err.message || 'Ocurrió un error inesperado'
+                  });
+                });    
+                      });
+
+
+
+
+
+  </script>
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+  <!-- DataTables y Buttons JS -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  {% endblock %}
+
