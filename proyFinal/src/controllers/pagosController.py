@@ -1,110 +1,86 @@
 from flask import current_app, render_template, url_for
 from flask_mail import Message
+
+from src.models.pago import Pago
 from src.models.usuario import Usuario
 from src.utils.enums import generalEnum
-from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, RamaEnum
+from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, EstadoPagoEnum, RamaEnum
 from src import db
 from src.utils.Mail import mail
 
-def obtener_deportistas(categoria=None, rama=None , dni=None):
-    query = Usuario.query.filter_by(IdRol=2)
-
-    if categoria:
-        try:
-            categoria_valor = int(categoria)
-            query = query.filter_by(Categoria=str(categoria_valor))
-        except KeyError:
-            return []
-        
-    if rama:
-        try:
-            rama_valor = int(rama)
-            query = query.filter_by(Rama=str(rama_valor))
-        except KeyError:
-            return []
-    if dni:
-        query = query.filter(Usuario.Dni == int(dni))
-
-    deportistas = []
-    for e in query.all():
-        try:
-            cat_enum = CategoriaEnum(int(e.Categoria))
-            categoria_nombre = cat_enum.name 
-        except (ValueError, KeyError):
-            categoria_nombre = 'Desconocido'
+def obtener_pagos():
+    query = Pago.query
+    resultados = query.all()
+    pagos = []
+    for e in resultados:
 
         try:
-            est_enum = EstadoEnum(int(e.IdEstado))
+            est_enum = EstadoPagoEnum(int(e.Estado))
             estado_nombre = est_enum.name
         except (ValueError, KeyError):
             estado_nombre = 'Desconocido'
             
-        try:
-            rama_enum = RamaEnum(int(e.Rama))
-            rama_nombre = rama_enum.name
-        except (ValueError, KeyError):
-            rama_nombre = 'Desconocido'
-        try:
-            division_enum = DivisionEnum(int(e.Division))
-            division_nombre = division_enum.name
-        except (ValueError, KeyError):
-            division_nombre = 'Desconocido'
+        # nombre_apellido = "Sin asignar"
+        # if e.usuario:
+        #     nombre_apellido = f"{e.usuario.Nombre} {e.usuario.Apellido}"
+        deportista = e.usuario
+        deportista_nombre = f"{deportista.Nombre} {deportista.Apellido}" if deportista else "Sin asignar"
 
-            
-
-        deportistas.append({
-            'dni': e.Dni,
-            'nombre': e.Nombre,
-            'apellido': e.Apellido,
-            'email': e.Email,
-            'telefono': e.Telefono,
-            'categoria': categoria_nombre,
-            'rama': rama_nombre,
-            'division': division_nombre,
-            'estado': estado_nombre
+        pagos.append({
+            'id': e.Id,
+            'fechaVencimiento': e.FechaVencimiento.strftime('%d/%m/%Y') if e.FechaVencimiento else None,
+            'fechaPago': e.FechaPago.strftime('%d/%m/%Y') if e.FechaPago else None,
+            'fechaVencimientoISO': e.FechaVencimiento.strftime('%Y-%m-%d') if e.FechaVencimiento else None,
+            'fechaPagoISO': e.FechaPago.strftime('%Y-%m-%d') if e.FechaPago else None,
+            'importe': e.Importe,
+            'estado': estado_nombre,
+            'deportista': deportista_nombre,
+            'deportista_id': e.Usuario_id
+           
         })
 
-    return deportistas
+    return pagos
 
-def getUsuarioById(id):
-    return Usuario.query.filter_by(Id=id).first()
+# def getUsuarioById(id):
+#     return Usuario.query.filter_by(Id=id).first()
 
 
-def agregarDeportista(nuevoDeportista):
-    db.session.add(nuevoDeportista)
+def agregarPago(nuevoPago):
+    db.session.add(nuevoPago)
     db.session.commit()
-    return nuevoDeportista
+    return nuevoPago
 
-def actualizar_deportista(deportista):
+def actualizar_pago(pago):
     db.session.commit()
     
-def obtener_deportista_por_dni(dni):
-    return Usuario.query.filter_by(Dni=dni, IdRol=2).first()
+# def obtener_pago_por_dni(dni):
+#     return Pago.query.filter_by(Dni=dni, IdRol=2).first()
+def obtener_pago_por_id(id):
+     return Pago.query.filter_by(Id=id).first()
 
-
-def borrar_deportista(deportista):
-    db.session.delete(deportista)
+def borrar_pago(pago):
+    db.session.delete(pago)
     db.session.commit()
     # return jsonify({'success': True, 'message': 'Entrenador eliminado'})
     
-def enviar_mail_alta_deportista(deportista, password):
-    if not deportista.Email:
-        print("[ERROR] El deportista no tiene correo electrónico.")
-        return False
+# def enviar_mail_alta_deportista(deportista, password):
+#     if not deportista.Email:
+#         print("[ERROR] El deportista no tiene correo electrónico.")
+#         return False
 
-    msg = Message(
-        subject="Voley App - Bienvenida",
-        sender=current_app.config['MAIL_USERNAME'],
-        recipients=[deportista.Email]
-    )
-    link = f"http://127.0.0.1:5002" # aca despues va la url del servidor
+#     msg = Message(
+#         subject="Voley App - Bienvenida",
+#         sender=current_app.config['MAIL_USERNAME'],
+#         recipients=[deportista.Email]
+#     )
+#     link = f"http://127.0.0.1:5002" # aca despues va la url del servidor
     
-    # link = url_for('usuarios.login', _external=True)
-    msg.html = render_template("deportista/emailAlta.html", deportista=deportista, password=password, link=link)
+#     # link = url_for('usuarios.login', _external=True)
+#     msg.html = render_template("deportista/emailAlta.html", deportista=deportista, password=password, link=link)
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
-        return False
+#     try:
+#         mail.send(msg)
+#         return True
+#     except Exception as e:
+#         print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
+#         return False

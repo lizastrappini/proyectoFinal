@@ -10,38 +10,6 @@
         <h2 class="card-header">Cuotas Deportivas</h2>
         <div class="card-body">
 
-          
-          <div class="d-flex row mb-5 gx-5">
-            <div class="col d-flex justify-content-end">
-              <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
-                Limpiar 
-              </button>
-            </div>
-            <div class="col-12 col-md-2">
-              <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
-                <option value=""></option>
-                {% for cat in categorias %}
-                    <option value="{{ cat.value }}">{{ cat.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-12 col-md-2">
-              <select id="ramaFiltro" class="select2 form-select" data-placeholder="Rama" >
-                <option value=""></option>
-                {% for rama in ramas %}
-                    <option value="{{ rama.value }}">{{ rama.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="col-12 col-md-2">
-              <select id="deportistaFiltro" class="select2 form-select" data-placeholder="Deportista">
-                <option value=""></option>
-                {% for deportista in deportistas %}
-                    <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
             <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
@@ -54,17 +22,14 @@
             </a>
           </div>
           <div class="table-responsive text-nowrap">
-            <table id="tablaDeportista" class="table">
+            <table id="tablaPagos" class="table">
               <thead>
                 <tr>
-                  <th>DNI</th>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Email</th> 
-                  <th>Teléfono</th> 
-                  <th>Categorías</th> 
-                  <th>Division</th> 
-                  <th>Rama</th> 
+                  <th>Id</th>
+                  <th>Deportista</th>
+                  <th>Fecha Pago</th>
+                  <th>Fecha Vencimiento</th>
+                  <th>Importe</th> 
                   <th>Estado</th> 
                   <th>Acciones</th>
                 </tr>
@@ -82,123 +47,85 @@
                           <h4 class="mb-2" id="tituloAdd">Agregar Pago</h4>
                         </div>
                         
-                        <form id="editDeportistaForm" class="row g-5" method="POST" action="{{ url_for('deportista.agregar_deportista') }}">
-                          <div class="col-12 col-md-6">
+                        <form id="editPagosForm" class="row g-5" method="POST" action="{{ url_for('pago.agregar_pago') }}">
+                          <!-- <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                               <input 
                                 type="int"
-                                id="dni"
-                                name="dni"
+                                id="id"
+                                name="id"
                                 class="form-control"
                                 value=""
                                 placeholder=""
                                 required />
-                              <label for="modalEditUserFirstName">DNI</label>
+                              <label for="modalEditUserFirstName">Id</label>
                             </div>
+                          </div> -->
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
+                            <label for="usuario_id" class="form-label">Deportista</label>
+                            <select class="form-select" id="deportista" name="deportista" required>
+                              <option value="">Seleccione un deportista</option>
+                              {% for deportista in deportistas %}
+                                <option value="{{ deportista.id }}">{{ deportista.nombre }}{{ deportista.apellido }}</option>
+                              {% endfor %}
+                            </select>
                           </div>
+                          </div>
+                          
+
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                               <input 
-                                type="text"
-                                id="nombre"
-                                name="nombre"
+                                type="date"
+                                id="fechaPago"
+                                name="fechaPago"
                                 class="form-control"
                                 value=""
                                 placeholder=""
                                 required />
-                              <label for="modalEditUserFirstName">Nombre</label>
+                              <label for="modalEditUserFirstName">Fecha Pago</label>
                             </div>
                           </div>
 
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                               <input
-                                type="text"
-                                id="apellido"
-                                name="apellido"
+                                type="date"
+                                id="fechaVencimiento"
+                                name="fechaVencimiento"
                                 class="form-control"
                                 value=""
                                 placeholder=""
                                 required />
-                              <label for="modalEditUserLastName">Apellido</label>
+                              <label for="modalEditUserLastName">Fecha Vencimiento</label>
                             </div>
                           </div>
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                               <input
-                                type="text"
-                                id="email"
-                                name="email"
+                                type="number"
+                                id="importe"
+                                name="importe"
+                                step="0.01" 
                                 class="form-control"
                                 value=""
                                 placeholder=""
                                 required />
-                              <label for="modalEditUserLastName">Email</label>
+                              <label for="modalEditUserLastName">Importe</label>
                             </div>
                           </div>
                           <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline">
-                              <input
-                                type="text"
-                                id="telefono"
-                                name="telefono"
-                                class="form-control"
-                                value=""
-                                placeholder="" 
-                                required/>
-                              <label for="modalEditUserLastName">Teléfono</label>
-                            </div>
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                              <option value="">Seleccione un estado</option>
+                              {% for estado in estados %}
+                                <option value="{{ estado.text }}">{{ estado.text }}</option>
+                              {% endfor %}
+                            </select>
                           </div>
-                      <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="137">
-                              <div class="position-relative" data-select2-id="136">
-                                  <select id="categoria" name="categoria"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                  data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true" multiple required>
-                                
-                                    <option value=""></option>
-                                    {% for categoria in categorias %}
-                                        <option value="{{ categoria.text }}">{{ categoria.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="categoria">Categorias</label>
-                            </div>
                           </div>
-
-                          <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="138">
-                              <div class="position-relative" data-select2-id="137">
-                                  <select id="division" name="division"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                  data-select2-id="select2Multiple1" tabindex="-1" aria-hidden="true" required>
-                                
-                                    <option value=""></option>
-                                    {% for div in divisiones %}
-                                        <option value="{{ div.text }}">{{ div.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="division">Division</label>
-                            </div>
-                          </div>
-                          <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="139">
-                              <div class="position-relative" data-select2-id="138">
-                                  <select id="rama" name="rama"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                   data-select2-id="select2Multiple2" tabindex="-1" aria-hidden="true" required>
-                                
-                                    <option value=""></option>
-                                    {% for rama in ramas %}
-                                        <option value="{{ rama.text }}">{{ rama.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="rama">Rama</label>
-                            </div>
-                          </div>
-                          
                           
                           <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
@@ -230,44 +157,53 @@
     let tabla = null;
 
     function filtrar() {
-      const categoria = $('#categoriaFiltro').val();
-      const rama = $('#ramaFiltro').val();
-      const dni = $('#deportistaFiltro').val(); 
-      console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
-      
-      const url = `/deportista/filtrar?categoria=${categoria}&dni=${dni}&rama=${rama}`;
+      const url = "/pago/obtener";
 
       if (tabla) {
         tabla.ajax.url(url).load();
       } else {
-        tabla = $('#tablaDeportista').DataTable({
+        tabla = $('#tablaPagos').DataTable({
           ajax: {
             url: url,
             dataSrc: 'data'
           },
           columns: [
-          { data: 'dni' },
-          { data: 'nombre' },
-          { data: 'apellido' },
-          { data: 'email' },
-          { data: 'telefono' },
-          { data: 'categoria' },
-          { data: 'division' },
-          { data: 'rama'},
+          { data: 'id' },
+          { data: 'deportista' },
+          { data: 'fechaPago' },
+          { data: 'fechaVencimiento' },
+          {
+          data: 'importe',
+          render: function (data) {
+            return `$ ${parseFloat(data).toLocaleString('es-AR')}`;
+            }
+          },
           {
             data: 'estado',
             render: function (data, type, row) {
-              let badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
+              let badgeClass = '';
+
+              if (data === 'Pago') {
+                badgeClass = 'bg-label-success';
+              } else if (data === 'Pendiente') {
+                badgeClass = 'bg-label-warning';
+              } else if (data === 'NoPago') {
+                badgeClass = 'bg-label-danger';
+              } else {
+                badgeClass = 'bg-label-secondary';
+              }
+
               return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
             }
           },
-      
+        
+          
           {
             data: null,
             orderable: false,
             searchable: false,
             render: function(data, type, row, meta) {
-            const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
+           
             return `
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
@@ -280,9 +216,7 @@
                   <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
                     <i class="ri-delete-bin-7-line me-1"></i> Eliminar
                   </a>
-                  <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
-                    <i class="ri-refresh-line me-1"></i> ${accion}
-                  </a>
+                 
                 </div>
               </div>
             `;
@@ -299,7 +233,7 @@
             {
               extend: 'excelHtml5',
               text: 'Exportar a Excel',
-              title: 'Deportista',
+              title: 'Pagos',
               className: 'buttons-excel',
               exportOptions: {
                 columns: ':not(:last-child)' // Excluir columna acciones
@@ -308,7 +242,7 @@
           ],
           
           initComplete: function () {
-            $('#tablaDeportista')
+            $('#tablaPagos')
               .removeClass('dataTable no-footer stripe hover')
               .addClass('table');
           }
@@ -316,51 +250,49 @@
       }
     }
       
-  $(document).ready(function () {
+    $(document).ready(function () {
     filtrar(); // carga inicial
+   
 
-    $('#categoriaFiltro,#ramaFiltro, #deportistaFiltro').on('change', function () {
-      filtrar(); // recarga con nuevos filtros
-      });
-      $('.btn-export').on('click', function() {
+   
+     $('.btn-export').on('click', function() {
     tabla.button('.buttons-excel').trigger();
       });
     });
 
 
               function editarFila(rowIndex) {
-              const tabla = $('#tablaDeportista').DataTable();
+              const tabla = $('#tablaPagos').DataTable();
               const data = tabla.row(rowIndex).data();
 
               // Llenar inputs
-              $('#dni').val(data.dni);
-              $('#nombre').val(data.nombre);
-              $('#apellido').val(data.apellido);
-              $('#email').val(data.email);
-              $('#telefono').val(data.telefono);
-              $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
-              $('#division').val(data.division).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
-              $('#rama').val(data.rama).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+              $('#id').val(data.id);
+              $('#fechaPago').val(data.fechaPagoISO);
+              $('#fechaVencimiento').val(data.fechaVencimientoISO);
+              $('#importe').val(data.importe);
+              $('#estado').val(data.estado).trigger('change');
+              $('#deportista').val(data.deportista_id).trigger('change');
 
+
+              
               // Cambiar modo y texto del botón
-              $('#editDeportistaForm').attr('action', `/deportista/editar/${data.dni}`);  // O data.id si tenés otro ID
+              $('#editPagosForm').attr('action', `/pago/editar/${data.id}`);  // O data.id si tenés otro ID
               $('#submitBtn').text('Actualizar');
-              $('#tituloAdd').text('Editar Deportista');
+              $('#tituloAdd').text('Editar Pago');
 
               // Mostrar el modal
               $('#addUser').modal('show');
             }
               $('#addUser').on('hidden.bs.modal', function () {
-              $('#editDeportistaForm')[0].reset();
-              $('#categoria').val(null).trigger('change');
-              $('#rama').val(null).trigger('change');
-              $('#division').val(null).trigger('change');
-              $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+              $('#editPagosForm')[0].reset();
+              $('#estado').val(null).trigger('change');
+              $('#deportista').val(null).trigger('change');
+              $('#editPagosForm').attr('action', '{{ url_for("pago.agregar_pago") }}');
               $('#submitBtn').text('Crear');
-              $('#tituloAdd').text('Agregar Deportista');
+              $('#tituloAdd').text('Agregar Pago');
             });
 
-            $('#editDeportistaForm').on('submit', function(e) {
+            $('#editPagosForm').on('submit', function(e) {
                 e.preventDefault(); // Evita el envío tradicional
 
                 const form = this;
@@ -384,19 +316,18 @@
                 .then(data => {
                   Swal.fire({
                     icon: 'success',
-                    title: data.message.includes('creado') ? 'Deportista creado' : 'Deportista actualizado',
+                    title: data.message.includes('creado') ? 'Pago creado' : 'Pago actualizado',
                     text: data.message,
                     showConfirmButton: false,
                     timer: 2000
                   });
                   $('#addUser').modal('hide');
-                  $('#editDeportistaForm')[0].reset();
-                  $('#categoria').val(null).trigger('change');
-                  $('#rama').val(null).trigger('change');
-                  $('#division').val(null).trigger('change');
-                  $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+                  $('#editPagosForm')[0].reset();
+                  $('#estado').val(null).trigger('change');
+                  $('#deportista').val(null).trigger('change');
+                  $('#editPagosForm').attr('action', '{{ url_for("pago.agregar_pago") }}');
                   $('#submitBtn').text('Crear');
-                  $('#tituloAdd').text('Agregar Deportista');
+                  $('#tituloAdd').text('Agregar Pago');
                   if (tabla) tabla.ajax.reload();
                 })
                 .catch(error => {
@@ -412,19 +343,18 @@
 
 
           function eliminarFila(rowIndex) {
-            const tabla = $('#tablaDeportista').DataTable();
+            const tabla = $('#tablaPagos').DataTable();
             const data = tabla.row(rowIndex).data();
 
             Swal.fire({
               title: '¿Estás segura/o?',
-              text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
               icon: 'warning',
               showCancelButton: true,
               confirmButtonText: 'Sí, eliminar',
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) {
-                fetch(`/deportista/eliminar/${data.dni}`, {
+                fetch(`/pago/eliminar/${data.id}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -452,60 +382,13 @@
                   Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: error.message || 'Hubo un error al intentar eliminar el deportista.'
+                    text: error.message || 'Hubo un error al intentar eliminar el pago.'
                   });
                 });
               }
             });
           }
-          function limpiar() {
-            $('#categoriaFiltro').val('').trigger('change');
-            $('#ramaFiltro').val('').trigger('change');
-            $('#deportistaFiltro').val('').trigger('change');
-            filtrar(); // recargar la tabla sin filtros
-
           
-          }
-          $('#tablaDeportista').on('click', '.cambiar-estado', function () {
-            const dni = $(this).data('dni');
-            const boton = $(this);
-            
-            fetch(`/deportista/cambiarEstado/${dni}`, {
-                method: 'POST',
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest'
-                }
-              })
-                .then(async response => {
-                  if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Error desconocido');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Estado actualizado',
-                    text: `Nuevo estado: ${data.nuevo_estado}`,
-                    timer: 2000,
-                    showConfirmButton: false
-                  });
-                  tabla.ajax.reload(null, false);
-                })
-                .catch(err => {
-                  console.error('Error:', err);
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error al cambiar estado',
-                    text: err.message || 'Ocurrió un error inesperado'
-                  });
-                });    
-                      });
-
-
-
-
 
   </script>
   <!-- DataTables Buttons CSS -->

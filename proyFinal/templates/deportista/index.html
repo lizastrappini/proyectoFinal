@@ -149,7 +149,18 @@
                               <label for="modalEditUserLastName">Teléfono</label>
                             </div>
                           </div>
-                      <div class="col-12 col-md-6">
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                              <option value="">Seleccione una categoria</option>
+                              {% for categoria in categorias %}
+                                <option value="{{ categoria.text }}">{{ categoria.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                      <!-- <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="137">
                               <div class="position-relative" data-select2-id="136">
                                   <select id="categoria" name="categoria"  
@@ -164,9 +175,9 @@
                               </div>
                               <label for="categoria">Categorias</label>
                             </div>
-                          </div>
+                          </div> -->
 
-                          <div class="col-12 col-md-6">
+                          <!-- <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="138">
                               <div class="position-relative" data-select2-id="137">
                                   <select id="division" name="division"  
@@ -181,8 +192,19 @@
                               </div>
                               <label for="division">Division</label>
                             </div>
-                          </div>
+                          </div> -->
                           <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
+                            <label for="division" class="form-label">Division</label>
+                            <select class="form-select" id="division" name="division" required>
+                              <option value="">Seleccione una division</option>
+                              {% for div in divisiones %}
+                                <option value="{{ div.text }}">{{ div.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                          <!-- <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="139">
                               <div class="position-relative" data-select2-id="138">
                                   <select id="rama" name="rama"  
@@ -198,7 +220,19 @@
                               <label for="rama">Rama</label>
                             </div>
                           </div>
-                          
+                           -->
+
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
+                            <label for="rama" class="form-label">Rama</label>
+                            <select class="form-select" id="rama" name="rama" required>
+                              <option value="">Seleccione una rama</option>
+                              {% for rama in ramas %}
+                                <option value="{{ rama.text}}">{{ rama.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
                           
                           <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>

@@ -21,6 +21,8 @@ class Usuario(UserMixin, db.Model):
     Token = db.Column(db.String(50))
     TokenEnviado = db.Column(db.Boolean, default=False)
     FechaVencimientoToken = db.Column(db.DateTime)
+    
+
 
     def get_id(self):
         return str(self.Id)

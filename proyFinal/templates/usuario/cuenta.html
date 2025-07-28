@@ -94,7 +94,9 @@
 
                 <!-- User Content -->
                 <div class="col-xl-8 col-lg-7 col-md-7">
+                 
                   <!-- Tabla que muestra los pagos filtrados para ese usuario -->
+                  {% if current_user.is_authenticated and current_user.IdRol != RolEnum.Admin %}
                   <div class="card mb-4">
                     <h5 class="card-header">Estado de Cuotas</h5>
                     <div class="table-responsive text-nowrap">
@@ -139,6 +141,7 @@
                       </table>
                     </div>
                   </div>
+                   {% endif %}
 
                   <div class="card">
                     <!-- Cambiar contraseña -->

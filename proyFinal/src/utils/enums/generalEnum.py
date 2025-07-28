@@ -10,7 +10,11 @@ class EstadoEnum(enum.IntEnum):
     Activo = 1
     Inactivo = 2
 
-
+class EstadoPagoEnum(enum.IntEnum):
+    Pago = 1
+    NoPago = 2
+    Pendiente = 3
+    
 class LocalidadEnum(enum.IntEnum): 
     Rosario = 1
 
@@ -18,6 +22,7 @@ class LocalidadEnum(enum.IntEnum):
 class EstadoPagoEnum(enum.IntEnum):
     Pago = 1
     NoPago = 2
+    Pendiente = 3
 
 class CategoriaEnum(enum.IntEnum): 
     Sub12 = 1
