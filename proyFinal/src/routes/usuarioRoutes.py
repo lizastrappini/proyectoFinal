@@ -1,6 +1,9 @@
+from babel.dates import format_date
 from flask import Blueprint, redirect, request, render_template,flash, url_for
+from sqlalchemy import desc
 import src.controllers.usuarioController as usuarioController
 from flask import session
+from src.models.pago import Pago
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from flask_login import logout_user, login_required, current_user, login_user
@@ -24,15 +27,42 @@ def login():
         flash("Usuario o contraseña incorrectos","danger")
         return render_template('usuario/index.html')
 
+# @login_required
+# @usuario_bp.route('/miCuenta', methods=['GET'])
+# def miCuenta():
+#     id = current_user.Id
+#     usuario = usuarioController.miCuenta(id)
+#     if(usuario is not None):   
+#         return render_template('usuario/cuenta.html', usuario=usuario)
+#     else:
+#         return render_template('usuario/index.html')
+
 @login_required
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():
     id = current_user.Id
     usuario = usuarioController.miCuenta(id)
-    if(usuario is not None):   
-        return render_template('usuario/cuenta.html', usuario=usuario)
+   
+    if usuario is not None:
+        pagos = db.session.query(Pago).filter_by(Usuario_id=id).order_by(desc(Pago.FechaPago)).all()
+
+        datos_pagos = []
+        for pago in pagos:
+            try:
+                est_enum = generalEnum.EstadoPagoEnum(int(pago.Estado))
+                estado_nombre = est_enum.name
+            except (ValueError, KeyError):
+                estado_nombre = 'Desconocido'
+            periodo = format_date(pago.FechaPago, "MMMM yyyy", locale="es_AR")
+            datos_pagos.append({
+                "fecha_pago": pago.FechaPago,
+                "estado": estado_nombre,
+                "periodo": periodo.capitalize()
+            })
+        return render_template('usuario/cuenta.html', usuario=usuario, pagos=datos_pagos)
     else:
         return render_template('usuario/index.html')
+
 
 @login_required
 @usuario_bp.route('/editUsuario', methods=['POST'])

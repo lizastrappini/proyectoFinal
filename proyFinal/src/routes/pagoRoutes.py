@@ -127,26 +127,5 @@ def eliminar_pago(id):
         return redirect(url_for('pago.index'))
     
     
-# @pago_bp.route('/cambiarEstado/<int:id>', methods=['POST'])
-# def cambiar_estado(id):
-#     pago = pagosController.obtener_pago_por_id(id)
-
-#     if not pago:
-#         return jsonify({'success': False, 'message': 'Pago no encontrado'}), 404
-
-#     # Alternar estado
-#     if int(pago.Estado) == generalEnum.EstadoPagoEnum.Pago:
-#         pago.Estado = generalEnum.EstadoPagoEnum.NoPago
-#     else:
-#         pago.Estado = generalEnum.EstadoPagoEnum.Pago
-
-#     pagosController.actualizar_pago(pago)
-
-#     return jsonify({
-#         'success': True,
-#         'message': 'Estado actualizado',
-#         'nuevo_estado': generalEnum.EstadoPagoEnum(int(pago.Estado)).name,
-   
-#     })
 
 

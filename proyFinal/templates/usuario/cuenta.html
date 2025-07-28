@@ -109,34 +109,25 @@
                           </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                          <tr>
-                            <td>
-                              Enero 2025
-                            </td>
-                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                            <td>10/01/2025</td>         
-                          </tr>
-                          <tr>
-                            <td>
-                              Febrero 2025
-                            </td>
-                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                            <td>11/02/2025</td>         
-                          </tr>
-                          <tr>
-                            <td>
-                              Marzo 2025
-                            </td>
-                            <td><span class="badge rounded-pill bg-label-success me-1">Pago</span></td>
-                            <td>10/03/2025</td>         
-                          </tr>
-                          <tr>
-                            <td>
-                              Abril 2025
-                            </td>
-                            <td><span class="badge rounded-pill bg-label-danger me-1">No Pago</span></td>
-                            <td>10/04/2025</td>         
-                          </tr>
+                          {% for pago in pagos %}
+                            <tr>
+                              <td>{{ pago.periodo if pago.periodo else '-' }}</td>
+                              <td>
+                                {% if pago.estado == 'Pago' %}
+                                  <span class="badge rounded-pill bg-label-success me-1">Pago</span>
+                                {% elif pago.estado == 'NoPago' %}
+                                  <span class="badge rounded-pill bg-label-danger me-1">No Pago</span>
+                                {% elif pago.estado == 'Pendiente' %}
+                                  <span class="badge rounded-pill bg-label-warning me-1">Pendiente</span>
+                                {% else %}
+                                  <span class="badge rounded-pill bg-label-secondary me-1">Desconocido</span>
+                                {% endif %}
+                              </td>
+                              <td>{{ pago.fecha_pago.strftime('%d/%m/%Y') if pago.fecha_pago else '-' }}</td>
+                            </tr>
+                          {% endfor %}
+
+
                         </tbody>
                       </table>
                     </div>
