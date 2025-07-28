@@ -230,6 +230,8 @@ ALTER TABLE `Usuario`
 --
 ALTER TABLE `Pago`
   ADD CONSTRAINT `fk_pago_usuario` FOREIGN KEY (`Usuario_id`) REFERENCES `Usuario` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+UPDATE Usuario SET Dni = '43491828', Email = 'morakopech@gmail.com' WHERE Usuario.Id = 4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
