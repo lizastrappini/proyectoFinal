@@ -25,6 +25,8 @@ def loginUser(email, password):
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
     if(usuario is not None):
+        localidad_valor = int(usuario.Localidad or 0)
+        localidad_nombre = generalEnum.LocalidadEnum(localidad_valor).name
         return {
             'id': usuario.Id,
             'dni': usuario.Dni,
@@ -35,7 +37,7 @@ def miCuenta(id):
             'usuario': usuario.NombreUsuario,
             'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria or 0)).name,
             # 'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
-            'localidad': generalEnum.LocalidadEnum(usuario.IdLocalidad).name,
+            'localidad': localidad_nombre,
             'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
             'direccion': usuario.Direccion,
             'telefono': usuario.Telefono,
@@ -52,8 +54,12 @@ def getUsuarioById(id):
 def update(id, datos):
     usuario = Usuario.query.filter_by(Id=id).first()
 
-    localidad_enum = generalEnum.LocalidadEnum[datos['Localidad']]
-    valor_localidad = localidad_enum.value
+    # Convertir a enum de forma segura
+    try:
+        localidad_enum = generalEnum.LocalidadEnum(int(datos.get('Localidad', 0)))
+        valor_localidad = localidad_enum.value
+    except (ValueError, KeyError):
+        valor_localidad = generalEnum.LocalidadEnum.NoDefinido.value
 
     if usuario:
         if 'Nombre' in datos:
@@ -66,8 +72,8 @@ def update(id, datos):
             usuario.NombreUsuario = datos['NombreUsuario']
         if 'Direccion' in datos:
             usuario.Direccion = datos['Direccion']
-        if 'IdLocalidad' in datos:
-            usuario.IdLocalidad = valor_localidad
+        if 'Localidad' in datos:
+            usuario.Localidad = valor_localidad
         if 'Telefono' in datos:
             usuario.Telefono = datos['Telefono']
 

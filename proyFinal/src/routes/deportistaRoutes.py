@@ -98,7 +98,7 @@ def agregar_deportista():
             Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"entrenador_{dni}",
-            IdLocalidad= 1,
+            Localidad= 1,
             IdEstado=1,
             Direccion="N/A",
             Telefono=telefono,

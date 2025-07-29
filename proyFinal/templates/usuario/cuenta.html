@@ -255,7 +255,7 @@
                             <label for="modalEditUserLastName">Apellido</label>
                           </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12  col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
@@ -279,19 +279,20 @@
                             <label for="modalEditUserEmail">Email</label>
                           </div>
                         </div>
+                        {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
                         <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="Categoria"
-                              name="Categoria"
-                              class="form-control"
-                              value="{{ usuario.categoria }}"
-                              placeholder="" />
-                            <label for="modalEditUserCategoria">Categoria</label>
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="categoria" name="Categoria" required>
+                              <option value="">Seleccione una categoría</option>
+                              {% for cat in categorias %}
+                                <option value="{{ cat.value }}">{{ cat.text }}</option>
+                              {% endfor %}
+                            </select>
                           </div>
-                        </div>
-                        <div class="col-12 col-md-6">
+                          </div>
+                           {% endif %}
+                          <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
@@ -304,17 +305,18 @@
                           </div>
                         </div>
                         <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="Localidad"
-                              name="Localidad"
-                              value="{{ usuario.localidad }}"
-                              class="form-control modal-edit-tax-id"
-                              placeholder="Localidad" />
-                            <label for="modalEditTaxID">Localidad</label>
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
+                            <label for="localidad" class="form-label">Localidad</label>
+                            <select class="form-select" id="Localidad" name="Localidad" required>
+                              <option value="">Seleccione una localidad</option>
+                              {% for loc in localidades %}
+                                <option value="{{ loc.value }}" {% if usuario.localidad_valor == loc.value %}selected{% endif %}>
+                                  {{ loc.text }}
+                                </option>
+                              {% endfor %}
+                            </select>
                           </div>
-                        </div>
+                          </div>
                         <div class="col-12 col-md-6">
                           <div class="input-group input-group-merge">
                             <span class="input-group-text">ARG (+54)</span>

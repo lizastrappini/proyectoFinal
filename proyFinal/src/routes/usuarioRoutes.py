@@ -18,7 +18,7 @@ def login():
     usuario = usuarioController.loginUser(email, password)
     # remember = True if request.form.get('remember') == 'on' else False  
     usuario = usuarioController.loginUser(email, password)
-    
+
     if(usuario is not None):   
         login_user(usuario) 
         flash("Bienvenido!", "success")
@@ -27,12 +27,28 @@ def login():
         flash("Usuario o contraseña incorrectos","danger")
         return render_template('usuario/index.html')
 
+# @usuario_bp.route('/')
+# def index():
+#     localidades = [
+#     {'value': loc.value, 'text': loc.name}
+#     for loc in generalEnum.LocalidadEnum
+#     ]
+#     return render_template('usuario/index.html', localidades=localidades)
+
+
 @login_required
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():
     id = current_user.Id
     usuario = usuarioController.miCuenta(id)
-   
+    localidades = [
+    {'value': loc.value, 'text': loc.name}
+    for loc in generalEnum.LocalidadEnum
+    ]
+    categorias = [
+    {'value': cat.value, 'text': cat.name}
+    for cat in generalEnum.CategoriaEnum
+    ]
     if usuario is not None:
         pagos = db.session.query(Pago).filter_by(Usuario_id=id).order_by(desc(Pago.FechaPago)).all()
 
@@ -49,7 +65,7 @@ def miCuenta():
                 "estado": estado_nombre,
                 "periodo": periodo.capitalize()
             })
-        return render_template('usuario/cuenta.html', usuario=usuario, pagos=datos_pagos)
+        return render_template('usuario/cuenta.html', usuario=usuario, pagos=datos_pagos, categorias= categorias,localidades=localidades)
     else:
         return render_template('usuario/index.html')
 
@@ -74,7 +90,15 @@ def editUsuario():
     if(usuario is not None):   
         usuarioController.update(id, usuarioModel)
         usuario = usuarioController.miCuenta(id)
-        return render_template('usuario/cuenta.html', usuario=usuario)
+        localidades = [
+            {'value': loc.value, 'text': loc.name}
+            for loc in generalEnum.LocalidadEnum
+            ]
+        categorias = [
+            {'value': cat.value, 'text': cat.name}
+            for cat in generalEnum.CategoriaEnum
+            ]
+        return render_template('usuario/cuenta.html', usuario=usuario, categorias=categorias, localidades=localidades)
     else:
         return render_template('usuario/index.html', error='Usuario o contraseña incorrectos')
 

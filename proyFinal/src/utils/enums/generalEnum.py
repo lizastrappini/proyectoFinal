@@ -17,6 +17,8 @@ class EstadoPagoEnum(enum.IntEnum):
     
 class LocalidadEnum(enum.IntEnum): 
     Rosario = 1
+    LasRosas = 2
+    NoDefinido = 0
 
 
 class EstadoPagoEnum(enum.IntEnum):
