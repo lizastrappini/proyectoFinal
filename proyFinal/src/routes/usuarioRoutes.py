@@ -27,16 +27,6 @@ def login():
         flash("Usuario o contraseña incorrectos","danger")
         return render_template('usuario/index.html')
 
-# @login_required
-# @usuario_bp.route('/miCuenta', methods=['GET'])
-# def miCuenta():
-#     id = current_user.Id
-#     usuario = usuarioController.miCuenta(id)
-#     if(usuario is not None):   
-#         return render_template('usuario/cuenta.html', usuario=usuario)
-#     else:
-#         return render_template('usuario/index.html')
-
 @login_required
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():

@@ -13,14 +13,14 @@ from datetime import datetime, timezone, timedelta
 from flask import render_template
 from werkzeug.security import check_password_hash
 
-def loginUser(email,password):
-    usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
-    return usuario
-# def loginUser(email, password):
-#     usuario = Usuario.query.filter_by(Email=email).first()
-#     if usuario and check_password_hash(usuario.Password, password):
-#         return usuario
-#     return None
+# def loginUser(email,password):
+#     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
+#     return usuario
+def loginUser(email, password):
+    usuario = Usuario.query.filter_by(Email=email).first()
+    if usuario and check_password_hash(usuario.Password, password):
+        return usuario
+    return None
 
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
@@ -33,7 +33,8 @@ def miCuenta(id):
             'email': usuario.Email,
             'password': usuario.Password,
             'usuario': usuario.NombreUsuario,
-            'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
+            'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria or 0)).name,
+            # 'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
             'localidad': generalEnum.LocalidadEnum(usuario.IdLocalidad).name,
             'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
             'direccion': usuario.Direccion,
@@ -94,7 +95,7 @@ def generar_token():
     return secrets.token_urlsafe(32)
 
 def enviar_mail_recuperacion(email, token, nombre):
-    link = f"http://127.0.0.1:5001/ingresarNuevaPass?token={token}"
+    link = f"http://127.0.0.1:5002/ingresarNuevaPass?token={token}"
 
     msg = Message("Voley App - Recuperación de contraseña",
                   sender="lizaotrascosas@gmail.com",
@@ -130,22 +131,40 @@ def recuperar_contraseña(token):
         return None
     return rec
 
+# def cambiarContraseña(token, nueva_contraseña):
+#     usuario = Usuario.query.filter_by(Token=token).first()
+#     usuario.Password = nueva_contraseña
+#     usuario.Token = None
+#     usuario.TokenEnviado = False
+#     usuario.FechaVencimientoToken = None
+#     db.session.commit()
+#     return True
+
 def cambiarContraseña(token, nueva_contraseña):
     usuario = Usuario.query.filter_by(Token=token).first()
-    usuario.Password = nueva_contraseña
-    usuario.Token = None
-    usuario.TokenEnviado = False
-    usuario.FechaVencimientoToken = None
-    db.session.commit()
-    return True
+    if usuario:
+        usuario.Password = generate_password_hash(nueva_contraseña)
+        usuario.Token = None
+        usuario.TokenEnviado = False
+        usuario.FechaVencimientoToken = None
+        db.session.commit()
+        return True
+    return False
 
-def verificarPass(token,password):
+
+# def verificarPass(token,password):
+#     usuario = Usuario.query.filter_by(Token=token).first()
+#     if usuario:
+#         if usuario.Password == password:
+#             return True
+#         else:
+#             return False
+#     return False
+
+def verificarPass(token, password):
     usuario = Usuario.query.filter_by(Token=token).first()
     if usuario:
-        if usuario.Password == password:
-            return True
-        else:
-            return False
+        return check_password_hash(usuario.Password, password)
     return False
 
 def verificarTokenEnviado(email):
@@ -162,7 +181,7 @@ def actualizar_contraseña(usuario_id, nueva_contraseña):
     try:
         usuario = Usuario.query.get(usuario_id)
         if usuario:
-            usuario.Password = nueva_contraseña
+            usuario.Password = generate_password_hash(nueva_contraseña)
             db.session.commit()
             return True
         else:

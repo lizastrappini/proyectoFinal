@@ -32,6 +32,7 @@ class CategoriaEnum(enum.IntEnum):
     Sub18 = 5
     Sub21 = 6
     Primera = 7
+    NoEspecificada = 0
     
 class DivisionEnum(enum.IntEnum):
     A = 1

@@ -54,10 +54,13 @@
                               {{ usuario.estado }}
                             </span>
                           </li>
+                         {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
                            <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Categoria:</span>
                             <span>{{usuario.categoria}}</span>
                           </li>
+                          {% endif %}
+                          
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Rol:</span>
                             <span>{{usuario.rol}}</span>
@@ -96,7 +99,7 @@
                 <div class="col-xl-8 col-lg-7 col-md-7">
                  
                   <!-- Tabla que muestra los pagos filtrados para ese usuario -->
-                  {% if current_user.is_authenticated and current_user.IdRol != RolEnum.Admin %}
+                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
                   <div class="card mb-4">
                     <h5 class="card-header">Estado de Cuotas</h5>
                     <div class="table-responsive text-nowrap">
@@ -109,6 +112,7 @@
                           </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
+                          {% if pagos %}
                           {% for pago in pagos %}
                             <tr>
                               <td>{{ pago.periodo if pago.periodo else '-' }}</td>
@@ -126,6 +130,11 @@
                               <td>{{ pago.fecha_pago.strftime('%d/%m/%Y') if pago.fecha_pago else '-' }}</td>
                             </tr>
                           {% endfor %}
+                          {% else %}
+                            <tr>
+                              <td colspan="3" class="text-center text-muted">No hay pagos registrados</td>
+                            </tr>
+                          {% endif %}
 
 
                         </tbody>

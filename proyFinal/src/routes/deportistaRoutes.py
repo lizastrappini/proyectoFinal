@@ -1,4 +1,5 @@
 import secrets
+import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
 from src.controllers import deportistaController
 from src.models.usuario import Usuario
@@ -81,8 +82,11 @@ def agregar_deportista():
         categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
-        password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
-        
+        # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
+        # Generar contraseña aleatoria segura
+        caracteres = string.ascii_letters + string.digits  # letras + números
+        password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  # 10 caracteres
+
         nuevo_deportista = Usuario(
             Dni= dni,
             Nombre=nombre,
@@ -91,7 +95,7 @@ def agregar_deportista():
             Categoria = categoria_id,
             Rama = rama_id,
             Division = division_id,
-            Password =  password_plana,
+            Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"entrenador_{dni}",
             IdLocalidad= 1,
