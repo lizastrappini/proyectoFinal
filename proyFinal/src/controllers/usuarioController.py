@@ -202,12 +202,16 @@ def actualizar_contraseña(usuario_id, nueva_contraseña):
     
 
 def usuario_tiene_cuota_al_dia(usuario_id):
+    hoy = date.today()
     ultimo_pago = Pago.query.filter(
         and_(
             Pago.Usuario_id == usuario_id,
             Pago.Estado == 1,
-            cast(Pago.FechaPago, Date) <= date.today()
+            cast(Pago.FechaPago, Date) <= hoy
         )
     ).order_by(Pago.FechaPago.desc()).first()
     
-    return ultimo_pago is not None
+    if ultimo_pago:
+        return ultimo_pago.FechaPago.month == hoy.month and ultimo_pago.FechaPago.year == hoy.year
+
+    return False

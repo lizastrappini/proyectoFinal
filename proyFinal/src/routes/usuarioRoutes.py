@@ -37,22 +37,6 @@ def login():
         return render_template('usuario/index.html')
 
 
-# @usuario_bp.route('/listar_usuarios', methods=['POST', 'GET'])
-# def listar_usuarios():
-#     email = request.form.get('email-username')  
-#     password = request.form.get('password') 
-#     usuario = usuarioController.loginUser(email, password)
-
-#     if usuario:
-
-#         cuota_al_dia = usuarioController.usuario_tiene_cuota_al_dia(usuario.Id)
-             
-#         login_user(usuario) 
-#         flash("Bienvenido!", "success")
-#         return render_template('inicio/index.html', usuario=usuario, cuota_al_dia=cuota_al_dia)
-#     else:
-#         flash("Usuario o contraseña incorrectos", "danger")
-#         return render_template('usuario/index.html')
     
 @usuario_bp.route('/cuota_al_dia', methods=['GET'])
 @login_required
@@ -60,35 +44,6 @@ def cuota_al_dia_route():
     cuota = usuarioController.usuario_tiene_cuota_al_dia(current_user.Id)
     return {"cuota_al_dia": cuota}
 
-
-# @usuario_bp.route('/listar_usuarios', methods=['POST'])
-# def login():
-#     email = request.form.get('email-username')  
-#     password = request.form.get('password') 
-#     usuario = usuarioController.loginUser(email, password)
-#     # remember = True if request.form.get('remember') == 'on' else False  
-#     usuario = usuarioController.loginUser(email, password)
-    
-#     ultimo_pago = Pago.query.filter_by(usuario=usuario.id).order_by(Pago.FechaPago.desc()).first()
-
-#     hoy = date.today()
-#     cuota_al_dia = ultimo_pago and ultimo_pago.FechaPago and ultimo_pago.FechaPago <= hoy
-
-#     if(usuario is not None):   
-#         login_user(usuario) 
-#         flash("Bienvenido!", "success")
-#         return render_template('inicio/index.html', usuario=usuario, cuota_al_dia= cuota_al_dia)
-#     else:
-#         flash("Usuario o contraseña incorrectos","danger")
-#         return render_template('usuario/index.html')
-
-# @usuario_bp.route('/')
-# def index():
-#     localidades = [
-#     {'value': loc.value, 'text': loc.name}
-#     for loc in generalEnum.LocalidadEnum
-#     ]
-#     return render_template('usuario/index.html', localidades=localidades)
 
 
 @login_required
