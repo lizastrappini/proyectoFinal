@@ -14,7 +14,6 @@ class Usuario(UserMixin, db.Model):
     Rama = db.Column(db.String(50), nullable=True)
     Division = db.Column(db.String(50), nullable=True)
     Localidad = db.Column(db.String(10), nullable=True)
-    # IdLocalidad = db.Column(db.Integer)
     IdEstado = db.Column(db.Integer)
     Direccion = db.Column(db.String(50))
     Telefono = db.Column(db.String(50))

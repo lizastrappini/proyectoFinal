@@ -16,12 +16,11 @@
                     <div class="card-body pt-12">
                       <div class="user-avatar-section">
                         <div class="d-flex align-items-center flex-column">
-                          <img
-                            class="img-fluid rounded-3 mb-4"
-                            src="../../static/img/avatars/2.png"
-                            height="120"
-                            width="120"
-                            alt="User avatar" />
+                         <div class="avatar rounded-circle d-flex  align-items-center justify-content-center text-white bg-label-primary mb-4"
+                                  style="width: 120px; height: 120px; font-size: 2rem; color: white;">
+                                {{ current_user.Nombre[0] }}{{ current_user.Apellido[0] }}
+                              </div>
+
                           <div class="user-info text-center">
                             <h5>{{ usuario.nombre }} {{ usuario.apellido }}</h5>
                             <span class="badge bg-label-hover-info rounded-pill">{{usuario.rol}}</span>

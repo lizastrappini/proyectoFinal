@@ -12,6 +12,8 @@ from src.utils.Mail import mail
 from datetime import datetime, timezone, timedelta
 from flask import render_template
 from werkzeug.security import check_password_hash
+from sqlalchemy import and_, cast, Date
+from datetime import date
 
 # def loginUser(email,password):
 #     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
@@ -199,3 +201,13 @@ def actualizar_contraseña(usuario_id, nueva_contraseña):
     
     
 
+def usuario_tiene_cuota_al_dia(usuario_id):
+    ultimo_pago = Pago.query.filter(
+        and_(
+            Pago.Usuario_id == usuario_id,
+            Pago.Estado == 1,
+            cast(Pago.FechaPago, Date) <= date.today()
+        )
+    ).order_by(Pago.FechaPago.desc()).first()
+    
+    return ultimo_pago is not None

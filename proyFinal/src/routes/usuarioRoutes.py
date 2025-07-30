@@ -1,6 +1,7 @@
+from datetime import date
 from babel.dates import format_date
 from flask import Blueprint, redirect, request, render_template,flash, url_for
-from sqlalchemy import desc
+from sqlalchemy import Date, cast, desc
 import src.controllers.usuarioController as usuarioController
 from flask import session
 from src.models.pago import Pago
@@ -8,24 +9,78 @@ from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from flask_login import logout_user, login_required, current_user, login_user
 from src import db
+from datetime import date
+from sqlalchemy import and_
+
 
 usuario_bp = Blueprint('usuarios', __name__)
 
-@usuario_bp.route('/listar_usuarios', methods=['POST'])
+@usuario_bp.route('/listar_usuarios', methods=['GET'])
+@login_required
+def listar_usuarios():
+    usuario = current_user
+    cuota_al_dia = usuarioController.usuario_tiene_cuota_al_dia(usuario.Id)
+    return render_template('inicio/index.html', usuario=usuario, cuota_al_dia=cuota_al_dia)
+
+@usuario_bp.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email-username')  
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(email, password)
-    # remember = True if request.form.get('remember') == 'on' else False  
-    usuario = usuarioController.loginUser(email, password)
 
-    if(usuario is not None):   
+    if usuario:
         login_user(usuario) 
         flash("Bienvenido!", "success")
-        return render_template('inicio/index.html', usuario=usuario)
+        return redirect(url_for('usuarios.listar_usuarios'))
     else:
-        flash("Usuario o contraseña incorrectos","danger")
+        flash("Usuario o contraseña incorrectos", "danger")
         return render_template('usuario/index.html')
+
+
+# @usuario_bp.route('/listar_usuarios', methods=['POST', 'GET'])
+# def listar_usuarios():
+#     email = request.form.get('email-username')  
+#     password = request.form.get('password') 
+#     usuario = usuarioController.loginUser(email, password)
+
+#     if usuario:
+
+#         cuota_al_dia = usuarioController.usuario_tiene_cuota_al_dia(usuario.Id)
+             
+#         login_user(usuario) 
+#         flash("Bienvenido!", "success")
+#         return render_template('inicio/index.html', usuario=usuario, cuota_al_dia=cuota_al_dia)
+#     else:
+#         flash("Usuario o contraseña incorrectos", "danger")
+#         return render_template('usuario/index.html')
+    
+@usuario_bp.route('/cuota_al_dia', methods=['GET'])
+@login_required
+def cuota_al_dia_route():
+    cuota = usuarioController.usuario_tiene_cuota_al_dia(current_user.Id)
+    return {"cuota_al_dia": cuota}
+
+
+# @usuario_bp.route('/listar_usuarios', methods=['POST'])
+# def login():
+#     email = request.form.get('email-username')  
+#     password = request.form.get('password') 
+#     usuario = usuarioController.loginUser(email, password)
+#     # remember = True if request.form.get('remember') == 'on' else False  
+#     usuario = usuarioController.loginUser(email, password)
+    
+#     ultimo_pago = Pago.query.filter_by(usuario=usuario.id).order_by(Pago.FechaPago.desc()).first()
+
+#     hoy = date.today()
+#     cuota_al_dia = ultimo_pago and ultimo_pago.FechaPago and ultimo_pago.FechaPago <= hoy
+
+#     if(usuario is not None):   
+#         login_user(usuario) 
+#         flash("Bienvenido!", "success")
+#         return render_template('inicio/index.html', usuario=usuario, cuota_al_dia= cuota_al_dia)
+#     else:
+#         flash("Usuario o contraseña incorrectos","danger")
+#         return render_template('usuario/index.html')
 
 # @usuario_bp.route('/')
 # def index():

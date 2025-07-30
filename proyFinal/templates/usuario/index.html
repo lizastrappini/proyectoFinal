@@ -83,7 +83,7 @@
           <div class="w-px-400 mx-auto pt-5 pt-lg-0">
             <h4 class="mb-1">Bienvenido! 👋</h4>
 
-            <form id="formAuthentication" class="mb-5" action="/listar_usuarios" method="post">
+            <form id="formAuthentication" class="mb-5" action="{{ url_for('usuarios.login') }}" method="post">
               <div class="form-floating form-floating-outline mb-5">
                 <input
                   type="text"
