@@ -2,6 +2,7 @@ from config import config
 from flask import Flask, render_template, redirect,session,url_for
 from flask_sqlalchemy import SQLAlchemy 
 from src import db
+from src.controllers import notificacionController
 from src.routes.usuarioRoutes import usuario_bp
 from src.routes.calendarioRoutes import calendario_bp
 from src.routes.pagoRoutes import pago_bp
@@ -9,10 +10,12 @@ from src.routes.inicioRoutes import inicio_bp
 from src.routes.entrenadorRoutes import entrenador_bp
 from src.routes.deportistaRoutes import deportista_bp
 from src.routes.estadisticasRoutes import estadisticas_bp
+from src.routes.notificacionRoutes import notificacion_bp
+
 import src.utils.enums
 import inspect
 import enum
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 import src.controllers.usuarioController as usuarioController
 from src.models.usuario import Usuario
 from src.utils.Mail import mail
@@ -31,6 +34,7 @@ app.register_blueprint(pago_bp, url_prefix='/pago')
 app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')
+app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
 app.register_blueprint(estadisticas_bp)
 
 #para exportar los enums a cualquier template
@@ -57,6 +61,15 @@ def load_user(user_id):
   # ✅ importar desde config
 
 mail.init_app(app)
+
+
+@app.context_processor
+def inject_notificaciones():
+    if current_user.is_authenticated:
+        notificaciones = notificacionController.obtener_notificaciones()
+    else:
+        notificaciones = []
+    return dict(notificaciones=notificaciones)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Nueva Notificación</title>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f5f5;
+        padding: 20px;
+        color: #444;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eeeeee;
+      }
+      .header h2 {
+        color: #666cff;
+        margin: 0;
+      }
+      .content {
+        margin-top: 20px;
+        line-height: 1.6;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .btn {
+        display: inline-block;
+        background-color: #666cff;
+        color: white !important;
+        padding: 12px 24px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+      .footer {
+        margin-top: 40px;
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>{{ notificacion.Titulo }}</h2>
+      </div>
+      <div class="content">
+        
+        
+        <p>{{ notificacion.Descripcion | safe }}</p>
+        <br>
+        <div class="button-container">
+          <a href="{{ link }}" class="btn">Ver Notificación</a>
+        </div>
+
+        <!-- <p style="margin-top: 30px;">Si no realizaste esta solicitud, podés ignorar este mensaje. El enlace expirará automáticamente después de cierto tiempo por razones de seguridad.</p> -->
+      </div>
+      <div class="footer">
+        © 2025 Tu Empresa. Todos los derechos reservados.
+      </div>
+    </div>
+  </body>
+</html>
