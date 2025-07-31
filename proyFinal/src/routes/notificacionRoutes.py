@@ -37,12 +37,7 @@ def nueva_notificacion():
         titulo = request.form.get('titulo')
         descripcion = request.form.get('descripcion')
         categoria_nombre = request.form.get('categoria')
-        # categoria = request.form.get('categoria')
-        # if categoria is not None and categoria != '':
-        #     categoria = int(categoria)
-        # else:
-        #     categoria = None
-        
+    
         if not categoria_nombre:
             categoria_id = None
         else:
@@ -59,13 +54,13 @@ def nueva_notificacion():
             Categoria=categoria_id
         )
         
-        # if categoria:
-        #     usuarios_destino = Usuario.query.filter_by(ategoria=categoria).all()
-        # else:
-        #     usuarios_destino = Usuario.query.all()
+        if categoria_id:
+            usuarios_destino = Usuario.query.filter_by(Categoria=categoria_id).all()
+        else:
+            usuarios_destino = Usuario.query.all()
             
-        # for user in usuarios_destino:
-        #     notificacionController.enviar_mail(user.Email, titulo, descripcion)
+        for user in usuarios_destino:
+            notificacionController.enviar_mail(user.Email, titulo, descripcion)
 
         notificacionController.agregarNotificacion(nueva_notif)
         # notificacionController.enviar_mail(nueva_notif)

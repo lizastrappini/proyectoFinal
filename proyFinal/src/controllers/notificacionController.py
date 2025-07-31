@@ -70,11 +70,16 @@ def enviar_mail(destinatario,titulo,descripcion):
     link = f"http://127.0.0.1:5002/notificacion" # aca despues va la url del servidor
     
     # link = url_for('usuarios.login', _external=True)
-    msg.html = render_template("notificacion/emailNotif.html", titulo=titulo, descripcion=descripcion)
-
+    # msg.html = render_template("notificacion/emailNotif.html", titulo=titulo, descripcion=descripcion)
+    msg.html = render_template(
+        "notificacion/emailNotif.html",
+        notificacion={'Titulo': titulo, 'Descripcion': descripcion},
+        link=link
+    )
     try:
         mail.send(msg)
         return True
+    
     except Exception as e:
         print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
         return False
