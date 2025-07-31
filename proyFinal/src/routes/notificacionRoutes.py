@@ -17,16 +17,17 @@ notificacion_bp = Blueprint('notificacion', __name__)
 
 @notificacion_bp.route('/')
 def index():
-    # categorias = [
-    # {'value': cat.value, 'text': cat.name}
-    # for cat in generalEnum.CategoriaEnum
-    # ]
+    categorias = [
+    {'value': cat.value, 'text': cat.name}
+    for cat in generalEnum.CategoriaEnum
+    ]
     notif = notificacionController.obtener_notificaciones()
-    return render_template('notificacion/index.html', notificaciones= notif)
+    return render_template('notificacion/index.html', notificaciones= notif, categorias= categorias)
 
 
 @notificacion_bp.route('/obtener', methods=['GET'])
 def obtener():
+    
     notif = notificacionController.obtener_notificaciones()
     return jsonify(data=notif)  
 
@@ -35,17 +36,27 @@ def nueva_notificacion():
     try:
         titulo = request.form.get('titulo')
         descripcion = request.form.get('descripcion')
-        # categoria = request.form.get('categoria') or None
+        categoria_nombre = request.form.get('categoria')
         # categoria = request.form.get('categoria')
         # if categoria is not None and categoria != '':
         #     categoria = int(categoria)
         # else:
         #     categoria = None
-
+        
+        if not categoria_nombre:
+            categoria_id = None
+        else:
+            try:
+                categoria_enum = generalEnum.CategoriaEnum(int(categoria_nombre))
+                categoria_id = categoria_enum.value
+            except ValueError:
+                raise ValueError("Categoría inválida")
+        
+       
         nueva_notif = Notificacion(
             Titulo = titulo,
             Descripcion= descripcion,
-            # Categoria=categoria
+            Categoria=categoria_id
         )
         
         # if categoria:

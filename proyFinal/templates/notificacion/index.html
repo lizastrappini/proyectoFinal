@@ -25,6 +25,7 @@
                   <th>Id</th>
                   <th>Título</th>
                   <th>Descripción</th>
+                  <th>Categoria</th>
                   {% if current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
                   <th>Acciones</th>
                   {% endif %}
@@ -57,17 +58,17 @@
                               <label for="modalEditUserFirstName">Título</label>
                             </div>
                           </div>
-                          <!-- <div class="col-12">
+                          <div class="col-12">
                             <div class="form-floating form-floating-outline">
                               <select id="categoria" name="categoria" class="form-select">
                                 <option value="" disabled selected>Seleccioná una categoría</option>
-                                {% for nombre in categorias %}
-                                  <option value="{{ nombre.text }}">{{ nombre.text }}</option>
+                                {% for cat in categorias %}
+                                  <option value="{{ cat.value }}">{{ cat.text }}</option>
                                 {% endfor %}
                               </select>
                               <label for="categoria">Categoría</label>
                             </div>
-                          </div> -->
+                          </div>
                           <div class="col-12">
                             <div class="form-floating form-floating-outline">
                               <textarea
@@ -119,7 +120,9 @@ function filtrar() {
   const columnas = [
     { data: 'id' },
     { data: 'titulo' },
-    { data: 'descripcion' }
+    { data: 'descripcion' },
+    { data: 'categoria' },
+
   ];
 
   // Solo agregar columna Acciones si es admin (1) o entrenador (3)
