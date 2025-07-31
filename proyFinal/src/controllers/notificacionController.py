@@ -10,19 +10,19 @@ from src import db
 from src.utils.Mail import mail
 
 def obtener_notificaciones():
-    # if not current_user.is_authenticated:
-    #     return [] 
-    # if current_user.IdRol in (1, 2):  # Admin o Entrenador
-    #     resultados = Notificacion.query.all()
-    # else:  # Deportista
-    #     resultados = Notificacion.query.filter(
-    #         or_(
-    #             Notificacion.Categoria == current_user.Categoria,
-    #             Notificacion.Categoria == None
-    #         )
-    #     ).all()
-    query = Notificacion.query
-    resultados = query.all()
+    if not current_user.is_authenticated:
+        return []
+
+    # Filtrar según el rol
+    if current_user.IdRol in (1, 3):  # Admin o Entrenador
+        resultados = Notificacion.query.all()
+    else:  # Deportista
+        resultados = Notificacion.query.filter(
+            or_(
+                Notificacion.Categoria == current_user.Categoria,
+                Notificacion.Categoria == None
+            )
+        ).all()
 
     notificaciones = []
     for e in resultados:
