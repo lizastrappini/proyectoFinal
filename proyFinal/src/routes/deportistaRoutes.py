@@ -85,7 +85,15 @@ def agregar_deportista():
         # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
         # Generar contraseña aleatoria segura
         caracteres = string.ascii_letters + string.digits  # letras + números
-        password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  # 10 caracteres
+        password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
+        
+        usuario_existente = Usuario.query.filter_by(Dni=dni).first()
+        if usuario_existente:
+         raise ValueError(f"Ya existe un usuario con el DNI {dni}")
+     
+        mail_usuario = Usuario.query.filter_by(Email=email).first()
+        if mail_usuario:
+         raise ValueError(f"Ya existe un usuario con el mismo email")
 
         nuevo_deportista = Usuario(
             Dni= dni,
@@ -127,42 +135,68 @@ def agregar_deportista():
 
 @deportista_bp.route('/editar/<int:dni>', methods=['POST'])
 def editar_deportista(dni):
-    deportista = deportistaController.obtener_deportista_por_dni(dni)
-    if not deportista:
+    try:
+        nuevo_dni = request.form.get('dni')
+        nuevo_email = request.form.get('email')
+        
+        if nuevo_dni and int(nuevo_dni) != dni:
+            usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
+            if usuario_existente:
+                raise ValueError(f"Ya existe un usuario con el DNI {nuevo_dni}")
+        
+        deportista = deportistaController.obtener_deportista_por_dni(dni)
+        
+        if not deportista:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Deportista no encontrado'}), 400
+            else:
+                flash('Deportista no encontrado', 'danger')
+                return redirect(url_for('deportista.index'))
+        
+        if nuevo_email and nuevo_email != deportista.Email:
+            email_usuario = Usuario.query.filter_by(Email=nuevo_email).first()
+            if email_usuario:
+                raise ValueError(f"Ya existe un usuario con el mismo email")
+
+        
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        telefono = request.form.get('telefono')
+        categoria_nombre = request.form.get('categoria')
+        rama_nombre = request.form.get('rama')
+        division_nombre = request.form.get('division')
+
+        # Actualiza campos
+        deportista.Dni = nuevo_dni
+        deportista.Nombre = nombre
+        deportista.Apellido = apellido
+        deportista.Email = nuevo_email
+        deportista.Telefono = telefono
+        deportista.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
+        deportista.Rama = generalEnum.RamaEnum[rama_nombre].value
+        deportista.Division = generalEnum.DivisionEnum[division_nombre].value
+
+        deportistaController.actualizar_deportista(deportista)
+
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Deportista no encontrado'}), 400
+            return jsonify({'success': True, 'message': 'Deportista actualizado exitosamente'}), 200
         else:
-            flash('Deportista no encontrado', 'danger')
+            flash('Deportista actualizado exitosamente', 'success')
             return redirect(url_for('deportista.index'))
 
-    dni = request.form.get('dni')
-    nombre = request.form.get('nombre')
-    apellido = request.form.get('apellido')
-    email = request.form.get('email')
-    telefono = request.form.get('telefono')
-    categoria_nombre = request.form.get('categoria')
-    rama_nombre = request.form.get('rama')
-    division_nombre = request.form.get('division')
-    
+    except ValueError as ve:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(ve)}), 400
+        else:
+            flash(str(ve), 'danger')
+            return redirect(url_for('deportista.index'))
 
-    # Actualiza campos
-    deportista.Dni = dni
-    deportista.Nombre = nombre
-    deportista.Apellido = apellido
-    deportista.Email = email
-    deportista.Telefono = telefono
-    deportista.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
-    deportista.Rama = generalEnum.RamaEnum[rama_nombre].value
-    deportista.Division = generalEnum.DivisionEnum[division_nombre].value
-    
-
-    deportistaController.actualizar_deportista(deportista)
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({'success': True, 'message': 'Deportista actualizado exitosamente'}), 200
-    else:
-        flash('Deportista actualizado exitosamente', 'success')
-        return redirect(url_for('deportista.index'))
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': f'Error inesperado: {str(e)}'}), 500
+        else:
+            flash('Ocurrió un error inesperado', 'danger')
+            return redirect(url_for('deportista.index'))
 
 
 

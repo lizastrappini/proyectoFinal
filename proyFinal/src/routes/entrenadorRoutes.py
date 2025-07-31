@@ -63,7 +63,15 @@ def agregar_entrenador():
         caracteres = string.ascii_letters + string.digits  # letras + números
         password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  # 10 caracteres
 
-
+        usuario_existente = Usuario.query.filter_by(Dni=dni).first()
+        if usuario_existente:
+         raise ValueError(f"Ya existe un usuario con el DNI {dni}")
+     
+     
+        mail_usuario = Usuario.query.filter_by(Email=email).first()
+        if mail_usuario:
+         raise ValueError(f"Ya existe un usuario con el mismo email")
+     
         nuevo_entrenador = Usuario(
             Dni= dni,
             Nombre=nombre,
@@ -102,36 +110,63 @@ def agregar_entrenador():
 
 @entrenador_bp.route('/editar/<int:dni>', methods=['POST'])
 def editar_entrenador(dni):
-    entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
-    if not entrenador:
+    try:
+        nuevo_dni = request.form.get('dni')
+        nuevo_email = request.form.get('email')
+        
+        if nuevo_dni and int(nuevo_dni) != dni:
+            usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
+            if usuario_existente:
+                raise ValueError(f"Ya existe un usuario con el DNI {nuevo_dni}")
+                    
+        entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
+        
+        if not entrenador:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Entrenador no encontrado'}), 400
+            else:
+                flash('Entrenador no encontrado', 'danger')
+                return redirect(url_for('entrenador.index'))
+        
+        if nuevo_email and nuevo_email != entrenador.Email:
+            email_usuario = Usuario.query.filter_by(Email=nuevo_email).first()
+            if email_usuario:
+                raise ValueError(f"Ya existe un usuario con el mismo email")
+
+        
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        telefono = request.form.get('telefono')
+        categoria_nombre = request.form.get('categoria')
+
+        # Actualiza campos
+        entrenador.Dni = nuevo_dni
+        entrenador.Nombre = nombre
+        entrenador.Apellido = apellido
+        entrenador.Email = nuevo_email
+        entrenador.Telefono = telefono
+        entrenador.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
+
+        entrenadorController.actualizar_entrenador(entrenador)
+    
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Entrenador no encontrado'}), 400
+            return jsonify({'success': True, 'message': 'Entrenador actualizado exitosamente'}), 200
         else:
-            flash('Entrenador no encontrado', 'danger')
+            flash('Entrenador actualizado exitosamente', 'success')
+            return redirect(url_for('entrenador.index'))
+    except ValueError as ve:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(ve)}), 400
+        else:
+            flash(str(ve), 'danger')
             return redirect(url_for('entrenador.index'))
 
-    dni = request.form.get('dni')
-    nombre = request.form.get('nombre')
-    apellido = request.form.get('apellido')
-    email = request.form.get('email')
-    telefono = request.form.get('telefono')
-    categoria_nombre = request.form.get('categoria')
-
-    # Actualiza campos
-    entrenador.Dni = dni
-    entrenador.Nombre = nombre
-    entrenador.Apellido = apellido
-    entrenador.Email = email
-    entrenador.Telefono = telefono
-    entrenador.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
-
-    entrenadorController.actualizar_entrenador(entrenador)
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({'success': True, 'message': 'Entrenador actualizado exitosamente'}), 200
-    else:
-        flash('Entrenador actualizado exitosamente', 'success')
-        return redirect(url_for('entrenador.index'))
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': f'Error inesperado: {str(e)}'}), 500
+        else:
+            flash('Ocurrió un error inesperado', 'danger')
+            return redirect(url_for('entrenador.index'))
 
 
 

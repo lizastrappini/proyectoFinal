@@ -80,8 +80,8 @@
                       <div class="modal-body p-0">
                         <div class="text-center mb-6">
                           <h4 class="mb-2" id="tituloAdd">Agregar Deportista</h4>
+                          <div id="formError" class="alert alert-danger mx-4 d-none" role="alert"></div>
                         </div>
-                        
                         <form id="editDeportistaForm" class="row g-5" method="POST" action="{{ url_for('deportista.agregar_deportista') }}">
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
@@ -160,39 +160,6 @@
                             </select>
                           </div>
                           </div>
-                      <!-- <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="137">
-                              <div class="position-relative" data-select2-id="136">
-                                  <select id="categoria" name="categoria"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                  data-select2-id="select2Multiple" tabindex="-1" aria-hidden="true" multiple required>
-                                
-                                    <option value=""></option>
-                                    {% for categoria in categorias %}
-                                        <option value="{{ categoria.text }}">{{ categoria.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="categoria">Categorias</label>
-                            </div>
-                          </div> -->
-
-                          <!-- <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="138">
-                              <div class="position-relative" data-select2-id="137">
-                                  <select id="division" name="division"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                  data-select2-id="select2Multiple1" tabindex="-1" aria-hidden="true" required>
-                                
-                                    <option value=""></option>
-                                    {% for div in divisiones %}
-                                        <option value="{{ div.text }}">{{ div.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="division">Division</label>
-                            </div>
-                          </div> -->
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="division" class="form-label">Division</label>
@@ -204,23 +171,6 @@
                             </select>
                           </div>
                           </div>
-                          <!-- <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="139">
-                              <div class="position-relative" data-select2-id="138">
-                                  <select id="rama" name="rama"  
-                                  class="select2 form-select select2-hidden-accessible " 
-                                   data-select2-id="select2Multiple2" tabindex="-1" aria-hidden="true" required>
-                                
-                                    <option value=""></option>
-                                    {% for rama in ramas %}
-                                        <option value="{{ rama.text }}">{{ rama.text }}</option>
-                                    {% endfor %}
-                              </select>
-                              </div>
-                              <label for="rama">Rama</label>
-                            </div>
-                          </div>
-                           -->
 
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
@@ -256,6 +206,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                  }); -->
 
   {% endblock %}
 
@@ -385,6 +341,9 @@
               $('#addUser').modal('show');
             }
               $('#addUser').on('hidden.bs.modal', function () {
+              const errorDiv = document.getElementById('formError');
+              errorDiv.classList.add('d-none');
+              errorDiv.textContent = '';
               $('#editDeportistaForm')[0].reset();
               $('#categoria').val(null).trigger('change');
               $('#rama').val(null).trigger('change');
@@ -434,11 +393,10 @@
                   if (tabla) tabla.ajax.reload();
                 })
                 .catch(error => {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-                  });
+                  const errorDiv = document.getElementById('formError');
+                  errorDiv.textContent = error.message;
+                  errorDiv.classList.remove('d-none');
+                  
                 });
               });
 

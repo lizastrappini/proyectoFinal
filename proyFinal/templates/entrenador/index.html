@@ -70,6 +70,7 @@
                     <div class="modal-body p-0">
                       <div class="text-center mb-6">
                         <h4 class="mb-2" id="tituloAdd">Agregar Entrenador</h4>
+                        <div id="formError" class="alert alert-danger mx-4 d-none" role="alert"></div>
                       </div>
                       
                       <form id="editEntrenadorForm" class="row g-5" method="POST" action="{{ url_for('entrenador.agregar_entrenador') }}">
@@ -304,6 +305,9 @@
             $('#addUser').modal('show');
           }
             $('#addUser').on('hidden.bs.modal', function () {
+            const errorDiv = document.getElementById('formError');
+            errorDiv.classList.add('d-none');
+            errorDiv.textContent = '';
             $('#editEntrenadorForm')[0].reset();
             $('#categoria').val(null).trigger('change');
             $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
@@ -349,11 +353,9 @@
                 if (tabla) tabla.ajax.reload();
               })
               .catch(error => {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: error.message
-                });
+                const errorDiv = document.getElementById('formError');
+                  errorDiv.textContent = error.message;
+                  errorDiv.classList.remove('d-none');
               });
             });
 
