@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event start (flatpicker)
     if (eventStartDate) {
       var start = eventStartDate.flatpickr({
+        locale: 'es',
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
         onReady: function (selectedDates, dateStr, instance) {
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event end (flatpicker)
     if (eventEndDate) {
       var end = eventEndDate.flatpickr({
+        locale: 'es',
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
         onReady: function (selectedDates, dateStr, instance) {
@@ -87,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inline sidebar calendar (flatpicker)
     if (inlineCalendar) {
       inlineCalInstance = inlineCalendar.flatpickr({
+        locale: 'es',
         monthSelectorType: 'static',
         inline: true
       });
@@ -102,14 +105,17 @@ document.addEventListener('DOMContentLoaded', function () {
       bsAddEventSidebar.show();
       // For update event set offcanvas title text: Update Event
       if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Update Event';
+        offcanvasTitle.innerHTML = 'Actualizar Evento';
       }
-      btnSubmit.innerHTML = 'Update';
+      btnSubmit.innerHTML = 'Actualizar';
       btnSubmit.classList.add('btn-update-event');
       btnSubmit.classList.remove('btn-add-event');
       btnDeleteEvent.classList.remove('d-none');
 
       eventTitle.value = eventToUpdate.title;
+      localidad.value  =eventToUpdate.localidad;
+      categoria.value = eventToUpdate.categoria;
+      tipoEvento.value = eventToUpdate.extendedProps.tipoEvento;
       start.setDate(eventToUpdate.start, true, 'Y-m-d');
       eventToUpdate.allDay === true ? (allDaySwitch.checked = true) : (allDaySwitch.checked = false);
       eventToUpdate.end !== null
@@ -185,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // We are reading event object from app-calendar-events.js file directly by including that file above app-calendar file.
       // You should make an API call, look into above commented API call for reference
       let selectedEvents = currentEvents.filter(function (event) {
+        
         // console.log(event.extendedProps.calendar.toLowerCase());
         return calendars.includes(event.extendedProps.calendar.toLowerCase());
       });
@@ -196,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Init FullCalendar
     // ------------------------------------------------
     let calendar = new Calendar(calendarEl, {
+      locale: 'es',
       initialView: 'dayGridMonth',
        displayEventTime: false,
        events: {
@@ -222,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       },
       headerToolbar: {
+        locale: 'es',
         start: 'sidebarToggle, prev,next, title',
         end: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
       },
@@ -240,9 +249,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // For new event set offcanvas title text: Add Event
         if (offcanvasTitle) {
-          offcanvasTitle.innerHTML = 'Add Event';
+          offcanvasTitle.innerHTML = 'Agregar Evento';
         }
-        btnSubmit.innerHTML = 'Add';
+        btnSubmit.innerHTML = 'Agregar';
         btnSubmit.classList.remove('btn-update-event');
         btnSubmit.classList.add('btn-add-event');
         btnDeleteEvent.classList.add('d-none');
@@ -271,21 +280,21 @@ document.addEventListener('DOMContentLoaded', function () {
         eventTitle: {
           validators: {
             notEmpty: {
-              message: 'Please enter event title '
+              message: 'Por favor complete el Titulo'
             }
           }
         },
         eventStartDate: {
           validators: {
             notEmpty: {
-              message: 'Please enter start date '
+              message: 'Por favor complete la fecha de inicio '
             }
           }
         },
         eventEndDate: {
           validators: {
             notEmpty: {
-              message: 'Please enter end date '
+              message: 'Por favor complete la fecha de fin '
             }
           }
         }
@@ -471,15 +480,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // When modal hides reset input values
     addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
+      locale: 'es';
       resetValues();
     });
 
     // Hide left sidebar if the right sidebar is open
     btnToggleSidebar.addEventListener('click', e => {
       if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Add Event';
+        offcanvasTitle.innerHTML = 'Agregar Evento';
       }
-      btnSubmit.innerHTML = 'Add';
+      btnSubmit.innerHTML = 'Agregar';
       btnSubmit.classList.remove('btn-update-event');
       btnSubmit.classList.add('btn-add-event');
       btnDeleteEvent.classList.add('d-none');
@@ -513,6 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Jump to date on sidebar(inline) calendar change
     inlineCalInstance.config.onChange.push(function (date) {
+      locale: 'es';
       calendar.changeView(calendar.view.type, moment(date[0]).format('YYYY-MM-DD'));
       modifyToggler();
       appCalendarSidebar.classList.remove('show');

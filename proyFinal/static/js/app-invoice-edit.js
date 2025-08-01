@@ -34,12 +34,14 @@
   // Datepicker
   if (invoiceDate) {
     invoiceDate.flatpickr({
+      locale: 'es',
       monthSelectorType: 'static',
       defaultDate: date
     });
   }
   if (dueDate) {
     dueDate.flatpickr({
+      locale: 'es',
       monthSelectorType: 'static',
       defaultDate: date
     });

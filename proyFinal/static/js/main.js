@@ -210,9 +210,9 @@ if (document.getElementById('layout-menu')) {
     i18next
       .use(i18NextHttpBackend)
       .init({
-        lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'en',
+        lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'es',
         debug: false,
-        fallbackLng: 'en',
+        fallbackLng: 'es',
         backend: {
           loadPath: assetsPath + 'json/locales/{{lng}}.json'
         },

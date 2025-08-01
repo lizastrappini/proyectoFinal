@@ -172,6 +172,7 @@
   }
   // Init kanban
   const kanban = new jKanban({
+    locale: 'es',
     element: '.kanban-wrapper',
     gutter: '12px',
     widthBoard: '250px',

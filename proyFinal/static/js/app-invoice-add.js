@@ -25,6 +25,7 @@
   if (invoiceItemQtyList) {
     invoiceItemQtyList.forEach(function (invoiceItemQty) {
       new Cleave(invoiceItemQty, {
+        locale: 'es',
         delimiter: '',
         numeral: true
       });
@@ -35,17 +36,20 @@
   if (invoiceDateList) {
     invoiceDateList.forEach(function (invoiceDateEl) {
       invoiceDateEl.flatpickr({
+        locale: 'es',
         monthSelectorType: 'static'
       });
     });
   }
   if (invoiceDate) {
     invoiceDate.flatpickr({
+      locale: 'es',
       monthSelectorType: 'static'
     });
   }
   if (dueDate) {
     dueDate.flatpickr({
+      locale: 'es',
       monthSelectorType: 'static'
     });
   }
