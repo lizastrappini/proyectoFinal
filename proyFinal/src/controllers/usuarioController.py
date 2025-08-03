@@ -139,14 +139,6 @@ def recuperar_contraseña(token):
         return None
     return rec
 
-# def cambiarContraseña(token, nueva_contraseña):
-#     usuario = Usuario.query.filter_by(Token=token).first()
-#     usuario.Password = nueva_contraseña
-#     usuario.Token = None
-#     usuario.TokenEnviado = False
-#     usuario.FechaVencimientoToken = None
-#     db.session.commit()
-#     return True
 
 def cambiarContraseña(token, nueva_contraseña):
     usuario = Usuario.query.filter_by(Token=token).first()

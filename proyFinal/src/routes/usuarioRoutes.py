@@ -1,4 +1,5 @@
 from datetime import date
+import string
 from babel.dates import format_date
 from flask import Blueprint, redirect, request, render_template,flash, url_for
 from sqlalchemy import Date, cast, desc
@@ -161,6 +162,20 @@ def cambiarPass():
         flash("Las contraseñas no coinciden", "danger")
         return render_template('usuario/nuevaPass.html', token=token)
     
+
+    if not password or len(password) < 8:
+        flash("La contraseña debe tener al menos 8 caracteres.", "danger")
+        return render_template('usuario/nuevaPass.html', token=token)
+      
+    elif not any(c.isupper() for c in password):
+        flash("La contraseña debe contener al menos una letra mayúscula.", "danger")
+        return render_template('usuario/nuevaPass.html', token=token)
+       
+    # Validación: al menos un símbolo
+    elif not any(c in string.punctuation for c in password):
+        flash("La contraseña debe contener al menos un símbolo (por ejemplo: !, @, #, etc).", "danger")
+        return render_template('usuario/nuevaPass.html', token=token)
+        
     recuperar = usuarioController.cambiarContraseña(token, password)
 
     if recuperar is True:
@@ -182,7 +197,15 @@ def cambiar_contraseña():
     errors = {}
 
     if not nueva or len(nueva) < 8:
-        errors['newPassword'] = 'La contraseña debe tener al menos 8 caracteres.'
+        # errors['newPassword'] = 'La contraseña debe tener al menos 8 caracteres.'
+        flash("La contraseña debe tener al menos 8 caracteres.", "danger")
+        return redirect(url_for('usuarios.miCuenta'))
+    elif not any(c.isupper() for c in nueva):
+        errors['newPassword'] = 'La contraseña debe contener al menos una letra mayúscula.'
+    # Validación: al menos un símbolo
+    elif not any(c in string.punctuation for c in nueva):
+        errors['newPassword'] = 'La contraseña debe contener al menos un símbolo (por ejemplo: !, @, #, etc).'
+    
     if nueva != confirmar:
         errors['confirmPassword'] = 'Las contraseñas no coinciden.'
 
