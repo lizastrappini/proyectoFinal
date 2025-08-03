@@ -30,7 +30,7 @@ app.config.from_object('config.Config')
 db.init_app(app)
 
 # Registra blueprints (rutas)
-app.register_blueprint(usuario_bp, url_prefix='/usuario')
+app.register_blueprint(usuario_bp)
 app.register_blueprint(calendario_bp)
 app.register_blueprint(pago_bp, url_prefix='/pago')
 app.register_blueprint(inicio_bp)
