@@ -16,46 +16,58 @@
   <div class="row text-center g-4">
     <div class="col-md-3">
       <div class="card card-tel h-100 shadow-sm">
+         <a href="tel:{{ contacto['teléfono'] }}" target="_blank" 
+            class="text-decoration-none text-black"> 
         <div class="card-body">
           <div class="icon-circle icon-tel mb-3 mx-auto">
             <i class="fas fa-phone fa-2x text-white"></i>
           </div>
           <h5 class="card-title">Teléfono</h5>
-          <p class="card-text">{{ contacto['teléfono'] }}</p>
+          <p class="card-text"> {{ contacto['teléfono'] }} </p>
         </div>
+        </a>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card card-email h-100 shadow-sm">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ contacto['email'] }}" target="_blank" 
+            class="text-decoration-none text-black">
         <div class="card-body">
           <div class="icon-circle icon-email mb-3 mx-auto">
             <i class="fas fa-envelope fa-2x text-white"></i>
           </div>
           <h5 class="card-title">Email</h5>
-          <p class="card-text">{{ contacto['email'] }}</p>
+          <p class="card-text"> {{ contacto['email'] }}</p>
         </div>
+        </a>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card card-wpp h-100 shadow-sm">
+           <a href="https://wa.me/{{ contacto['whatsapp'] | replace(' ', '') }}" target="_blank" 
+            class="text-decoration-none text-black">
         <div class="card-body">
           <div class="icon-circle icon-wpp mb-3 mx-auto">
             <i class="fab fa-whatsapp fa-2x text-white"></i>
           </div>
           <h5 class="card-title">WhatsApp</h5>
-          <p class="card-text">{{ contacto['whatsapp'] }}</p>
+          <p class="card-text">{{ contacto['whatsapp'] }}   </p>
         </div>
+        </a>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card card-instagram h-100 shadow-sm">
+          <a href="{{ contacto['instagram'] }}" target="_blank" 
+            class="text-decoration-none text-black">
         <div class="card-body">
           <div class="icon-circle icon-instagram mb-3 mx-auto">
             <i class="fab fa-instagram fa-2x text-white"></i>
           </div>
           <h5 class="card-title">Instagram</h5>
-          <p class="card-text">{{ contacto['instagram'] }}</p>
+          <p class="card-text"> @voleycarc</p>
         </div>
+        </a>
       </div>
     </div>
   </div>

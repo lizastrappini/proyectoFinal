@@ -47,7 +47,7 @@ def cuota_al_dia_route():
 
 
 @login_required
-@usuario_bp.route('/miCuenta', methods=['GET'])
+@usuario_bp.route('/', methods=['GET'])
 def miCuenta():
     id = current_user.Id
     usuario = usuarioController.miCuenta(id)

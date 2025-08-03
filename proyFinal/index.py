@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect,session,url_for
 from flask_sqlalchemy import SQLAlchemy 
 from src import db
 from src.controllers import notificacionController
+from src.models.contacto import Contacto
 from src.routes.usuarioRoutes import usuario_bp
 from src.routes.calendarioRoutes import calendario_bp
 from src.routes.pagoRoutes import pago_bp
@@ -29,7 +30,7 @@ app.config.from_object('config.Config')
 db.init_app(app)
 
 # Registra blueprints (rutas)
-app.register_blueprint(usuario_bp)
+app.register_blueprint(usuario_bp, url_prefix='/usuario')
 app.register_blueprint(calendario_bp)
 app.register_blueprint(pago_bp, url_prefix='/pago')
 app.register_blueprint(inicio_bp)
@@ -72,6 +73,16 @@ def inject_notificaciones():
     else:
         notificaciones = []
     return dict(notificaciones=notificaciones)
+
+
+# En tu app principal, por ejemplo app.py o __init__.py
+from datetime import datetime
+
+@app.context_processor
+def inject_contacto():
+    contacto = Contacto.query.first()
+    return {'contacto': contacto, 'now': datetime.now()}
+
 
 
 if __name__ == "__main__":

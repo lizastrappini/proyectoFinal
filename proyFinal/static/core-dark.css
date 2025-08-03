@@ -30748,6 +30748,7 @@ a.bg-vimeo:hover, a.bg-vimeo:focus {
 }
 
 .footer.bg-light {
+  background-color: #2e5a10;
   color: #b2b3ca;
 }
 .footer.bg-light .footer-link {
