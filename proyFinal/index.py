@@ -11,6 +11,7 @@ from src.routes.entrenadorRoutes import entrenador_bp
 from src.routes.deportistaRoutes import deportista_bp
 from src.routes.estadisticasRoutes import estadisticas_bp
 from src.routes.notificacionRoutes import notificacion_bp
+from src.routes.contactoRoutes import contacto_bp
 
 import src.utils.enums
 import inspect
@@ -35,6 +36,7 @@ app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')
 app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
+app.register_blueprint(contacto_bp, url_prefix='/contacto')
 app.register_blueprint(estadisticas_bp)
 
 #para exportar los enums a cualquier template
