@@ -48,8 +48,8 @@ CREATE TABLE `Evento` (
   `FechaFin` datetime NOT NULL,
   `TodoElDia` tinyint(1) NOT NULL,
   `Localidad` varchar(50) DEFAULT NULL,
-  `TipoEvento` int NOT NULL,
-  `Categoria` varchar(50) NOT NULL
+  `IdTipoEvento` int NOT NULL,
+  `IdCategoria` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -116,9 +116,9 @@ CREATE TABLE `Pago` (
   `Id` int NOT NULL,
   `FechaPago` datetime NOT NULL,
   `FechaVencimiento` datetime NOT NULL,
-  `Estado` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `IdEstado` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `Importe` int NOT NULL,
-  `Usuario_id` int DEFAULT NULL
+  `IdUsuario` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -147,17 +147,17 @@ CREATE TABLE `Usuario` (
   `Email` varchar(50) NOT NULL,
   `Password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `NombreUsuario` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `Categoria` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `IdCategoria` int DEFAULT NULL,
   `Localidad` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `IdEstado` varchar(10) NOT NULL,
+  `IdEstado` int NOT NULL,
   `Direccion` varchar(50) NOT NULL,
   `Telefono` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `IdRol` int NOT NULL,
   `Token` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `TokenEnviado` tinyint(1) NOT NULL,
   `FechaVencimientoToken` datetime DEFAULT NULL,
-  `Rama` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `Division` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+  `IdRama` int DEFAULT NULL,
+  `IdDivision` int DEFAULT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --

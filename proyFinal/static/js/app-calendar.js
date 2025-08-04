@@ -1,17 +1,6 @@
-/**
- * App Calendar
- */
-
-/**
- * ! If both start and end dates are same Full calendar will nullify the end date value.
- * ! Full calendar will end the event on a day before at 12:00:00AM thus, event won't extend to the end date.
- * ! We are getting events from a separate file named app-calendar-events.js. You can add or remove events from there.
- *
- **/
-
 'use strict';
 
-let direction = 'ltr';
+var direction = 'ltr';  // o 'rtl' según tu lógica
 
 if (isRtl) {
   direction = 'rtl';
@@ -61,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event start (flatpicker)
     if (eventStartDate) {
       var start = eventStartDate.flatpickr({
-        locale: 'es',
+        locale: flatpickr.l10ns.es,
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
         onReady: function (selectedDates, dateStr, instance) {
@@ -75,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event end (flatpicker)
     if (eventEndDate) {
       var end = eventEndDate.flatpickr({
-        locale: 'es',
+        locale: flatpickr.l10ns.es,
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
         onReady: function (selectedDates, dateStr, instance) {
@@ -89,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inline sidebar calendar (flatpicker)
     if (inlineCalendar) {
       inlineCalInstance = inlineCalendar.flatpickr({
-        locale: 'es',
+        locale: flatpickr.l10ns.es,
         monthSelectorType: 'static',
         inline: true
       });
@@ -206,6 +195,12 @@ document.addEventListener('DOMContentLoaded', function () {
       locale: 'es',
       initialView: 'dayGridMonth',
        displayEventTime: false,
+       buttonText: {
+        dayGridMonth: 'Mes',
+        timeGridWeek: 'Semana',
+        timeGridDay: 'Día',
+        listMonth: 'Lista'
+      },
        events: {
           url: '/eventos',
           method: 'GET',
@@ -480,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // When modal hides reset input values
     addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
-      locale: 'es';
+      calendar.setOption('locale', 'es');
       resetValues();
     });
 
@@ -523,7 +518,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Jump to date on sidebar(inline) calendar change
     inlineCalInstance.config.onChange.push(function (date) {
-      locale: 'es';
       calendar.changeView(calendar.view.type, moment(date[0]).format('YYYY-MM-DD'));
       modifyToggler();
       appCalendarSidebar.classList.remove('show');

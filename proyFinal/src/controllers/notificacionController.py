@@ -19,14 +19,14 @@ def obtener_notificaciones():
     else:  # Deportista
         resultados = Notificacion.query.filter(
             or_(
-                Notificacion.Categoria == current_user.Categoria,
-                Notificacion.Categoria == None
+                Notificacion.IdCategoria == current_user.IdCategoria,
+                Notificacion.IdCategoria == None
             )
         ).all()
 
     notificaciones = []
     for e in resultados:
-        nombre_categoria = CategoriaEnum(int(e.Categoria)).name if e.Categoria is not None else "Todas"
+        nombre_categoria = CategoriaEnum(int(e.IdCategoria)).name if e.IdCategoria is not None else "Todas"
         notificaciones.append({
             'id': e.Id,
             'titulo': e.Titulo,

@@ -17,7 +17,7 @@ def obtenerEventos(inicio,fin,tipos):
     ]
 
     if tipos:
-        filtros.append(Evento.TipoEvento.in_(tipos))
+        filtros.append(Evento.IdTipoEvento.in_(tipos))
 
     eventos = Evento.query.filter(*filtros).all()
     eventosTodos = [
@@ -29,9 +29,9 @@ def obtenerEventos(inicio,fin,tipos):
             "allDay": evento.TodoElDia,
             "extendedProps": {
                 "description": evento.Descripcion,
-                "calendar": evento.TipoEvento,
+                "calendar": evento.IdTipoEvento,
                 "localidad": evento.Localidad,
-                "categoria": evento.Categoria
+                "categoria": evento.IdCategoria
             }
         } for evento in eventos
     ]

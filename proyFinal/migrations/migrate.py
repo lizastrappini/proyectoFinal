@@ -20,6 +20,16 @@ def execute_statements(cursor, sql_text):
     for stmt in statements:
         cursor.execute(stmt + ';')
 
+def execute_drop_statements(cursor, sql_text):
+    # Buscar todas las sentencias DROP TABLE IF EXISTS y ejecutarlas
+    drop_statements = re.findall(r'DROP TABLE IF EXISTS .*?;', sql_text, re.IGNORECASE | re.DOTALL)
+    for drop_sql in drop_statements:
+        try:
+            print(f"Ejecutando drop: {drop_sql.strip()}")
+            cursor.execute(drop_sql)
+        except Exception as e:
+            print(f"Error ejecutando drop: {e}")
+
 def main():
     conn = pymysql.connect(
         host='db',
@@ -50,16 +60,20 @@ def main():
             with open(os.path.join(migrations_dir, file), 'r', encoding='utf-8') as f:
                 sql = f.read()
 
+            # Primero ejecuto los drops (si existen)
+            execute_drop_statements(cursor, sql)
+
+            # Después sigo con el split por tablas y el resto normal
             tablas = split_by_tables(sql)
 
             for tabla, contenido in tablas:
                 print(f"Procesando tabla {tabla}")
 
-                # Verifico si tabla existe
+                # Verifico si tabla existe (después de drops probablemente no exista)
                 cursor.execute(f"SHOW TABLES LIKE '{tabla}';")
                 tabla_existe = cursor.fetchone() is not None
 
-                # Extraigo el bloque CREATE TABLE (desde el principio del contenido hasta justo antes de INSERT)
+                # Extraigo el bloque CREATE TABLE
                 match_create = re.search(r'(CREATE TABLE.*?;)', contenido, re.DOTALL | re.IGNORECASE)
                 if match_create and not tabla_existe:
                     create_sql = match_create.group(1)

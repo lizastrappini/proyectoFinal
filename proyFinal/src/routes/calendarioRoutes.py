@@ -32,7 +32,7 @@ def nuevo_evento():
     todoElDia = request.form.get('todoElDia') == 'on'
     localidad = request.form.get('localidad')
     descripcion = request.form.get('descripcion')
-    categoria = request.form.get('categoria')
+    idCategoria = request.form.get('categoria')
     fecha_inicio_dt = datetime.fromisoformat(fechaInicio.replace('Z', '')) if fechaInicio else None
     fecha_fin_dt = datetime.fromisoformat(fechaFin.replace('Z', '')) if fechaFin else None
 
@@ -44,7 +44,7 @@ def nuevo_evento():
         TodoElDia=todoElDia,
         Localidad=localidad,
         Descripcion=descripcion,
-        Categoria = categoria
+        IdCategoria = idCategoria
     )
     calendarioController.crearEvento(nuevo_evento)
     return redirect(url_for('calendario.index'))

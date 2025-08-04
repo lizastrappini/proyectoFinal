@@ -37,7 +37,7 @@ def miCuenta(id):
             'email': usuario.Email,
             'password': usuario.Password,
             'usuario': usuario.NombreUsuario,
-            'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria or 0)).name,
+            'idCategoria': usuario.IdCategoria,
             # 'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
             'localidad': localidad_nombre,
             'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
@@ -205,7 +205,7 @@ def usuario_tiene_cuota_al_dia(usuario_id):
     hoy = date.today()
     ultimo_pago = Pago.query.filter(
         and_(
-            Pago.Usuario_id == usuario_id,
+            Pago.IdUsuario == usuario_id,
             Pago.Estado == 1,
             cast(Pago.FechaPago, Date) <= hoy
         )

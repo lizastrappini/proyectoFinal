@@ -60,7 +60,7 @@ def miCuenta():
     for cat in generalEnum.CategoriaEnum
     ]
     if usuario is not None:
-        pagos = db.session.query(Pago).filter_by(Usuario_id=id).order_by(desc(Pago.FechaPago)).all()
+        pagos = db.session.query(Pago).filter_by(IdUsuario=id).order_by(desc(Pago.FechaPago)).all()
 
         datos_pagos = []
         for pago in pagos:

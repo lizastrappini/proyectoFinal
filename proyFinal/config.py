@@ -8,8 +8,8 @@ class Config():
     SECRET_KEY = config('SECRET_KEY', default='clave_por_defecto')
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
-    MAIL_USERNAME = 'lizaotrascosas@gmail.com' #cambiar por voleyapp@gmail.com cuando nos deje usarlo
-    MAIL_PASSWORD = 'pvbukucydnvgskye'  # usar contraseña de aplicación en Gmail
+    MAIL_USERNAME = 'voleyapp@gmail.com' 
+    MAIL_PASSWORD = 'rvniyvgqammziwiu'  # usar contraseña de aplicación en Gmail
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
     REMEMBER_COOKIE_DURATION = timedelta(days=7)
