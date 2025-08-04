@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect,session,url_for
 from flask_sqlalchemy import SQLAlchemy 
 from src import db
 from src.controllers import notificacionController
+from src.models.contacto import Contacto
 from src.routes.usuarioRoutes import usuario_bp
 from src.routes.calendarioRoutes import calendario_bp
 from src.routes.pagoRoutes import pago_bp
@@ -11,6 +12,7 @@ from src.routes.entrenadorRoutes import entrenador_bp
 from src.routes.deportistaRoutes import deportista_bp
 from src.routes.estadisticasRoutes import estadisticas_bp
 from src.routes.notificacionRoutes import notificacion_bp
+from src.routes.contactoRoutes import contacto_bp
 
 import src.utils.enums
 import inspect
@@ -35,6 +37,7 @@ app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')
 app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
+app.register_blueprint(contacto_bp, url_prefix='/contacto')
 app.register_blueprint(estadisticas_bp)
 
 #para exportar los enums a cualquier template
@@ -70,6 +73,16 @@ def inject_notificaciones():
     else:
         notificaciones = []
     return dict(notificaciones=notificaciones)
+
+
+# En tu app principal, por ejemplo app.py o __init__.py
+from datetime import datetime
+
+@app.context_processor
+def inject_contacto():
+    contacto = Contacto.query.first()
+    return {'contacto': contacto, 'now': datetime.now()}
+
 
 
 if __name__ == "__main__":

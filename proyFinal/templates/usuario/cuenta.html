@@ -150,56 +150,60 @@
                     <form id="formChangePassword" method="POST" action="{{ url_for('usuarios.cambiar_contraseña') }}">
                     <div class="alert alert-warning alert-dismissible" role="alert">
                       <h5 class="alert-heading mb-1">Asegúrese de que se cumplan estos requisitos: </h5>
-                      <span>Mínimo 8 caracteres de largo, mayúsculas y símbolo</span>
+                      <span>Mínimo 8 caracteres de largo, una mayúscula y un símbolo</span>
                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
 
                     <div class="row gx-5">
-                      <!-- Nueva contraseña -->
-                      <div class="mb-3 col-12 col-sm-6 form-password-toggle">
-                        <div class="input-group input-group-merge">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              class="form-control {% if errors and errors.newPassword %}is-invalid{% endif %}"
-                              type="password"
-                              id="newPassword"
-                              name="newPassword"
-                              placeholder="••••••••••••" />
-                            <label for="newPassword">Nueva Contraseña</label>
-                          </div>
-                          <span class="input-group-text cursor-pointer text-heading">
-                            <i class="ri-eye-off-line"></i>
-                          </span>
-                        </div>
-                        {% if errors and errors.newPassword %}
-                          <div class="invalid-feedback d-block">
-                            {{ errors.newPassword }}
-                          </div>
-                        {% endif %}
-                      </div>
+                      <!-- nueva contraseña -->
+                        <div class="mb-3 col-12 col-sm-6">
+                              
+                                  <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline flex-grow-1">
+                                      <input
+                                        type="password"
+                                        id="newPassword"
+                                        name="newPassword"
+                                        placeholder="••••••••••••"
+                                        class="form-control {% if errors and errors.newPassword %}is-invalid{% endif %}" />
+                                      <label for="newPassword">Nueva Contraseña</label>
+                                    </div>
+                                    <!-- <span class="input-group-text cursor-pointer toggle-password">
+                                      <i class="ri-eye-off-line"></i>
+                                    </span> -->
+                                  </div>
+                                  {% if errors and errors.newPassword %}
+                                    <div class="invalid-feedback d-block">
+                                      {{ errors.newPassword }}
+                                    </div>
+                                  {% endif %}
+                                
+                              </div>
 
-                      <!-- Confirmar contraseña -->
-                      <div class="mb-3 col-12 col-sm-6 form-password-toggle">
-                        <div class="input-group input-group-merge">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              class="form-control {% if errors and errors.confirmPassword %}is-invalid{% endif %}"
-                              type="password"
-                              name="confirmPassword"
-                              id="confirmPassword"
-                              placeholder="••••••••••••" />
-                            <label for="confirmPassword">Confirmar nueva contraseña</label>
-                          </div>
-                          <span class="input-group-text cursor-pointer text-heading">
-                            <i class="ri-eye-off-line"></i>
-                          </span>
-                        </div>
-                        {% if errors and errors.confirmPassword %}
-                          <div class="invalid-feedback d-block">
-                            {{ errors.confirmPassword }}
-                          </div>
-                        {% endif %}
-                      </div>
+                              <!-- Confirmar contraseña -->
+                              <div class="mb-3 col-12 col-sm-6">
+                                
+                                  <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline flex-grow-1">
+                                      <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        placeholder="••••••••••••"
+                                        class="form-control {% if errors and errors.confirmPassword %}is-invalid{% endif %}" />
+                                      <label for="confirmPassword">Confirmar nueva contraseña</label>
+                                    </div>
+                                    <!-- <span class="input-group-text cursor-pointer toggle-password">
+                                      <i class="ri-eye-off-line"></i>
+                                    </span> -->
+                                  </div>
+                                  {% if errors and errors.confirmPassword %}
+                                    <div class="invalid-feedback d-block">
+                                      {{ errors.confirmPassword }}
+                                    </div>
+                                  {% endif %}
+                            
+                              </div>
 
                       <div>
                         <button type="submit" class="btn btn-primary me-2">Cambiar Contraseña</button>
@@ -351,20 +355,6 @@
             </div>
             <!-- / Content -->
 
-            <div class="content-backdrop fade"></div>
-          </div>
-          <!-- Content wrapper -->
-        </div>
-        <!-- / Layout page -->
-      </div>
-
-      <!-- Overlay -->
-      <div class="layout-overlay layout-menu-toggle"></div>
-
-      <!-- Drag Target Area To SlideIn Menu On Small Screens -->
-      <div class="drag-target"></div>
-    </div>
-    <!-- / Layout wrapper -->
 
 
 {% endblock %}

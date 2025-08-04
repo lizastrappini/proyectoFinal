@@ -1,0 +1,167 @@
+  {% extends "base.html" %}
+
+  {% block content %}
+
+<section class="container my-5">
+  <h2 class="text-center mb-4">Medios de Contacto</h2>
+  <p class="text-center mb-5 text-muted">
+    En caso de dudas, consultas o requerimientos, no dudes en comunicarte con nosotros a través de los siguientes medios:
+  </p>
+  <!-- <div class="text-right mb-4">
+  <a href="" class="btn btn-outline-primary">
+    <i class="ri-edit-line ri-18px me-2"></i> Editar contacto
+  </a>
+</div> -->
+
+  <div class="row text-center g-4">
+    <div class="col-md-3">
+      <div class="card card-tel h-100 shadow-sm">
+         <a href="tel:{{ contacto['teléfono'] }}" target="_blank" 
+            class="text-decoration-none text-black"> 
+        <div class="card-body">
+          <div class="icon-circle icon-tel mb-3 mx-auto">
+            <i class="fas fa-phone fa-2x text-white"></i>
+          </div>
+          <h5 class="card-title">Teléfono</h5>
+          <p class="card-text"> {{ contacto['teléfono'] }} </p>
+        </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-email h-100 shadow-sm">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ contacto['email'] }}" target="_blank" 
+            class="text-decoration-none text-black">
+        <div class="card-body">
+          <div class="icon-circle icon-email mb-3 mx-auto">
+            <i class="fas fa-envelope fa-2x text-white"></i>
+          </div>
+          <h5 class="card-title">Email</h5>
+          <p class="card-text"> {{ contacto['email'] }}</p>
+        </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-wpp h-100 shadow-sm">
+           <a href="https://wa.me/{{ contacto['whatsapp'] | replace(' ', '') }}" target="_blank" 
+            class="text-decoration-none text-black">
+        <div class="card-body">
+          <div class="icon-circle icon-wpp mb-3 mx-auto">
+            <i class="fab fa-whatsapp fa-2x text-white"></i>
+          </div>
+          <h5 class="card-title">WhatsApp</h5>
+          <p class="card-text">{{ contacto['whatsapp'] }}   </p>
+        </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-instagram h-100 shadow-sm">
+          <a href="{{ contacto['instagram'] }}" target="_blank" 
+            class="text-decoration-none text-black">
+        <div class="card-body">
+          <div class="icon-circle icon-instagram mb-3 mx-auto">
+            <i class="fab fa-instagram fa-2x text-white"></i>
+          </div>
+          <h5 class="card-title">Instagram</h5>
+          <p class="card-text"> @voleycarc</p>
+        </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  /* Colores hover específicos */
+  .card-tel:hover {
+    background-color: #cce5ff;
+  }
+  .card-email:hover {
+    background-color: #fff3cd;
+  }
+  .card-wpp:hover {
+    background-color: #d4edda;
+  }
+  .card-instagram:hover {
+    background-color:  #f8d7da ;
+  }
+
+  /* Cambiar color icono y título al hover */
+  .card-tel:hover i, .card-tel:hover .card-title {
+    color: #004085;
+  }
+  .card-email:hover i, .card-email:hover .card-title {
+    color:  #856404;
+  }
+  .card-wpp:hover i, .card-wpp:hover .card-title {
+    color: #155724;
+  }
+  .card-instagram:hover i, .card-instagram:hover .card-title {
+    color: #721c24;
+  }
+
+  /* Transiciones */
+  .card i, .card-title {
+    transition: color 0.3s ease;
+  }
+  .card-text {
+    color: #6c757d;
+  }
+
+
+  /* Colores suaves para íconos */
+.icon-tel {
+  background-color: #d6eaff; /* celeste claro */
+}
+
+.icon-email {
+  background-color: #fef0cd; /* amarillo suave */
+}
+
+.icon-wpp {
+  background-color: #d1f0dc; /* verde claro */
+}
+
+.icon-instagram {
+  background-color:  #f9d6d5; /* rojo pastel */
+}
+
+</style>
+
+
+
+  {% endblock %}
+
+  {% block scripts %}
+
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+  <!-- DataTables y Buttons JS -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  {% endblock %}
+
