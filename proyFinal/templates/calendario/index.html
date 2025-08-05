@@ -202,4 +202,25 @@
 
 
 {% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $('#eventForm').on('submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: '/nuevoEvento',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function (response) {
+          alert('Evento creado correctamente');
+          location.reload(); // o actualizar calendario dinámicamente
+        },
+        error: function (xhr) {
+          let errores = xhr.responseJSON?.errores || ['Error desconocido'];
+          alert('Errores:\n' + errores.join('\n'));
+        }
+      });
+    });
+  </script>
+{% endblock %}
 

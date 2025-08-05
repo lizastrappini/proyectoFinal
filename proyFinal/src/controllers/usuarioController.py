@@ -198,7 +198,7 @@ def usuario_tiene_cuota_al_dia(usuario_id):
     ultimo_pago = Pago.query.filter(
         and_(
             Pago.IdUsuario == usuario_id,
-            Pago.Estado == 1,
+            Pago.IdEstado == 1,
             cast(Pago.FechaPago, Date) <= hoy
         )
     ).order_by(Pago.FechaPago.desc()).first()

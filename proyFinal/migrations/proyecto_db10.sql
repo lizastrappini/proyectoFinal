@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS `Pago`;
 DROP TABLE IF EXISTS `Calendario`;
 DROP TABLE IF EXISTS `Usuario`;
 DROP TABLE IF EXISTS `migrations_applied`;
+DROP TABLE IF EXISTS `Contacto`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -26,7 +27,7 @@ SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */; 
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
@@ -35,6 +36,27 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
+
+--
+-- Table structure for table `Contacto`
+--
+
+CREATE TABLE `Contacto` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `Titulo` varchar(50) NOT NULL,
+  `Valor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `Contacto`
+--
+
+INSERT INTO `Contacto` (`Id`, `Titulo`, `Valor`) VALUES
+(1, 'Email', 'voley@rosariocentral.com'),
+(2, 'WhatsApp', '+54 9 341 555-5678'),
+(3, 'Instagram', 'https://www.instagram.com/voleycarc?igsh=MTZ0aHpiMDJmNTdnNg%3D%3D&utm_source=qr'),
+(4, 'Teléfono', '+54 341 555-1234');
+
 
 --
 -- Estructura de tabla para la tabla `Calendario`
