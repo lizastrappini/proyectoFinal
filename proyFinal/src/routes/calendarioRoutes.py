@@ -47,7 +47,7 @@ def nuevo_evento():
         IdCategoria = idCategoria
     )
     calendarioController.crearEvento(nuevo_evento)
-    return redirect(url_for('calendario.index'))
+    return jsonify({'mensaje': 'Evento creado correctamente'})
 
 
 @calendario_bp.route("/eventos")

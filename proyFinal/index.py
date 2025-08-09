@@ -25,7 +25,7 @@ from src.routes.contactoRoutes import contacto_bp
 from src.utils.Mail import mail
 
 app = Flask(__name__)
-
+# Carga la configuración desde config.Config
 app.config.from_object(app_configs['development'])
 
 # Inicializa la extensión de base de datos
