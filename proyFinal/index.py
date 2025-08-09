@@ -8,7 +8,7 @@ from flask import Flask, render_template, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 
-from config import config
+from config import DevelopmentConfig, app_configs
 from src import db
 from src.controllers import notificacionController
 from src.models.contacto import Contacto
@@ -25,8 +25,8 @@ from src.routes.contactoRoutes import contacto_bp
 from src.utils.Mail import mail
 
 app = Flask(__name__)
-# Carga la configuración desde config.Config
-app.config.from_object(config.Config)
+
+app.config.from_object(app_configs['development'])
 
 # Inicializa la extensión de base de datos
 db.init_app(app)

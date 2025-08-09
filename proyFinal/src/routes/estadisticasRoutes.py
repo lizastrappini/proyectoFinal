@@ -70,7 +70,7 @@ def estadisticas_data():
 
     first_row, last_row = 11, 14  # filas de jugadores
 
-    # 1) Sumar por equipo
+    # 1 Sumar por equipo
     team = {}
     for block, cols in BLOCKS.items():
         acc = {sym: 0 for sym in SYMBOLS[block]}
@@ -80,7 +80,7 @@ def estadisticas_data():
                 acc[sym] += int(val)
         team[block] = acc
 
-    # 2) Estadísticas individuales
+    # 2 Estadísticas individuales
     players = []
     for row in range(first_row, last_row + 1):
         jersey = ws[f'D{row}'].value or 0

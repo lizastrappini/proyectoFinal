@@ -1,20 +1,115 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container-xxl flex-grow-1 container-p-y">
   <h1>Estadísticas</h1>
 
-  {% include "estadisticas/subida_descarga.html" %}
-  {% include "estadisticas/graficos_imagen.html" %}
-  {% include "estadisticas/lista_archivos.html" %}
-  {% include "estadisticas/grafico_interactivo.html" %}
+  {# … tus includes de subida, imágenes, lista de archivos … #}
+
+  <!-- Filtro por jugador -->
+  <div class="card mt-5">
+    <div class="card-body">
+      <h5 class="card-title">Filtrar por jugador</h5>
+      <select id="player-filter" class="form-select">
+        <option value="all">Todos los jugadores</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenedor de gráficas del equipo -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">📊 Estadísticas del equipo</h5>
+      <div id="team-charts" class="row"></div>
+    </div>
+  </div>
+
+  <!-- Contenedor de gráficas por jugador -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">📊 Estadísticas por jugador</h5>
+      <div id="player-charts" class="row"></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Tu lógica de Chart.js puede ir directamente aquí
-  // Si prefieres, traslada este bloque a grafico_interactivo.html
+  const COLORS = ['#d9534f','#f0ad4e','#5bc0de','#5cb85c','#428bca','#f7ec59','#8e44ad'];
+
+  // Función para dibujar las gráficas de un array de jugadores
+  function drawPlayers(players) {
+    const container = document.getElementById('player-charts');
+    container.innerHTML = ''; // limpia
+    players.forEach(player => {
+      // Wrapper por jugador
+      const wrap = document.createElement('div');
+      wrap.className = 'col-12 mb-5';
+      wrap.innerHTML = `<h6>Jugador #${player.jersey}</h6><div class="row" id="p-${player.jersey}"></div>`;
+      container.appendChild(wrap);
+
+      // Para cada bloque de datos del jugador
+      Object.entries(player.stats).forEach(([block, data]) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 mb-4 text-center';
+        col.innerHTML = `<strong>${block}</strong><canvas></canvas>`;
+        wrap.querySelector(`#p-${player.jersey}`).appendChild(col);
+
+        new Chart(col.querySelector('canvas'), {
+          type: 'pie',
+          data: {
+            labels: Object.keys(data),
+            datasets: [{ data: Object.values(data), backgroundColor: COLORS }]
+          }
+        });
+      });
+    });
+  }
+
+  // Arranca todo
+  fetch('/estadisticas/data')
+    .then(res => res.json())
+    .then(({ team, players }) => {
+      // 1) Graficar equipo
+      const teamContainer = document.getElementById('team-charts');
+      Object.entries(team).forEach(([block, data]) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 mb-4 text-center';
+        col.innerHTML = `<h6>${block}</h6><canvas></canvas>`;
+        teamContainer.appendChild(col);
+        new Chart(col.querySelector('canvas'), {
+          type: 'pie',
+          data: {
+            labels: Object.keys(data),
+            datasets: [{ data: Object.values(data), backgroundColor: COLORS }]
+          }
+        });
+      });
+
+      // 2) Poblar filtro
+      const filter = document.getElementById('player-filter');
+      players.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.jersey;
+        opt.textContent = `#${p.jersey}`;
+        filter.appendChild(opt);
+      });
+
+      // 3) Mostrar todas inicialmente
+      drawPlayers(players);
+
+      // 4) Listener de cambio
+      filter.addEventListener('change', () => {
+        if (filter.value === 'all') {
+          drawPlayers(players);
+        } else {
+          const sel = players.find(p => p.jersey == filter.value);
+          drawPlayers(sel ? [sel] : []);
+        }
+      });
+    })
+    .catch(err => console.error('Error al cargar datos:', err));
 </script>
 {% endblock %}
