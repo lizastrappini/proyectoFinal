@@ -1,8 +1,5 @@
+{#
 {% extends "base.html" %}
-
-
-
-
 {% block content %}
 
  <!-- Content -->
@@ -201,8 +198,9 @@
             <!-- / Content -->
 
 
-{% endblock %}
+{% endblock %}  <!-- Cierra content -->
 {% block scripts %}
+
   {{ super() }}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -293,4 +291,205 @@
   });
   </script>
 {% endblock %}
+#}
 
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Content -->
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="card app-calendar-wrapper">
+    <div class="row g-0">
+      <!-- Calendar Sidebar -->
+      <div class="col app-calendar-sidebar border-end" id="app-calendar-sidebar">
+        <div class="p-5 my-sm-0 mb-4 border-bottom">
+          {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
+          <button
+            class="btn btn-primary btn-toggle-sidebar w-100"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#addEventSidebar"
+            aria-controls="addEventSidebar">
+            <i class="ri-add-line ri-16px me-1_5"></i>
+            <span class="align-middle">Nuevo Evento</span>
+          </button>
+          {% endif %}
+        </div>
+
+        <div class="px-4">
+          <!-- inline calendar (flatpicker) -->
+          <div class="inline-calendar"></div>
+
+          <hr class="mb-5 mx-n4 mt-3" />
+
+          <!-- Filter -->
+          <div class="mb-4 ms-1">
+            <h5>Filtros</h5>
+          </div>
+
+          <div class="form-check form-check-secondary mb-5 ms-3">
+            <input
+              class="form-check-input select-all"
+              type="checkbox"
+              id="selectAll"
+              data-value="0"
+              checked />
+            <label class="form-check-label" for="selectAll">Todos</label>
+          </div>
+
+          <div class="app-calendar-events-filter text-heading">
+            <div class="form-check form-check-danger mb-5 ms-3">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-vacaciones" value="{{ TipoEventoEnum.Vacaciones.value }}" checked />
+              <label class="form-check-label" for="select-personal">Vacaciones</label>
+            </div>
+            <div class="form-check mb-5 ms-3">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-entrenamiento" value="{{ TipoEventoEnum.Entrenamiento.value }}" checked />
+              <label class="form-check-label" for="select-business">Entrenamiento</label>
+            </div>
+            <div class="form-check form-check-warning mb-5 ms-3">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-suspension" value="{{ TipoEventoEnum.SuspensionEntrenamiento.value }}" checked />
+              <label class="form-check-label" for="select-family">Suspension Entrenamiento</label>
+            </div>
+            <div class="form-check form-check-success mb-5 ms-3">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-partido" value="{{ TipoEventoEnum.Partido.value }}" checked />
+              <label class="form-check-label" for="select-holiday">Partido</label>
+            </div>
+            <div class="form-check form-check-info mb-5 ms-3">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-torneo" value="{{ TipoEventoEnum.Torneo.value }}" checked />
+              <label class="form-check-label" for="select-etc">Torneo</label>
+            </div>
+            <div class="form-check mb-5 ms-3 form-check-recaudacion">
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" checked />
+              <label class="form-check-label" for="select-recaudacion">Recaudacion</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /Calendar Sidebar -->
+
+      <!-- Calendar & Modal -->
+      <div class="col app-calendar-content">
+        <div class="card shadow-none border-0">
+          <div class="card-body pb-0">
+            <!-- FullCalendar -->
+            <div id="calendar"></div>
+          </div>
+        </div>
+        <div class="app-overlay"></div>
+
+        <!-- FullCalendar Offcanvas -->
+        <div
+          class="offcanvas offcanvas-end event-sidebar"
+          tabindex="-1"
+          id="addEventSidebar"
+          aria-labelledby="addEventSidebarLabel">
+
+          {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
+          <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title" id="addEventSidebarLabel">Nuevo Evento</h5>
+            <button
+              type="button"
+              class="btn-close text-reset"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"></button>
+          </div>
+
+          <div class="offcanvas-body">
+            <form class="event-form pt-0" id="eventForm" action="/nuevoEvento" method="POST">
+              <div class="form-floating form-floating-outline mb-5">
+                <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Titulo Evento" />
+                <label for="titulo">Titulo</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <select id="tipoEvento" name="tipoEvento" class="select2 form-select" multiple>
+                  <option value=""></option>
+                  {% for evento in tipoeventos %}
+                    <option value="{{ evento.value }}">{{ evento.text }}</option>
+                  {% endfor %}
+                </select>
+                <label for="tipoEvento">Tipo</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <input type="text" class="form-control" id="eventStartDate" name="fechaInicio" placeholder="Fecha Inicio" />
+                <label for="eventStartDate">Fecha Inicio</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <input type="text" class="form-control" id="eventEndDate" name="fechaFin" placeholder="Fecha Fin" />
+                <label for="eventEndDate">Fecha Fin</label>
+              </div>
+
+              <div class="mb-5">
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input allDay-switch" id="todoElDia" name="todoElDia" />
+                  <label class="form-check-label" for="todoElDia">Todo el día</label>
+                </div>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <select id="categoria" name="categoria" class="select2 form-select" multiple>
+                  <option value=""></option>
+                  {% for categoria in categorias %}
+                    <option value="{{ categoria.value }}">{{ categoria.text }}</option>
+                  {% endfor %}
+                </select>
+                <label for="categoria">Categoría</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <input type="text" class="form-control" id="localidad" name="localidad" placeholder="Localidad" />
+                <label for="localidad">Localidad</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+                <label for="descripcion">Descripción</label>
+              </div>
+
+              <div class="mb-5 d-flex justify-content-sm-between justify-content-start my-6 gap-2">
+                <div class="d-flex">
+                  <button type="submit" id="addEventBtn" class="btn btn-primary btn-add-event me-4">
+                    Agregar
+                  </button>
+                  <button type="reset" class="btn btn-outline-secondary btn-cancel me-sm-0 me-1" data-bs-dismiss="offcanvas">
+                    Cancelar
+                  </button>
+                </div>
+                <button class="btn btn-outline-danger btn-delete-event d-none">Eliminar</button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <!-- /Calendar & Modal -->
+    </div>
+  </div>
+</div>
+<!-- / Content -->
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $('#eventForm').on('submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: '/nuevoEvento',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function () {
+          alert('Evento creado correctamente');
+          location.reload();
+        },
+        error: function (xhr) {
+          let errores = xhr.responseJSON?.errores || ['Error desconocido'];
+          alert('Errores:\n' + errores.join('\n'));
+        }
+      });
+    });
+  </script>
+{% endblock %}

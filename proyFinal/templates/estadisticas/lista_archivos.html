@@ -1,0 +1,26 @@
+<div class="card mt-5">
+  <div class="card-body">
+    <h5 class="card-title">Archivos de estadísticas disponibles</h5>
+    <div id="lista-archivos"></div>
+  </div>
+</div>
+
+<script>
+  fetch('/estadisticas/archivos')
+    .then(response => response.json())
+    .then(data => {
+      const contenedor = document.getElementById('lista-archivos');
+      if (data.length === 0) {
+        contenedor.textContent = 'No hay archivos disponibles.';
+      } else {
+        data.forEach(nombre => {
+          const enlace = document.createElement('a');
+          enlace.href = `/estadisticas/descargar/${nombre}`;
+          enlace.textContent = nombre;
+          enlace.download = nombre;
+          enlace.classList.add('d-block', 'mb-2');
+          contenedor.appendChild(enlace);
+        });
+      }
+    });
+</script>

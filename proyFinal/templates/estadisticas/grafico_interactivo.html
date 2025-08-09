@@ -1,0 +1,35 @@
+{% if jugadores and goles %}
+<div class="card mt-5">
+  <div class="card-body">
+    <h5 class="card-title">Goles por jugador</h5>
+    <canvas id="graficoGoles" height="100"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const jugadores = JSON.parse('{{ jugadores | tojson | safe }}');
+  const goles = JSON.parse('{{ goles | tojson | safe }}');
+
+  const ctx = document.getElementById('graficoGoles').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: jugadores,
+      datasets: [{
+        label: 'Goles',
+        data: goles,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+{% endif %}
