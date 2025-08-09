@@ -205,15 +205,84 @@
 {% block scripts %}
   {{ super() }}
   <script>
-    $('#eventForm').on('submit', function (e) {
-      e.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+    const fv = FormValidation.formValidation(
+      document.getElementById('formCalendario'),
+      {
+        fields: {
+          titulo: {
+            validators: {
+              notEmpty: { message: 'El título es obligatorio' }
+            }
+          },
+          tipoEvento: {
+            validators: {
+              notEmpty: { message: 'Debe seleccionar al menos un tipo de evento' }
+            }
+          },
+          fechaInicio: {
+            validators: {
+              notEmpty: { message: 'La fecha de inicio es obligatoria' }
+            }
+          },
+          fechaFin: {
+            validators: {
+              notEmpty: { message: 'La fecha de fin es obligatoria' }
+            }
+          },
+          categoria: {
+            validators: {
+              notEmpty: { message: 'Debe seleccionar al menos una categoría' }
+            }
+          },
+          /*localidad: {
+            validators: {
+              notEmpty: { message: 'La localidad es obligatoria' }
+            }
+          },*/
+          descripcion: {
+            validators: {
+              notEmpty: { message: 'La descripción es obligatoria' }
+            }
+          }
+        },
+        plugins: {
+          trigger: new FormValidation.plugins.Trigger(),
+          bootstrap5: new FormValidation.plugins.Bootstrap5({
+            rowSelector: '.form-floating',
+            eleInvalidClass: '',
+            eleValidClass: ''
+          }),
+          submitButton: new FormValidation.plugins.SubmitButton(),
+          submit: new FormValidation.plugins.Submit(),
+          autoFocus: new FormValidation.plugins.AutoFocus()
+        }
+      }
+    ).on('core.form.valid', function (e) {
+      let form = e.form;
+
       $.ajax({
         url: '/nuevoEvento',
         type: 'POST',
-        data: $(this).serialize(),
+        data: $(form).serialize(),
         success: function (response) {
           alert('Evento creado correctamente');
-          location.reload(); // o actualizar calendario dinámicamente
+
+          // Refrescar FullCalendar
+          let calendarEl = document.getElementById('calendar');
+          if (calendarEl && calendarEl._fullCalendar) {
+            calendarEl._fullCalendar.refetchEvents();
+          } else if (typeof $('#calendar').fullCalendar === 'function') {
+            $('#calendar').fullCalendar('refetchEvents');
+          }
+
+          form.reset();
+
+          // Cerrar offcanvas o modal si estás usando Bootstrap
+          let offcanvasEl = document.querySelector('.offcanvas.show');
+          if (offcanvasEl && typeof bootstrap !== 'undefined') {
+            bootstrap.Offcanvas.getInstance(offcanvasEl).hide();
+          }
         },
         error: function (xhr) {
           let errores = xhr.responseJSON?.errores || ['Error desconocido'];
@@ -221,6 +290,7 @@
         }
       });
     });
+  });
   </script>
 {% endblock %}
 
