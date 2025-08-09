@@ -1,70 +1,15 @@
 {% extends "base.html" %}
 
-
 {% block content %}
-
 <div class="content-wrapper">
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <h1>Estadísticas</h1>
-        <div class="container mt-4">
-            <div class="row">
-                <!-- Card para subir Excel -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Subir plantilla con estadísticas</h5>
-                            <form action="/subir_estadisticas" method="POST" enctype="multipart/form-data">
-                                <div class="mb-3">
-                                    <input class="form-control" type="file" name="archivo_excel" accept=".xlsx" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Subir archivo Excel</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h1>Estadísticas</h1>
 
-                <!-- Card para descargar plantilla -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Descargar plantilla</h5>
-                            <p class="card-text">Descargá la plantilla vacía para completar con las estadisticas del partido</p>
-                            <a href="/descargar_plantilla" class="btn btn-success">Descargar</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    {% include "partials/subida_descarga.html" %}
+    {% include "partials/graficos_imagen.html" %}
+    {% include "partials/lista_archivos.html" %}
 
-        <!-- Recuadro con graficos-->
-        
-        <div class="row mt-5 mb-4"> <!---- separa los bloques --> 
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Gráficos del partido</h4>
-                        <p class="card-text">Visualización de estadísticas extraídas del Excel.</p>
-
-                        <!-- Gráficos -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <img src="{{ url_for('static', filename='graficos/grafico1.png') }}" class="img-fluid" alt="Gráfico 1">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <img src="{{ url_for('static', filename='graficos/grafico2.png') }}" class="img-fluid" alt="Gráfico 2">
-                            </div>
-                        </div>
-    
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
+  </div>
 </div>
-
-
 {% endblock %}
 
