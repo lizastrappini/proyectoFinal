@@ -18,6 +18,6 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
-config = {
+app_configs = {
     'development': DevelopmentConfig
 }

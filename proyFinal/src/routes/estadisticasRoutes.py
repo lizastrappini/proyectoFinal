@@ -3,7 +3,8 @@ from flask import (
     flash, send_file, jsonify, send_from_directory, session
 )
 import os
-from openpyxl import load_workbook
+import openpyxl
+import io 
 
 import src.controllers.usuarioController as usuarioController
 import src.utils.enums.generalEnum as generalEnum
@@ -45,8 +46,58 @@ def index():
 #         flash("Formato inválido. Debe ser .xlsx o .xls", "danger")
 #     return redirect(url_for('estadisticas.mostrar_estadisticas'))
 
+def rellenar_excel():
+    # Cargar archivo de Excel
+    ruta_archivo = "plantilla_estadisticas.xlsx"
+    wb = openpyxl.load_workbook(ruta_archivo)
+    ws = wb.active  # Hoja activa
+
+    # Buscar columna JUGADOR
+    jugador_col_index = None
+    jugador_row_index = None
+    for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=50, values_only=True), start=1):
+        if row:
+            for col_idx, value in enumerate(row, start=1):
+                if isinstance(value, str) and value.strip().upper() == "JUGADOR":
+                    jugador_col_index = col_idx
+                    jugador_row_index = row_idx
+                    break
+        if jugador_col_index:
+            break
+
+    if jugador_col_index is None:
+        return "No se encontró la columna 'JUGADOR'", 404
+
+    # Lista de usuarios de ejemplo (esto podrías traerlo de usuarioController)
+    usuarios = [
+        (101, "Juan Pérez"),
+        (102, "María López"),
+        (103, "Carlos Gómez"),
+        (104, "Ana Torres"),
+        (105, "Pedro Ramírez")
+    ]
+
+    # Rellenar desde la fila siguiente al encabezado
+    start_row = jugador_row_index + 1
+    for i, (uid, nombre) in enumerate(usuarios, start=start_row):
+        ws.cell(row=i, column=jugador_col_index, value=f"#{uid} - {nombre}")
+
+    # Guardar en memoria y devolver
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="plantilla_estadisticas_rellena.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+
 @estadisticas_bp.route('/descargar_plantilla', methods=['GET'])
 def descargar_plantilla():
+    rellenar_excel()
     ruta = os.path.join('src', 'datos', 'plantilla_de_estadisticas.xlsx')
     return send_file(ruta, as_attachment=True)
 
