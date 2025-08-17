@@ -8,8 +8,21 @@ import io
 
 import src.controllers.usuarioController as usuarioController
 import src.utils.enums.generalEnum as generalEnum
+from openpyxl.utils import range_boundaries
+
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
+
+def set_value_in_merged_cell(ws, row, col, value):
+    for merged_range in ws.merged_cells.ranges:
+        min_col, min_row, max_col, max_row = range_boundaries(str(merged_range))
+        # Si la celda está dentro del rango combinado
+        if min_row <= row <= max_row and min_col <= col <= max_col:
+            # Asignamos solo a la celda superior izquierda del rango
+            ws.cell(row=min_row, column=min_col, value=value)
+            return
+    # Si no está en rango combinado, asignamos normal
+    ws.cell(row=row, column=col, value=value)
 
 # Columnas Excel para cada bloque
 BLOCKS = {
@@ -48,7 +61,10 @@ def index():
 
 def rellenar_excel():
     # Cargar archivo de Excel
-    ruta_archivo = "plantilla_estadisticas.xlsx"
+    carpeta_actual = os.path.dirname(__file__)
+
+# Construye la ruta al archivo plantilla subiendo un nivel y entrando en datos
+    ruta_archivo = os.path.abspath(os.path.join(carpeta_actual, "..", "datos", "plantilla_de_estadisticas.xlsx"))
     wb = openpyxl.load_workbook(ruta_archivo)
     ws = wb.active  # Hoja activa
 
@@ -77,12 +93,11 @@ def rellenar_excel():
         (105, "Pedro Ramírez")
     ]
 
-    # Rellenar desde la fila siguiente al encabezado
-    start_row = jugador_row_index + 1
+    start_row = 11
     for i, (uid, nombre) in enumerate(usuarios, start=start_row):
-        ws.cell(row=i, column=jugador_col_index, value=f"#{uid} - {nombre}")
+        ws.cell(row=i, column=1, value=uid)
+        ws.cell(row=i, column=2, value=nombre)
 
-    # Guardar en memoria y devolver
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
@@ -97,9 +112,7 @@ def rellenar_excel():
 
 @estadisticas_bp.route('/descargar_plantilla', methods=['GET'])
 def descargar_plantilla():
-    rellenar_excel()
-    ruta = os.path.join('src', 'datos', 'plantilla_de_estadisticas.xlsx')
-    return send_file(ruta, as_attachment=True)
+    return rellenar_excel()
 
 @estadisticas_bp.route('/archivos', methods=['GET'])
 def listar_archivos():
@@ -116,7 +129,7 @@ def descargar_archivo(nombre):
 def estadisticas_data():
     # Carga el Excel con valores calculados
     ruta_excel = os.path.join('src', 'datos', 'plantilla_de_estadisticas.xlsx')
-    wb = load_workbook(ruta_excel, data_only=True)
+    wb = openpyxl.load_workbook(ruta_excel, data_only=True)
     ws = wb.active
 
     first_row, last_row = 11, 14  # filas de jugadores

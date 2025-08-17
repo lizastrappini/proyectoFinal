@@ -28,7 +28,7 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
     deportistas = []
     for e in query.all():
         try:
-            cat_enum = CategoriaEnum(int(e.Categoria))
+            cat_enum = CategoriaEnum(int(e.IdCategoria))
             categoria_nombre = cat_enum.name 
         except (ValueError, KeyError):
             categoria_nombre = 'Desconocido'
@@ -40,12 +40,12 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
             estado_nombre = 'Desconocido'
             
         try:
-            rama_enum = RamaEnum(int(e.Rama))
+            rama_enum = RamaEnum(int(e.IdRama))
             rama_nombre = rama_enum.name
         except (ValueError, KeyError):
             rama_nombre = 'Desconocido'
         try:
-            division_enum = DivisionEnum(int(e.Division))
+            division_enum = DivisionEnum(int(e.IdDivision))
             division_nombre = division_enum.name
         except (ValueError, KeyError):
             division_nombre = 'Desconocido'

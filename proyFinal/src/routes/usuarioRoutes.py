@@ -66,7 +66,7 @@ def miCuenta():
         datos_pagos = []
         for pago in pagos:
             try:
-                est_enum = generalEnum.EstadoPagoEnum(int(pago.Estado))
+                est_enum = generalEnum.EstadoPagoEnum(int(pago.IdEstado))
                 estado_nombre = est_enum.name
             except (ValueError, KeyError):
                 estado_nombre = 'Desconocido'

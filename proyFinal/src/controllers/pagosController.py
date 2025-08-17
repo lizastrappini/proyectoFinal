@@ -15,7 +15,7 @@ def obtener_pagos():
     for e in resultados:
 
         try:
-            est_enum = EstadoPagoEnum(int(e.Estado))
+            est_enum = EstadoPagoEnum(int(e.IdEstado))
             estado_nombre = est_enum.name
         except (ValueError, KeyError):
             estado_nombre = 'Desconocido'
@@ -35,7 +35,7 @@ def obtener_pagos():
             'importe': e.Importe,
             'estado': estado_nombre,
             'deportista': deportista_nombre,
-            'deportista_id': e.Usuario_id
+            'deportista_id': e.IdUsuario
            
         })
 
