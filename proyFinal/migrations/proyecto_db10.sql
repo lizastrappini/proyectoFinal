@@ -44,7 +44,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `Contacto` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `Titulo` varchar(50) NOT NULL,
-  `Valor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `Valor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --

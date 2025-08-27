@@ -26,7 +26,7 @@ def index():
 @calendario_bp.route('/nuevoEvento', methods=['POST'])
 def nuevo_evento():
     titulo = request.form.get('titulo')
-    tipoEvento = request.form.get('tipoEvento')
+    tipoEvento = request.form.getlist('tipoEvento')
     fechaInicio = request.form.get('fechaInicio')
     fechaFin = request.form.get('fechaFin')
     todoElDia = request.form.get('todoElDia') == 'on'
@@ -36,18 +36,21 @@ def nuevo_evento():
     fecha_inicio_dt = datetime.fromisoformat(fechaInicio.replace('Z', '')) if fechaInicio else None
     fecha_fin_dt = datetime.fromisoformat(fechaFin.replace('Z', '')) if fechaFin else None
 
+    IdTipoEvento = int(tipoEvento[0]) if tipoEvento else None
+    IdCategoria = int(idCategoria[0]) if idCategoria else None
+    
     nuevo_evento = Evento(
         Titulo=titulo,
-        TipoEvento=tipoEvento,
+        IdTipoEvento=IdTipoEvento,
         FechaInicio=fecha_inicio_dt,
         FechaFin=fecha_fin_dt,
         TodoElDia=todoElDia,
         Localidad=localidad,
         Descripcion=descripcion,
-        IdCategoria = idCategoria
+        IdCategoria = IdCategoria
     )
     calendarioController.crearEvento(nuevo_evento)
-    return jsonify({'mensaje': 'Evento creado correctamente'})
+    return redirect(url_for('calendario.index'))
 
 
 @calendario_bp.route("/eventos")
@@ -66,4 +69,32 @@ def eventos():
     eventos = calendarioController.obtenerEventos(start, end, tipos_list)
     return jsonify(eventos)
     
+@calendario_bp.route('/editarEvento/<int:evento_id>', methods=['PUT'])
+def editar_evento(evento_id):
+    evento = Evento.query.get(evento_id)
+    if not evento:
+        return jsonify({'error': 'Evento no encontrado'}), 404
+
+    data = request.form
+    evento.Titulo = data.get('titulo', evento.Titulo)
+    tipoEvento = data.get('tipoEvento')
+    evento.IdTipoEvento = int(tipoEvento) if tipoEvento else evento.IdTipoEvento
+    evento.FechaInicio = datetime.fromisoformat(data.get('fechaInicio').replace('Z','')) if data.get('fechaInicio') else evento.FechaInicio
+    evento.FechaFin = datetime.fromisoformat(data.get('fechaFin').replace('Z','')) if data.get('fechaFin') else evento.FechaFin
+    evento.TodoElDia = data.get('todoElDia') == 'on'
+    evento.Localidad = data.get('localidad', evento.Localidad)
+    evento.Descripcion = data.get('descripcion', evento.Descripcion)
+    idCategoria = data.get('categoria')
+    evento.IdCategoria = int(idCategoria) if idCategoria else evento.IdCategoria
+
+    calendarioController.editarEvento(evento)
+    return jsonify({'mensaje': 'Evento actualizado correctamente'})
+
+@calendario_bp.route('/eliminarEvento/<int:evento_id>', methods=['DELETE'])
+def eliminar_evento(evento_id):
+    evento = Evento.query.get(evento_id)
+    if not evento:
+        return jsonify({'error': 'Evento no encontrado'}), 404
     
+    return jsonify({'mensaje': 'Evento eliminado correctamente'})
+

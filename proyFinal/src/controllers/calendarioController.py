@@ -10,6 +10,13 @@ def crearEvento(nuevoEvento):
     db.session.commit()
     return nuevoEvento
 
+def eliminarEvento(evento):
+    db.session.remove(evento)
+    db.session.commit()
+    
+def editarEvento(evento):
+     db.session.commit()
+
 def obtenerEventos(inicio,fin,tipos):
     filtros = [
         Evento.FechaInicio <= fin,
@@ -29,10 +36,12 @@ def obtenerEventos(inicio,fin,tipos):
             "allDay": evento.TodoElDia,
             "extendedProps": {
                 "description": evento.Descripcion,
-                "calendar": evento.IdTipoEvento,
                 "localidad": evento.Localidad,
-                "categoria": evento.IdCategoria
+                "calendar": [str(evento.IdTipoEvento)],
+                "categoria": [str(evento.IdCategoria)]
+
             }
         } for evento in eventos
     ]
     return eventosTodos
+
