@@ -77,7 +77,7 @@ def agregar_entrenador():
             Nombre=nombre,
             Apellido=apellido,
             Email= email,
-            Categoria = categoria_id,
+            IdCategoria = categoria_id,
             Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"entrenador_{dni}",
@@ -145,7 +145,7 @@ def editar_entrenador(dni):
         entrenador.Apellido = apellido
         entrenador.Email = nuevo_email
         entrenador.Telefono = telefono
-        entrenador.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
+        entrenador.IdCategoria = generalEnum.CategoriaEnum[categoria_nombre].value
 
         entrenadorController.actualizar_entrenador(entrenador)
     

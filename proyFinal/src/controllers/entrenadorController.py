@@ -12,7 +12,7 @@ def obtener_entrenadores(categoria=None, dni=None):
     if categoria:
         try:
             categoria_valor = int(categoria)
-            query = query.filter_by(Categoria=str(categoria_valor))
+            query = query.filter_by(IdCategoria=str(categoria_valor))
         except KeyError:
             return []
     if dni:
@@ -21,7 +21,7 @@ def obtener_entrenadores(categoria=None, dni=None):
     entrenadores = []
     for e in query.all():
         try:
-            cat_enum = CategoriaEnum(int(e.Categoria))
+            cat_enum = CategoriaEnum(int(e.IdCategoria))
             categoria_nombre = cat_enum.name 
         except (ValueError, KeyError):
             categoria_nombre = 'Desconocido'

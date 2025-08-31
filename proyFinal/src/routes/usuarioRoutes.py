@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import string
 from babel.dates import format_date
 from flask import Blueprint, redirect, request, render_template,flash, url_for
@@ -94,7 +94,15 @@ def editUsuario():
         'Localidad': request.form.get('Localidad'),
         'Telefono': request.form.get('Telefono'),
         'Categoria': request.form.get('Categoria'),
+        'FechaNacimiento': None,
+        
     }
+    fecha_str = request.form.get('FechaNacimiento')
+    if fecha_str:
+        try:
+            usuarioModel['FechaNacimiento'] = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+        except ValueError:
+            usuarioModel['FechaNacimiento'] = None
 
     usuario = usuarioController.getUsuarioById(id)
 

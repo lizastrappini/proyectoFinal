@@ -1,4 +1,5 @@
 import datetime
+from src.controllers import deportistaController
 from src.models.pago import Pago
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
@@ -29,6 +30,8 @@ def miCuenta(id):
     if(usuario is not None):
         localidad_valor = int(usuario.Localidad or 0)
         localidad_nombre = generalEnum.LocalidadEnum(localidad_valor).name
+        categoria_valor = int(usuario.IdCategoria or 0)
+        categoria_nombre = generalEnum.CategoriaEnum(categoria_valor).name
         return {
             'id': usuario.Id,
             'dni': usuario.Dni,
@@ -37,15 +40,18 @@ def miCuenta(id):
             'email': usuario.Email,
             'password': usuario.Password,
             'usuario': usuario.NombreUsuario,
-            'idCategoria': usuario.IdCategoria,
-            # 'categoria': generalEnum.CategoriaEnum(int(usuario.Categoria)).name,
+            'idCategoria': categoria_nombre,
             'localidad': localidad_nombre,
+            'localidad_valor' : localidad_valor,
             'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
             'direccion': usuario.Direccion,
             'telefono': usuario.Telefono,
             'rol': generalEnum.RolEnum(usuario.IdRol).name ,
             'idEstado': usuario.IdEstado,
             'idRol': usuario.IdRol,
+            'fechaNacimiento': usuario.FechaNacimiento.strftime('%d/%m/%Y') if usuario.FechaNacimiento else None,
+            'fechaNacimientoISO': usuario.FechaNacimiento.strftime('%Y-%m-%d') if usuario.FechaNacimiento else None,
+            # 'fechaNacimiento' : usuario.FechaNacimiento
         }
 
 
@@ -57,11 +63,12 @@ def update(id, datos):
     usuario = Usuario.query.filter_by(Id=id).first()
 
     # Convertir a enum de forma segura
-    try:
-        localidad_enum = generalEnum.LocalidadEnum(int(datos.get('Localidad', 0)))
-        valor_localidad = localidad_enum.value
-    except (ValueError, KeyError):
-        valor_localidad = generalEnum.LocalidadEnum.NoDefinido.value
+    # try:
+    #     localidad_enum = generalEnum.LocalidadEnum(int(datos.get('Localidad', 0)))
+    #     valor_localidad = localidad_enum.value
+        
+    # except (ValueError, KeyError):
+    #     valor_localidad = generalEnum.LocalidadEnum.NoDefinido.value
 
     if usuario:
         if 'Nombre' in datos:
@@ -75,9 +82,23 @@ def update(id, datos):
         if 'Direccion' in datos:
             usuario.Direccion = datos['Direccion']
         if 'Localidad' in datos:
-            usuario.Localidad = valor_localidad
+            usuario.Localidad = datos['Localidad']
         if 'Telefono' in datos:
             usuario.Telefono = datos['Telefono']
+        if 'FechaNacimiento' in datos:
+            usuario.FechaNacimiento = datos['FechaNacimiento']
+            
+        
+            
+
+        # Actualizar categoría automáticamente
+        if usuario.FechaNacimiento:
+            usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
+        else:
+            usuario.IdCategoria = generalEnum.CategoriaEnum.NoEspecificada.value
+
+
+        # usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
 
         db.session.commit()
         return usuario

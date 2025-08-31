@@ -17,7 +17,19 @@ class EstadoPagoEnum(enum.IntEnum):
     
 class LocalidadEnum(enum.IntEnum): 
     Rosario = 1
-    LasRosas = 2
+    Funes = 2
+    VillaConstitucion = 3
+    SanLorenzo = 5
+    Casilda = 6
+    PuebloEsher = 7
+    Roldan = 8
+    Zavalla = 9
+    Perez = 4
+    ArroyoSeco = 10
+    VillaGobernadorGalvez = 11
+    Carcaraña = 12
+    CañadaDeGomez = 13
+    SanNicolas = 14 
     NoDefinido = 0
 
 

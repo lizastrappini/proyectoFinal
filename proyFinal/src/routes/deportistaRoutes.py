@@ -1,3 +1,4 @@
+from datetime import datetime
 import secrets
 import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
@@ -63,6 +64,7 @@ def agregar_deportista():
         nombre = request.form.get('nombre')
         apellido = request.form.get('apellido')
         email = request.form.get('email')
+        fechaNacimiento= request.form.get('fechaNacimiento')
         telefono = request.form.get('telefono')
         categoria_nombre = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
@@ -78,8 +80,9 @@ def agregar_deportista():
         if not division_nombre or division_nombre not in generalEnum.DivisionEnum.__members__:
             raise ValueError("División inválida o no seleccionada")
 
-
-        categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
+        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  # Convertir string a datetime
+        categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        # categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
         # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
@@ -100,9 +103,10 @@ def agregar_deportista():
             Nombre=nombre,
             Apellido=apellido,
             Email= email,
-            Categoria = categoria_id,
-            Rama = rama_id,
-            Division = division_id,
+            FechaNacimiento= fechaNacimiento,
+            IdCategoria = categoria_id,
+            IdRama = rama_id,
+            IdDivision = division_id,
             Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"entrenador_{dni}",
@@ -161,6 +165,7 @@ def editar_deportista(dni):
         
         nombre = request.form.get('nombre')
         apellido = request.form.get('apellido')
+        fechaNacimiento = request.form.get('fechaNacimiento')
         telefono = request.form.get('telefono')
         categoria_nombre = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
@@ -171,10 +176,13 @@ def editar_deportista(dni):
         deportista.Nombre = nombre
         deportista.Apellido = apellido
         deportista.Email = nuevo_email
+        deportista.FechaNacimiento = fechaNacimiento
         deportista.Telefono = telefono
-        deportista.Categoria = generalEnum.CategoriaEnum[categoria_nombre].value
-        deportista.Rama = generalEnum.RamaEnum[rama_nombre].value
-        deportista.Division = generalEnum.DivisionEnum[division_nombre].value
+        # deportista.IdCategoria = generalEnum.CategoriaEnum[categoria_nombre].value
+        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
+        deportista.IdCategoria = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        deportista.IdRama = generalEnum.RamaEnum[rama_nombre].value
+        deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
 
         deportistaController.actualizar_deportista(deportista)
 

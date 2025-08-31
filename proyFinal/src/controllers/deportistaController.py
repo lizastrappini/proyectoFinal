@@ -1,3 +1,4 @@
+from datetime import date
 from flask import current_app, render_template, url_for
 from flask_mail import Message
 from src.models.usuario import Usuario
@@ -12,14 +13,14 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
     if categoria:
         try:
             categoria_valor = int(categoria)
-            query = query.filter_by(Categoria=str(categoria_valor))
+            query = query.filter_by(IdCategoria=str(categoria_valor))
         except KeyError:
             return []
         
     if rama:
         try:
             rama_valor = int(rama)
-            query = query.filter_by(Rama=str(rama_valor))
+            query = query.filter_by(IdRama=str(rama_valor))
         except KeyError:
             return []
     if dni:
@@ -58,6 +59,8 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
             'apellido': e.Apellido,
             'email': e.Email,
             'telefono': e.Telefono,
+            'fechaNacimiento': e.FechaNacimiento.strftime('%d/%m/%Y') if e.FechaNacimiento else None,
+            'fechaNacimientoISO': e.FechaNacimiento.strftime('%Y-%m-%d') if e.FechaNacimiento else None,
             'categoria': categoria_nombre,
             'rama': rama_nombre,
             'division': division_nombre,
@@ -108,3 +111,30 @@ def enviar_mail_alta_deportista(deportista, password):
     except Exception as e:
         print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
         return False
+    
+    
+def calcular_categoria_por_fecha(fecha_nacimiento):
+    
+    if not fecha_nacimiento:
+        # Si no hay fecha, devolver "NoDefinido" o el valor que uses
+        return generalEnum.CategoriaEnum.NoEspecificada.value
+    
+    hoy = date.today()
+    edad = hoy.year - fecha_nacimiento.year - (
+        (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day)
+    )
+
+    if edad < 12:
+        return CategoriaEnum.Sub12.value
+    elif edad < 13:
+        return CategoriaEnum.Sub13.value
+    elif edad < 14:
+        return CategoriaEnum.Sub14.value
+    elif edad < 16:
+        return CategoriaEnum.Sub16.value
+    elif edad < 18:
+        return CategoriaEnum.Sub18.value
+    elif edad < 21:
+        return CategoriaEnum.Sub21.value
+    else:
+        return CategoriaEnum.Primera.value
