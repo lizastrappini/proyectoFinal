@@ -27,6 +27,10 @@ def index():
     {'value': div.value, 'text': div.name}
     for div in generalEnum.DivisionEnum
     ]
+    federados = [
+    {'value': federado.value, 'text': federado.name}
+    for federado in generalEnum.FederadoEnum
+    ]
     deportistas = deportistaController.obtener_deportistas()  
     lista_deportistas = [
         {
@@ -36,7 +40,7 @@ def index():
         }
         for e in deportistas
     ]
-    return render_template('deportista/index.html', categorias=categorias,deportistas=lista_deportistas, ramas=ramas, divisiones=divisiones)
+    return render_template('deportista/index.html', categorias=categorias,deportistas=lista_deportistas, ramas=ramas, divisiones=divisiones, federados= federados)
 
 
 @deportista_bp.route('/filtrar')
@@ -69,6 +73,8 @@ def agregar_deportista():
         categoria_nombre = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
+        federado_nombre = request.form.get('federado')
+        
 
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
@@ -87,6 +93,7 @@ def agregar_deportista():
         division_id = generalEnum.DivisionEnum[division_nombre].value
         # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
         # Generar contraseña aleatoria segura
+        federado_id = generalEnum.FederadoEnum[federado_nombre].value
         caracteres = string.ascii_letters + string.digits  # letras + números
         password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
         
@@ -117,7 +124,8 @@ def agregar_deportista():
             IdRol=2,
             Token=None,
             TokenEnviado=False,
-            FechaVencimientoToken=None
+            FechaVencimientoToken=None,
+            Federado = federado_id
         )
         deportistaController.agregarDeportista(nuevo_deportista)
         deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
@@ -170,6 +178,8 @@ def editar_deportista(dni):
         categoria_nombre = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
+        federado_nombre = request.form.get('federado')
+        
 
         # Actualiza campos
         deportista.Dni = nuevo_dni
@@ -183,6 +193,8 @@ def editar_deportista(dni):
         deportista.IdCategoria = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
         deportista.IdRama = generalEnum.RamaEnum[rama_nombre].value
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
+        deportista.Federado = generalEnum.FederadoEnum[federado_nombre].value
+        
 
         deportistaController.actualizar_deportista(deportista)
 

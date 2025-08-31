@@ -49,6 +49,7 @@ def miCuenta(id):
             'rol': generalEnum.RolEnum(usuario.IdRol).name ,
             'idEstado': usuario.IdEstado,
             'idRol': usuario.IdRol,
+            'federado': generalEnum.FederadoEnum(usuario.Federado).name,
             'fechaNacimiento': usuario.FechaNacimiento.strftime('%d/%m/%Y') if usuario.FechaNacimiento else None,
             'fechaNacimientoISO': usuario.FechaNacimiento.strftime('%Y-%m-%d') if usuario.FechaNacimiento else None,
             # 'fechaNacimiento' : usuario.FechaNacimiento

@@ -53,6 +53,12 @@
                             <span>{{ usuario.fechaNacimientoISO }}</span>
                           </li>
                           {% endif %}
+                           {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
+                           <li class="mb-2">
+                            <span class="fw-medium text-heading me-2">Tipo Deportista:</span>
+                            <span>{{ usuario.federado }}</span>
+                          </li>
+                          {% endif %}
                           <li class="mb-2">
                             <span class="fw-medium text-heading me-2">Estado:</span>
                             <span class="badge rounded-pill {{ 'bg-label-success' if usuario.IdEstado == Activo else 'bg-label-danger' }}">

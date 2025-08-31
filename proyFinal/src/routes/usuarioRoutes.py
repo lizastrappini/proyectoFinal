@@ -96,6 +96,7 @@ def editUsuario():
         'Categoria': request.form.get('Categoria'),
         'FechaNacimiento': None,
         
+        
     }
     fecha_str = request.form.get('FechaNacimiento')
     if fecha_str:

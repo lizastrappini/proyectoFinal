@@ -197,6 +197,20 @@
                             </select>
                           </div>
                           </div>
+
+                          
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
+                            <label for="rama" class="form-label">Federado</label>
+                            <select class="form-select" id="federado" name="federado" required>
+                              <option value="">Seleccione si es federado o no</option>
+                              {% for federado in federados %}
+                                <option value="{{ federado.text}}">{{ federado.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                          
                           
                           <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
@@ -342,6 +356,7 @@
               $('#apellido').val(data.apellido);
               $('#email').val(data.email);
               $('#fechaNacimiento').val(data.fechaNacimientoISO);
+              $('#federado').val(data.federado).trigger('change');
               $('#telefono').val(data.telefono);
               $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
               $('#division').val(data.division).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar

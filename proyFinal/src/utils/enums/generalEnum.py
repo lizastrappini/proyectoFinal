@@ -33,10 +33,7 @@ class LocalidadEnum(enum.IntEnum):
     NoDefinido = 0
 
 
-class EstadoPagoEnum(enum.IntEnum):
-    Pago = 1
-    NoPago = 2
-    Pendiente = 3
+
 
 class CategoriaEnum(enum.IntEnum): 
     Sub12 = 1
@@ -71,3 +68,8 @@ class TipoEventoEnum(enum.IntEnum):
     SuspensionEntrenamiento = 4
     Torneo = 5
     Recaudacion = 6
+    
+class FederadoEnum(enum.IntEnum):
+    Federado = 1
+    NoFederado = 2
+    NoAplica = 3

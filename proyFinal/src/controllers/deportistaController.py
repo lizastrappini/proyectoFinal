@@ -3,7 +3,7 @@ from flask import current_app, render_template, url_for
 from flask_mail import Message
 from src.models.usuario import Usuario
 from src.utils.enums import generalEnum
-from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, RamaEnum
+from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, FederadoEnum, RamaEnum
 from src import db
 from src.utils.Mail import mail
 
@@ -50,6 +50,11 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
             division_nombre = division_enum.name
         except (ValueError, KeyError):
             division_nombre = 'Desconocido'
+        try:
+            fed_enum = FederadoEnum(int(e.Federado)) if e.Federado is not None else None
+            fed_nombre = fed_enum.name 
+        except (ValueError, KeyError):
+            fed_nombre = 'Desconocido'
 
             
 
@@ -64,7 +69,8 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
             'categoria': categoria_nombre,
             'rama': rama_nombre,
             'division': division_nombre,
-            'estado': estado_nombre
+            'estado': estado_nombre,
+            'federado': fed_nombre
         })
 
     return deportistas
