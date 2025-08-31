@@ -138,3 +138,16 @@ def calcular_categoria_por_fecha(fecha_nacimiento):
         return CategoriaEnum.Sub21.value
     else:
         return CategoriaEnum.Primera.value
+
+
+def actualizar_categorias_automaticas():
+    hoy = date.today()
+    usuarios = Usuario.query.all()
+    
+    for u in usuarios:
+        if u.FechaNacimiento:
+            u.IdCategoria = calcular_categoria_por_fecha(u.FechaNacimiento)
+        else:
+            u.IdCategoria = generalEnum.CategoriaEnum.NoEspecificada.value
+    
+    db.session.commit()
