@@ -71,6 +71,7 @@ def update(id, datos):
     #     valor_localidad = generalEnum.LocalidadEnum.NoDefinido.value
 
     if usuario:
+        categoria_vieja = usuario.IdCategoria
         if 'Nombre' in datos:
             usuario.Nombre = datos['Nombre']
         if 'Apellido' in datos:
@@ -88,9 +89,6 @@ def update(id, datos):
         if 'FechaNacimiento' in datos:
             usuario.FechaNacimiento = datos['FechaNacimiento']
             
-        
-            
-
         # Actualizar categoría automáticamente
         if usuario.FechaNacimiento:
             usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
@@ -101,6 +99,13 @@ def update(id, datos):
         # usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
 
         db.session.commit()
+        if usuario.IdCategoria != categoria_vieja:
+            enviar_mail_categoria(
+                usuario.Email,
+                usuario.Nombre,
+                generalEnum.CategoriaEnum(usuario.IdCategoria).name
+            )
+
         return usuario
 
     return None
@@ -228,3 +233,18 @@ def usuario_tiene_cuota_al_dia(usuario_id):
         return ultimo_pago.FechaPago.month == hoy.month and ultimo_pago.FechaPago.year == hoy.year
 
     return False
+
+def enviar_mail_categoria(usuario_email, nombre, categoria_nueva):
+    msg = Message(
+        "Voley App - Actualización de Categoría",
+        sender="lizaotrascosas@gmail.com",
+        recipients=[usuario_email]
+    )
+    msg.html = render_template("usuario/emailCambioCategoria.html", nombre=nombre, categoria_nueva=categoria_nueva)
+
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"[ERROR] No se pudo enviar el correo: {e}")
+        return False
