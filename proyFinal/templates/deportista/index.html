@@ -166,7 +166,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="categoria" class="form-label">Categoría</label>
-                            <select class="form-select" id="categoria" name="categoria" required>
+                            <select class="form-select" id="categoria" name="categoria"  required>
                               <option value="">Seleccione una categoria</option>
                               {% for categoria in categorias %}
                                 <option value="{{ categoria.text }}">{{ categoria.text }}</option>
@@ -174,6 +174,7 @@
                             </select>
                           </div>
                           </div>
+                        
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="division" class="form-label">Division</label>

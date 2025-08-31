@@ -1,3 +1,4 @@
+import datetime
 from flask import current_app, render_template, url_for
 from flask_mail import Message
 
@@ -8,10 +9,35 @@ from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum
 from src import db
 from src.utils.Mail import mail
 
-def obtener_pagos():
+def obtener_pagos(estado= None,  fecha_desde=None, fecha_hasta=None):
     query = Pago.query
+    
+    if estado:
+        try:
+            estado_valor = int(estado)
+            query = query.filter_by(IdEstado=str(estado_valor))
+        except KeyError:
+            return []
+        
+    # Filtrar por fecha desde
+    if fecha_desde:
+        try:
+            fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
+            query = query.filter(Pago.FechaPago >= fecha_desde_dt)
+        except ValueError:
+            pass
+
+    # Filtrar por fecha hasta
+    if fecha_hasta:
+        try:
+            fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
+            query = query.filter(Pago.FechaPago <= fecha_hasta_dt)
+        except ValueError:
+            pass
+    
     resultados = query.all()
     pagos = []
+    
     for e in resultados:
 
         try:

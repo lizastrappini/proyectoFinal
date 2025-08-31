@@ -30,6 +30,18 @@ def obtener():
     pagos = pagosController.obtener_pagos()
     return jsonify(data=pagos)  
 
+@pago_bp.route('/filtrar')
+def filtrar():
+    estado = request.args.get('estado')
+    fecha_desde = request.args.get('fechaDesde')
+    fecha_hasta = request.args.get('fechaHasta')
+    # dni = request.args.get('dni')
+    
+    if estado and estado.isdigit():
+        estado = int(estado)
+    
+    data = pagosController.obtener_pagos(estado=estado, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta)
+    return jsonify({'data': data})
 
 @pago_bp.route('/nuevoPago', methods=['POST'])
 def agregar_pago():

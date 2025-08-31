@@ -73,3 +73,24 @@ class FederadoEnum(enum.IntEnum):
     Federado = 1
     NoFederado = 2
     NoAplica = 3
+
+
+class ContrincantesEnum(enum.IntEnum):
+    Sonder = 1
+    Central = 2
+    Nautico = 3
+    Normal3 = 4
+    ElTala = 5
+    Citta = 6
+    Ger = 7
+    Provincial = 8
+    RedEstar = 9
+    Rowing = 10
+    Atalaya  = 11
+    Regatas =12
+    Libertad = 13
+    Newells = 14
+    Estudiantil = 15
+    Sportsmen = 17
+    Bancario = 18
+    Fisherton = 19
