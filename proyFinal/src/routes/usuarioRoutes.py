@@ -25,14 +25,15 @@ def listar_usuarios():
 
 @usuario_bp.route('/login', methods=['POST'])
 def login():
-    email = request.form.get('email-username')  
+    username = request.form.get('username')  
     password = request.form.get('password') 
-    usuario = usuarioController.loginUser(email, password)
+    usuario = usuarioController.loginUser(username, password)
 
     if usuario:
-        login_user(usuario) 
+        login_user(usuario, remember = True) 
         flash("Bienvenido!", "success")
         return redirect(url_for('usuarios.listar_usuarios'))
+        # return redirect(url_for('inicio_bp.index')) esta me la dio el chat
     else:
         flash("Usuario o contraseña incorrectos", "danger")
         return render_template('usuario/index.html')

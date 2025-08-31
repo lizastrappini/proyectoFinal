@@ -19,8 +19,8 @@ from datetime import date
 # def loginUser(email,password):
 #     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
 #     return usuario
-def loginUser(email, password):
-    usuario = Usuario.query.filter_by(Email=email).first()
+def loginUser(username, password):
+    usuario = Usuario.query.filter_by(NombreUsuario=username).first()
     if usuario and check_password_hash(usuario.Password, password):
         return usuario
     return None
