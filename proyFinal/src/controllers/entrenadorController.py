@@ -88,3 +88,4 @@ def enviar_mail_alta_entrenador(entrenador, password):
     except Exception as e:
         print(f"[ERROR] No se pudo enviar el correo al entrenador: {e}")
         return False
+    

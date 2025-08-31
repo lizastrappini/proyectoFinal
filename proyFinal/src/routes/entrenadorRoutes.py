@@ -47,6 +47,8 @@ def filtrar():
 def agregar_entrenador():
     try:
         dni = request.form.get('dni')
+        if not dni or not dni.isdigit() or len(dni) != 8:
+            raise ValueError("DNI inválido. Debe contener exactamente 8 dígitos numéricos.")
         nombre = request.form.get('nombre')
         apellido = request.form.get('apellido')
         email = request.form.get('email')
@@ -118,6 +120,8 @@ def editar_entrenador(dni):
             usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
             if usuario_existente:
                 raise ValueError(f"Ya existe un usuario con el DNI {nuevo_dni}")
+        if not nuevo_dni or not nuevo_dni.isdigit() or len(nuevo_dni) != 8:
+            raise ValueError("DNI inválido. Debe contener exactamente 8 dígitos numéricos.")
                     
         entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
         

@@ -249,3 +249,7 @@ def enviar_mail_categoria(usuario_email, nombre, categoria_nueva):
     except Exception as e:
         print(f"[ERROR] No se pudo enviar el correo: {e}")
         return False
+    
+    
+
+
