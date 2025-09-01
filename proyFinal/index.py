@@ -23,6 +23,7 @@ from src.routes.deportistaRoutes import deportista_bp
 from src.routes.estadisticasRoutes import estadisticas_bp
 from src.routes.notificacionRoutes import notificacion_bp
 from src.routes.contactoRoutes import contacto_bp
+from src.routes.chatbotRoutes import chatbot_bp
 from src.utils.Mail import mail
 
 app = Flask(__name__)
@@ -42,6 +43,8 @@ app.register_blueprint(deportista_bp, url_prefix='/deportista')
 app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
 app.register_blueprint(contacto_bp, url_prefix='/contacto')
 app.register_blueprint(estadisticas_bp)  # monta en /estadisticas
+app.register_blueprint(chatbot_bp)
+
 
 # Context processor para exponer todos los Enum y funciones de src.utils.enums
 @app.context_processor
