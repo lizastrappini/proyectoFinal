@@ -51,11 +51,11 @@ def nueva_notificacion():
         nueva_notif = Notificacion(
             Titulo = titulo,
             Descripcion= descripcion,
-            Categoria=categoria_id
+            IdCategoria=categoria_id
         )
         
         if categoria_id:
-            usuarios_destino = Usuario.query.filter_by(Categoria=categoria_id).all()
+            usuarios_destino = Usuario.query.filter_by(IdCategoria=categoria_id).all()
         else:
             usuarios_destino = Usuario.query.all()
             
