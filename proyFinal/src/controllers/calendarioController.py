@@ -42,7 +42,7 @@ def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
                 "description": evento.Descripcion,
                 "calendar": [str(evento.IdTipoEvento)],
                 "categoria": [str(evento.IdCategoria)],
-                "contrincante": [str(evento.Contrincante)],
+                "contrincante": [str(evento.IdContrincante)],
                 "localidad": [str(evento.Localidad)],
                 
                 

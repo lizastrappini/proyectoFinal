@@ -61,7 +61,7 @@ def nuevo_evento():
         Localidad=Localidad,
         Descripcion=descripcion,
         IdCategoria = IdCategoria,
-        Contrincante= Contrincante,
+        IdContrincante= Contrincante,
         
     )
     calendarioController.crearEvento(nuevo_evento)
@@ -102,7 +102,7 @@ def editar_evento(evento_id):
     idCategoria = data.get('categoria')
     evento.IdCategoria = int(idCategoria) if idCategoria else evento.IdCategoria
     contrincante = data.get('contrincante')
-    evento.Contrincante = int(contrincante) if contrincante else evento.Contrincante
+    evento.IdContrincante = int(contrincante) if contrincante else evento.IdContrincante
     localidad = data.get('localidad')
     evento.Localidad = int(localidad) if localidad else evento.Localidad
     
