@@ -22,7 +22,7 @@ class Usuario(UserMixin, db.Model):
     TokenEnviado = db.Column(db.Boolean, default=False)
     FechaVencimientoToken = db.Column(db.DateTime)
     FechaNacimiento = db.Column(db.DateTime, nullable=True)
-    Federado = db.Column(db.Integer, nullable=True)
+    Federado = db.Column(db.Integer, nullable=False)
     CategoriaExtra = db.Column(db.String(30), nullable=True)
     
 
