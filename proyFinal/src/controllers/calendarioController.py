@@ -1,3 +1,4 @@
+from flask_login import current_user
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum  as generalEnum
 from src import db
@@ -18,7 +19,7 @@ def eliminarEvento(evento):
 def editarEvento(evento):
      db.session.commit()
 
-def obtenerEventos(inicio,fin,tipos):
+def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
     filtros = [
         Evento.FechaInicio <= fin,
         Evento.FechaFin >= inicio
@@ -26,6 +27,8 @@ def obtenerEventos(inicio,fin,tipos):
 
     if tipos:
         filtros.append(Evento.IdTipoEvento.in_(tipos))
+    if mi_categoria == "1":  # checkbox marcado
+        filtros.append(Evento.IdCategoria == current_user.IdCategoria)
 
     eventos = Evento.query.filter(*filtros).all()
     eventosTodos = [
@@ -37,9 +40,12 @@ def obtenerEventos(inicio,fin,tipos):
             "allDay": evento.TodoElDia,
             "extendedProps": {
                 "description": evento.Descripcion,
-                "localidad": evento.Localidad,
                 "calendar": [str(evento.IdTipoEvento)],
-                "categoria": [str(evento.IdCategoria)]
+                "categoria": [str(evento.IdCategoria)],
+                "contrincante": [str(evento.Contrincante)],
+                "localidad": [str(evento.Localidad)],
+                
+                
 
             }
         } for evento in eventos

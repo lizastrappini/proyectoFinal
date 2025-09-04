@@ -67,6 +67,7 @@ class TipoEventoEnum(enum.IntEnum):
     Torneo = 5
     Recaudacion = 6
     
+    
 class FederadoEnum(enum.IntEnum):
     Federado = 1
     NoFederado = 2
