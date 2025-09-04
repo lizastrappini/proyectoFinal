@@ -11,7 +11,11 @@ class Evento(db.Model):
     Localidad = db.Column(db.String(100), nullable=True)
     Descripcion = db.Column(db.Text, nullable=True)
     IdCategoria = db.Column(db.Integer, nullable=True)
-
+    TieneEstadistica = db.Column(db.Boolean, default=False)
+    IdRama = db.Column(db.Integer, nullable=True)
+    IdDivision = db.Column(db.Integer, nullable=True)
+    IdContrincante = db.Column(db.Integer, nullable=True)
+    
     
     def __repr__(self):
         return f"<Evento {self.Titulo}>"

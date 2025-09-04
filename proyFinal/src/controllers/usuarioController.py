@@ -13,7 +13,7 @@ from src.utils.Mail import mail
 from datetime import datetime, timezone, timedelta
 from flask import render_template
 from werkzeug.security import check_password_hash
-from sqlalchemy import and_, cast, Date
+from sqlalchemy import and_, cast, Date, or_, and_
 from datetime import date
 
 # def loginUser(email,password):
@@ -251,5 +251,43 @@ def enviar_mail_categoria(usuario_email, nombre, categoria_nueva):
         return False
     
     
+def getUsuarioByCategoriaYRama(categoria, rama, division, ids_seleccionados=None):
+    try:
+        cat_buscar = int(categoria)
+    except Exception:
+        return []
+
+    query = Usuario.query.filter(
+        Usuario.IdRama == rama,
+        Usuario.IdDivision == division,
+        or_(
+            Usuario.IdCategoria == cat_buscar,
+            and_(Usuario.CategoriaExtra.isnot(None), Usuario.CategoriaExtra != '')
+        )
+    )
+
+    if ids_seleccionados:
+        query = query.filter(Usuario.Id.in_(ids_seleccionados))
+
+    usuarios = query.with_entities(
+        Usuario.Id, Usuario.Nombre, Usuario.Apellido,
+        Usuario.IdCategoria, Usuario.CategoriaExtra
+    ).all()
+
+    resultado = []
+    for u in usuarios:
+        user_id, nombre, apellido, id_categoria, categoria_extra = u
+
+        if id_categoria == cat_buscar:
+            resultado.append({"Id": user_id, "Nombre": f"{nombre} {apellido}"})
+            continue
 
 
+        if categoria_extra:
+            partes = [p.strip() for p in categoria_extra.split(",") if p.strip() != ""]
+            for p in partes:
+                if p.isdigit() and int(p) == cat_buscar:
+                    resultado.append({"Id": user_id, "Nombre": f"{nombre} {apellido}"})
+                    break
+
+    return resultado

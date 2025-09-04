@@ -4,112 +4,342 @@
 <div class="container-xxl flex-grow-1 container-p-y">
   <h1>Estadísticas</h1>
 
-  {# … tus includes de subida, imágenes, lista de archivos … #}
-
-  <!-- Filtro por jugador -->
+  <!-- DESCARGAR -->
   <div class="card mt-5">
     <div class="card-body">
-      <h5 class="card-title">Filtrar por jugador</h5>
-      <select id="player-filter" class="form-select">
-        <option value="all">Todos los jugadores</option>
-      </select>
-    </div>
-  </div>
-  <a href="/estadisticas/descargar_plantilla" class="btn btn-success">Descargar</a>
-  <!-- Contenedor de gráficas del equipo -->
-  <div class="card mt-4">
-    <div class="card-body">
-      <h5 class="card-title">📊 Estadísticas del equipo</h5>
-      <div id="team-charts" class="row"></div>
+      <h5 class="card-title">Selecciona filtros para <b>descargar</b> la planilla</h5>
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-md-2">
+          <div class="form-floating mb-0">
+            <input type="text" class="form-control" id="fechaDescargar" placeholder="Fecha de partido">
+            <label for="fechaDescargar">Fecha de partido</label>
+          </div>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="categoriaDescargar" class="select2 form-select" data-placeholder="Categoría">
+            <option value=""></option>
+            {% for cat in categorias %}
+              <option value="{{ cat.value }}">{{ cat.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="ramaDescargar" class="select2 form-select" data-placeholder="Rama">
+            <option value=""></option>
+            {% for r in ramas %}
+              <option value="{{ r.value }}">{{ r.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="divisionDescargar" class="select2 form-select" data-placeholder="Division">
+            <option value=""></option>
+            {% for d in division %}
+              <option value="{{ d.value }}">{{ d.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="partidoDescargar" class="select2 form-select" data-placeholder="Partido">
+            <option value=""></option>
+            {% for p in partidosDescarga %}
+              <option value="{{ p.value }}">{{ p.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-auto">
+          <button type="button" class="btn btn-success" id="btnDescargar" disabled>Descargar</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Contenedor de gráficas por jugador -->
-  <div class="card mt-4">
+  <!-- SUBIR -->
+  <div class="card mt-5">
     <div class="card-body">
-      <h5 class="card-title">📊 Estadísticas por jugador</h5>
-      <div id="player-charts" class="row"></div>
+      <h5 class="card-title">Selecciona filtros para <b>subir</b> la planilla</h5>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <div style="flex:1;">
+          <div class="form-floating mb-0">
+            <input type="text" class="form-control" id="fechaSubir" placeholder="Fecha de partido">
+            <label for="fechaSubir">Fecha de partido</label>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div class="form-floating mb-0">
+            <select id="categoriaSubir" class="select2 form-select" data-placeholder="Categoría">
+              <option value=""></option>
+              {% for cat in categorias %}
+                <option value="{{ cat.value }}">{{ cat.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <select id="partidoSubir" class="select2 form-select" data-placeholder="Partido">
+            <option value=""></option>
+            {% for p in partidos %}
+              <option value="{{ p.value }}">{{ p.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+          <label for="upload" class="btn btn-primary mb-0" style="white-space: nowrap;">
+            Seleccionar archivo
+            <input type="file" id="upload" hidden accept=".xls,.xlsx">
+          </label>
+
+        <button type="button" class="btn btn-icon btn-label-danger" id="resetArchivo">
+          <span class="tf-icons ri-delete-bin-line ri-22px"></span>
+        </button>
+        <button type="button" class="btn btn-success" id="btnSubir" disabled>Subir</button>
+      </div>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const COLORS = ['#d9534f','#f0ad4e','#5bc0de','#5cb85c','#428bca','#f7ec59','#8e44ad'];
+$(document).ready(function() {
+  // --- SELECT2 ---
+  $('#categoriaDescargar, #ramaDescargar, #divisionDescargar, #partidoDescargar').select2({ allowClear:true, width:'100%' });
+  $('#categoriaSubir, #partidoSubir').select2({ allowClear:true, width:'100%' });
 
-  // Función para dibujar las gráficas de un array de jugadores
-  function drawPlayers(players) {
-    const container = document.getElementById('player-charts');
-    container.innerHTML = ''; // limpia
-    players.forEach(player => {
-      // Wrapper por jugador
-      const wrap = document.createElement('div');
-      wrap.className = 'col-12 mb-5';
-      wrap.innerHTML = `<h6>Jugador #${player.jersey}</h6><div class="row" id="p-${player.jersey}"></div>`;
-      container.appendChild(wrap);
+  // --- BOTONES ---
+  const $btnDescargar = $('#btnDescargar');
+  const $categoriaDescargar = $('#categoriaDescargar');
+  const $ramaDescargar = $('#ramaDescargar');
+  const $divisionDescargar = $('#divisionDescargar');
+  const $partidoDescargar = $('#partidoDescargar');
+  const $fechaDescargar = $('#fechaDescargar');
 
-      // Para cada bloque de datos del jugador
-      Object.entries(player.stats).forEach(([block, data]) => {
-        const col = document.createElement('div');
-        col.className = 'col-md-4 mb-4 text-center';
-        col.innerHTML = `<strong>${block}</strong><canvas></canvas>`;
-        wrap.querySelector(`#p-${player.jersey}`).appendChild(col);
+  const $btnSubir = $('#btnSubir');
+  const $categoriaSubir = $('#categoriaSubir');
+  const $partidoSubir = $('#partidoSubir');
+  const $archivo = $('#upload');
+  const $fechaSubir = $('#fechaSubir');
 
-        new Chart(col.querySelector('canvas'), {
-          type: 'pie',
-          data: {
-            labels: Object.keys(data),
-            datasets: [{ data: Object.values(data), backgroundColor: COLORS }]
-          }
-        });
-      });
-    });
+  $btnDescargar.prop('disabled', true);
+  $btnSubir.prop('disabled', true);
+
+  // --- FLATPICKR ---
+flatpickr("#fechaDescargar", { 
+    locale: "es", 
+    dateFormat: "d-m-Y",
+    maxDate: "today" // no permite seleccionar fechas futuras
+});
+
+flatpickr("#fechaSubir", { 
+    locale: "es", 
+    dateFormat: "d-m-Y",
+    maxDate: "today" // no permite seleccionar fechas futuras
+});
+
+  // --- FUNCIONES HABILITAR BOTONES ---
+  function verificarDescargar() {
+    if($categoriaDescargar.val() && $ramaDescargar.val() && $divisionDescargar.val() && $partidoDescargar.val() && $fechaDescargar.val()) {
+      $btnDescargar.prop('disabled', false);
+    } else {
+      $btnDescargar.prop('disabled', true);
+    }
   }
 
-  // Arranca todo
-  fetch('/estadisticas/data')
-    .then(res => res.json())
-    .then(({ team, players }) => {
-      // 1) Graficar equipo
-      const teamContainer = document.getElementById('team-charts');
-      Object.entries(team).forEach(([block, data]) => {
-        const col = document.createElement('div');
-        col.className = 'col-md-4 mb-4 text-center';
-        col.innerHTML = `<h6>${block}</h6><canvas></canvas>`;
-        teamContainer.appendChild(col);
-        new Chart(col.querySelector('canvas'), {
-          type: 'pie',
-          data: {
-            labels: Object.keys(data),
-            datasets: [{ data: Object.values(data), backgroundColor: COLORS }]
+  function verificarSubir() {
+    // 3. Ahora verificamos que haya fecha también
+    if($categoriaSubir.val() && $partidoSubir.val() && $archivo[0].files.length > 0 && $fechaSubir.val()) {
+      $btnSubir.prop('disabled', false);
+    } else {
+      $btnSubir.prop('disabled', true);
+    }
+  }
+
+  // --- EVENTOS ---
+  $categoriaDescargar.add($ramaDescargar).add($divisionDescargar).add($partidoDescargar).add($fechaDescargar).on('change', verificarDescargar);
+  $categoriaSubir.add($partidoSubir).add($archivo).add($fechaSubir).on('change', verificarSubir);
+
+  $('#resetArchivo').on('click', function() {
+    $archivo.val('');
+    verificarSubir();
+  });
+
+  // --- AJAX DESCARGAR ---
+  $btnDescargar.on('click', function() {
+    const categoria = $categoriaDescargar.val();
+    const rama = $ramaDescargar.val();
+    const division = $divisionDescargar.val();
+    const partido = $partidoDescargar.val() || '';
+    const fecha = $fechaDescargar.val();
+
+     $.getJSON('/estadisticas/usuarios_por_categoria', { categoria, rama, division }, function(res) {
+        if(res.estado !== 'ok') { Swal.fire('Error', res.mensaje,'error'); return; }
+        if(res.usuarios.length === 0) { Swal.fire('Info','No hay usuarios para esta categoría','info'); return; }
+
+        let html = '<div style="max-height:300px; overflow-y:auto; width:100%; box-sizing:border-box;">';
+              res.usuarios.forEach(u => {
+                  html += `
+                  <div class="form-check" 
+                      style="display:flex; flex-direction:row-reverse; align-items:center; justify-content:space-between; width:100%; padding:3px 0; ">
+                      <input type="checkbox" 
+                            class="form-check-input" 
+                            id="usuario_${u.Id}" 
+                            name="usuarios" 
+                            value="${u.Id}" 
+                            checked
+                            style="margin:0;">
+                      <label for="usuario_${u.Id}" 
+                            class="form-check-label" 
+                            style="flex-grow:1; text-align:start; margin:0 8px 0 0;">${u.Nombre}</label>
+                  </div>
+                  `;
+              });
+              html += '</div>';
+        Swal.fire({
+          title: 'Selecciona usuarios a incluir',
+          html: html,
+          showCancelButton: true,
+          confirmButtonText: 'Descargar',
+          width: 500,
+          customClass: {
+              popup: 'swal2-popup',
+              backdrop: 'swal2-container'
+          },
+          didOpen: function() {
+
+              document.querySelector('.swal2-container').style.zIndex = 20000;
+              document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+              const labels = document.querySelectorAll('.form-check-label');
+              labels.forEach(lbl => {
+                  lbl.style.display = 'flex';
+                  lbl.style.justifyContent = 'space-between';
+                  lbl.style.alignItems = 'flex-start';
+                  lbl.style.padding = '3px 0';
+                  lbl.style.borderBottom = '1px solid #eee';
+              });
+          },
+          preConfirm: function() {
+              const ids = [...document.querySelectorAll('input[name="usuarios"]:checked')]
+                  .map(e => e.value);
+              if(ids.length === 0) Swal.showValidationMessage("Debe seleccionar al menos un usuario");
+              return ids;
           }
-        });
+      }).then(result => {
+          if(result.isConfirmed) {
+              const ids = result.value.join(',');
+              window.location.href = `/estadisticas/descargar_planilla?categoria=${categoria}&rama=${rama}&division=${division}&partido=${partido}&fecha=${fecha}&usuarios=${ids}`;
+          }
       });
+    });
+  });
 
-      // 2) Poblar filtro
-      const filter = document.getElementById('player-filter');
-      players.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.jersey;
-        opt.textContent = `#${p.jersey}`;
-        filter.appendChild(opt);
-      });
+  // --- AJAX SUBIR ---
+  $btnSubir.on('click', function() {
+    const categoria = $categoriaSubir.val();
+    const partido = $partidoSubir.val();
+    const archivo = $archivo[0].files[0];
+    const fecha = $fechaSubir.val();
+    
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+    formData.append('categoria', categoria);
+    formData.append('partido', partido);
+    formData.append('fecha', fecha); 
 
-      // 3) Mostrar todas inicialmente
-      drawPlayers(players);
+    $.ajax({
+      url:'/estadisticas/subir_estadisticas',
+      type:'POST',
+      data:formData,
+      processData:false,
+      contentType:false,
+      success: res => {
+        if(res.estado!=='ok') Swal.fire('Error', res.mensaje,'error');
+        else Swal.fire('Éxito', res.mensaje,'success');
+      },
+      error: xhr => {
+        let msg = "Ocurrió un error en la solicitud";
+        if(xhr.responseJSON && xhr.responseJSON.mensaje) msg = xhr.responseJSON.mensaje;
+        Swal.fire('Error', msg,'error');
+      }
+    });
+  });
 
-      // 4) Listener de cambio
-      filter.addEventListener('change', () => {
-        if (filter.value === 'all') {
-          drawPlayers(players);
-        } else {
-          const sel = players.find(p => p.jersey == filter.value);
-          drawPlayers(sel ? [sel] : []);
+function cargarPartidosDescargar() {
+    const fecha = $fechaDescargar.val();
+    const categoria = $categoriaDescargar.val();
+    const rama = $ramaDescargar.val();
+    const division = $divisionDescargar.val();
+
+    if(!fecha || !categoria || !rama || !division) {
+        $partidoDescargar.empty().trigger('change.select2');
+        verificarDescargar();
+        return;
+    }
+
+    $.getJSON("/estadisticas/partidos_por_categoria", {
+        fecha: fecha,
+        categoria: categoria,
+        rama: rama,
+        division: division
+    }, function(res) {
+        if(res.estado !== "ok") {
+            Swal.fire("Error", res.mensaje, "error");
+            $partidoDescargar.empty().append('<option value=""></option>').trigger('change.select2');
+            verificarDescargar();
+            return;
         }
-      });
-    })
-    .catch(err => console.error('Error al cargar datos:', err));
+
+        // Vaciar y agregar placeholder
+        $partidoDescargar.empty().append('<option value=""></option>');
+
+        // Agregar nuevos partidos correctamente
+        res.partidos.forEach(p => {
+            $partidoDescargar.append(new Option(p.text, p.value, false, false));
+        });
+
+        // Refrescar Select2 para que reconozca las nuevas opciones
+        $partidoDescargar.val(null).trigger('change.select2');
+        verificarDescargar();
+    });
+}
+
+function cargarPartidosSubir() {
+    const fecha = $fechaSubir.val(); // tomar la fecha seleccionada
+    const categoria = $categoriaSubir.val();
+
+    if(!categoria) {
+        $partidoSubir.empty().append('<option value=""></option>').trigger('change.select2');
+        verificarSubir();
+        return;
+    }
+
+    $.getJSON("/estadisticas/partidos_por_categoriayfecha", {
+        fecha: fecha,
+        categoria: categoria
+    }, function(res) {
+        if(res.estado !== "ok") {
+            Swal.fire("Error", res.mensaje, "error");
+            $partidoSubir.empty().append('<option value=""></option>').trigger('change.select2');
+            verificarSubir();
+            return;
+        }
+
+        // vaciar y agregar placeholder
+        $partidoSubir.empty().append('<option value=""></option>');
+
+        // agregar opciones con new Option para select2
+        res.partidos.forEach(p => {
+            $partidoSubir.append(new Option(p.text, p.value, false, false));
+        });
+
+        // refrescar select2
+        $partidoSubir.val(null).trigger('change.select2');
+        verificarSubir();
+    });
+}
+
+// --- EVENTOS PARA CARGAR PARTIDOS ---
+$categoriaDescargar.add($ramaDescargar).add($divisionDescargar).add($fechaDescargar).on('change', cargarPartidosDescargar);
+$categoriaSubir.add($fechaSubir).on('change', cargarPartidosSubir);
+
+});
 </script>
 {% endblock %}

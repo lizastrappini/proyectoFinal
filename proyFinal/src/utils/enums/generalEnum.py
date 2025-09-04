@@ -33,8 +33,6 @@ class LocalidadEnum(enum.IntEnum):
     NoDefinido = 0
 
 
-
-
 class CategoriaEnum(enum.IntEnum): 
     Sub12 = 1
     Sub13 = 2
@@ -47,7 +45,7 @@ class CategoriaEnum(enum.IntEnum):
     
 class DivisionEnum(enum.IntEnum):
     A = 1
-    B= 2
+    B = 2
     
 class RamaEnum(enum.IntEnum):
     Femenino = 1
@@ -94,3 +92,9 @@ class ContrincantesEnum(enum.IntEnum):
     Sportsmen = 17
     Bancario = 18
     Fisherton = 19
+
+
+class ResultadoEnum(enum.IntEnum):
+    G = 1
+    P = 2
+    

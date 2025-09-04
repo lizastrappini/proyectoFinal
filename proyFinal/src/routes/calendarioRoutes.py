@@ -98,3 +98,10 @@ def eliminar_evento(evento_id):
     
     return jsonify({'mensaje': 'Evento eliminado correctamente'})
 
+
+@calendario_bp.route("/partidosByCategoria")
+def partidosByCategoria(fecha, categoria):
+
+    eventos = calendarioController.getPartidosByCategoria(fecha,categoria)
+
+    return jsonify(eventos)

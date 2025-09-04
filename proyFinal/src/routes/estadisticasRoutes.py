@@ -2,101 +2,66 @@ from flask import (
     Blueprint, request, render_template, redirect, url_for,
     flash, send_file, jsonify, send_from_directory, session
 )
+import re
 import os
 import openpyxl
 import io 
-
+import datetime
 import src.controllers.usuarioController as usuarioController
+import src.controllers.calendarioController as calendarioController
 import src.utils.enums.generalEnum as generalEnum
 from openpyxl.utils import range_boundaries
+from src.models.usuario import Usuario
+from src.models.estadisticaPorPartido import EstadisticaPorPartido
+from src.models.estadisticaUsuarioPartido import EstadisticaUsuarioPartido
 
+from src import db
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
 
-def set_value_in_merged_cell(ws, row, col, value):
-    for merged_range in ws.merged_cells.ranges:
-        min_col, min_row, max_col, max_row = range_boundaries(str(merged_range))
-        # Si la celda está dentro del rango combinado
-        if min_row <= row <= max_row and min_col <= col <= max_col:
-            # Asignamos solo a la celda superior izquierda del rango
-            ws.cell(row=min_row, column=min_col, value=value)
-            return
-    # Si no está en rango combinado, asignamos normal
-    ws.cell(row=row, column=col, value=value)
-
-# Columnas Excel para cada bloque
-BLOCKS = {
-    'Recepción':      ['E','F','G','H','I','J','K'],
-    'Ataque Rotación':['M','N','O','P','Q','R','S'],
-    'Ataque Trans.':  ['T','U','V','W','X','Y','Z'],
-    'Saque':          ['AA','AB','AC','AD','AE'],
-    'Bloqueo':        ['AH','AI']
-}
-
-# Símbolos que quieres mostrar, en el mismo orden
-SYMBOLS = {
-    'Recepción':      ['E','V','=','-','!','+','#'],
-    'Ataque Rotación':['E','B','=','-','!','+','#'],
-    'Ataque Trans.':  ['E','B','=','-','!','+','#'],
-    'Saque':          ['=','-','!','+','#'],
-    'Bloqueo':        ['P','N']
-}
 
 @estadisticas_bp.route('/', methods=['GET'])
 def index():
     return render_template('estadisticas/index.html')
 
-
-# Si lo necesitas, puedes descomentar este bloque para subir Excel
-# @estadisticas_bp.route('/subir', methods=['POST'])
-# def subir_excel():
-#     archivo = request.files.get('archivoExcel')
-#     if archivo and archivo.filename.endswith(('.xlsx', '.xls')):
-#         destino = os.path.join('src', 'datos', archivo.filename)
-#         archivo.save(destino)
-#         flash("Archivo cargado correctamente", "success")
-#     else:
-#         flash("Formato inválido. Debe ser .xlsx o .xls", "danger")
-#     return redirect(url_for('estadisticas.mostrar_estadisticas'))
-
-def rellenar_excel():
-    # Cargar archivo de Excel
+def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None):
     carpeta_actual = os.path.dirname(__file__)
-
-# Construye la ruta al archivo plantilla subiendo un nivel y entrando en datos
     ruta_archivo = os.path.abspath(os.path.join(carpeta_actual, "..", "datos", "plantilla_de_estadisticas.xlsx"))
     wb = openpyxl.load_workbook(ruta_archivo)
-    ws = wb.active  # Hoja activa
+    ws = wb.active
 
-    # Buscar columna JUGADOR
-    jugador_col_index = None
-    jugador_row_index = None
-    for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=50, values_only=True), start=1):
-        if row:
-            for col_idx, value in enumerate(row, start=1):
-                if isinstance(value, str) and value.strip().upper() == "JUGADOR":
-                    jugador_col_index = col_idx
-                    jugador_row_index = row_idx
-                    break
-        if jugador_col_index:
-            break
+    partido = calendarioController.getPartidosById(int(idPartido))
 
-    if jugador_col_index is None:
-        return "No se encontró la columna 'JUGADOR'", 404
+    if not partido:
+        return jsonify({
+                "estado": "error",
+                "mensaje": f"Partido no encontrado"
+            }), 400
 
-    # Lista de usuarios de ejemplo (esto podrías traerlo de usuarioController)
-    usuarios = [
-        (101, "Juan Pérez"),
-        (102, "María López"),
-        (103, "Carlos Gómez"),
-        (104, "Ana Torres"),
-        (105, "Pedro Ramírez")
-    ]
+    categoria_texto = generalEnum.CategoriaEnum(int(categoria)).name.replace("_", " ").title()
+    rama_texto      = generalEnum.RamaEnum(int(rama)).name.replace("_", " ").title()
+    division_texto  = generalEnum.DivisionEnum(int(division)).name.replace("_", " ").title()
 
+    # --- NUEVAS CELDAS ---
+    # D3
+    ws.cell(row=3, column=4, value=f"Rosario Central - {categoria_texto} - {rama_texto} - {division_texto}")
+
+    # O3
+    ws.cell(row=3, column=15, value="Contrincante")  # hardcode por ahora
+
+    # P5
+    fecha_str = partido.FechaInicio.strftime("%d-%m-%Y")
+    ws.cell(row=5, column=16, value=fecha_str)
+
+    # AE3 -> idPartido (siempre presente)
+    ws.cell(row=3, column=31, value=partido.Id)
+
+    # --- RELLENAR USUARIOS ---
+    usuarios = usuarioController.getUsuarioByCategoriaYRama(categoria, rama, division, ids_seleccionados)
     start_row = 11
-    for i, (uid, nombre) in enumerate(usuarios, start=start_row):
-        ws.cell(row=i, column=1, value=uid)
-        ws.cell(row=i, column=2, value=nombre)
+    for i, u in enumerate(usuarios, start=start_row):
+        ws.cell(row=i, column=1, value=u["Id"])
+        ws.cell(row=i, column=2, value=u["Nombre"])
 
     output = io.BytesIO()
     wb.save(output)
@@ -110,6 +75,107 @@ def rellenar_excel():
     )
 
 
+@estadisticas_bp.route('/subir_estadisticas', methods=['POST'])
+def subir_estadisticas():
+    archivo = request.files.get("archivo")
+    fecha_str = request.form.get("fecha")  # dd-mm-YYYY
+    idPartido = request.form.get("partido")
+
+    if not archivo or not fecha_str or not idPartido:
+        return jsonify({"estado": "error", "mensaje": "Faltan datos"}), 400
+
+    try:
+        idPartido = int(idPartido)
+    except ValueError:
+        return jsonify({"estado": "error", "mensaje": "ID de partido inválido"}), 400
+
+    partido = calendarioController.getPartidosById(idPartido)
+    if not partido:
+        return jsonify({"estado": "error", "mensaje": "No se encontró el partido seleccionado"}), 400
+
+    try:
+        wb = openpyxl.load_workbook(archivo)
+    except Exception:
+        return jsonify({"estado": "error", "mensaje": "No se pudo abrir el archivo Excel"}), 400
+
+    ws = wb.active
+
+    # ---------- VALIDACION DE PARTIDO ----------
+    id_partido_excel_value = ws['AE3'].value
+    if id_partido_excel_value is None:
+        return jsonify({"estado": "error", "mensaje": "No se puede determinar el ID del partido en la planilla"}), 400
+
+    try:
+        id_partido_excel = int(str(id_partido_excel_value).strip())
+    except ValueError:
+        return jsonify({"estado": "error", "mensaje": f"El id del partido de la planilla ('{id_partido_excel_value}') no es válido"}), 400
+
+    if idPartido != id_partido_excel:
+        return jsonify({"estado": "error", "mensaje": f"El partido seleccionado no coincide con el de la planilla"}), 400
+
+    # ---------- RESULTADO ----------
+    resultado_str = ws['AE5'].value
+    if resultado_str not in ['G', 'P']:
+        return jsonify({"estado": "error", "mensaje": "Resultado del partido inválido, debe ser 'G' o 'P'"}), 400
+
+    try:
+        idResultado = generalEnum.ResultadoEnum[resultado_str].value
+    except KeyError:
+        return jsonify({"estado": "error", "mensaje": "Resultado del partido no reconocido"}), 400
+
+    # ---------- FECHA ----------
+    try:
+        fecha_str = fecha_str.strip()
+        fecha = datetime.datetime.strptime(fecha_str, "%d-%m-%Y")
+    except Exception:
+        return jsonify({"estado": "error", "mensaje": "Formato de fecha inválido, debe ser dd-mm-YYYY"}), 400
+
+    # ---------- CREAR ESTADISTICA ----------
+    try:
+        estadistica = EstadisticaPorPartido(
+            Fecha=fecha,
+            IdContrincante=partido.IdContrincante,
+            IdCategoria=partido.IdCategoria,
+            IdRama=partido.IdRama,
+            IdDivision=partido.IdDivision,
+            Resultado=idResultado,
+            IdPartido=partido.Id
+        )
+        db.session.add(estadistica)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"estado": "error", "mensaje": f"No se pudo guardar la estadística, intente más tarde"}), 500
+
+    # ---------- LEER JUGADORES ----------
+    try:
+        fila = 11
+        while True:
+            celda_id = ws.cell(row=fila, column=1).value  # columna A
+            if not celda_id:
+                break
+            try:
+                idUsuario = int(celda_id)
+            except ValueError:
+                return jsonify({"estado": "error", "mensaje": f"ID de usuario inválido en fila {fila}"}), 400
+
+            usuario = Usuario.query.get(idUsuario)
+            if usuario:
+                rel = EstadisticaUsuarioPartido(
+                    IdEstadisticaPorPartido=estadistica.Id,
+                    IdUsuario=idUsuario
+                )
+                db.session.add(rel)
+            fila += 1
+
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"estado": "error", "mensaje": f"Error al guardar los jugadores: {str(e)}"}), 500
+
+    return jsonify({"estado": "ok", "mensaje": "Estadísticas cargadas correctamente"})
+
+
 @estadisticas_bp.route('/descargar_plantilla', methods=['GET'])
 def descargar_plantilla():
     return rellenar_excel()
@@ -120,41 +186,96 @@ def listar_archivos():
     archivos = [f for f in os.listdir(carpeta) if f.lower().endswith(('.xlsx', '.xls'))]
     return jsonify(archivos)
 
-@estadisticas_bp.route('/descargar/<nombre>', methods=['GET'])
-def descargar_archivo(nombre):
-    carpeta = os.path.join('src', 'datos')
-    return send_from_directory(carpeta, nombre, as_attachment=True)
 
-@estadisticas_bp.route('/data', methods=['GET'])
-def estadisticas_data():
-    # Carga el Excel con valores calculados
-    ruta_excel = os.path.join('src', 'datos', 'plantilla_de_estadisticas.xlsx')
-    wb = openpyxl.load_workbook(ruta_excel, data_only=True)
-    ws = wb.active
+@estadisticas_bp.route('/cargar_estadisticas', methods=['GET'])
+def cargar_estadisticas():
+    
+    categorias = [
+    {'value': cat.value, 'text': cat.name}
+    for cat in generalEnum.CategoriaEnum
+    ]
+    ramas = [
+        {'value': r.value, 'text': r.name}
+        for r in generalEnum.RamaEnum
+    ]
+    division = [
+        {'value': d.value, 'text': d.name}
+        for d in generalEnum.DivisionEnum
+        ]
+    return render_template('estadisticas/index.html',categorias=categorias, ramas=ramas, division = division)
 
-    first_row, last_row = 11, 14  # filas de jugadores
 
-    # 1 Sumar por equipo
-    team = {}
-    for block, cols in BLOCKS.items():
-        acc = {sym: 0 for sym in SYMBOLS[block]}
-        for col, sym in zip(cols, SYMBOLS[block]):
-            for row in range(first_row, last_row + 1):
-                val = ws[f"{col}{row}"].value or 0
-                acc[sym] += int(val)
-        team[block] = acc
+@estadisticas_bp.route('/descargar_planilla', methods=['GET'])
+def descargar_planilla():
+    categoria = request.args.get("categoria")
+    usuarios = request.args.get("usuarios")  
+    rama = request.args.get("rama")
+    division = request.args.get("division")
+    partido = request.args.get("partido")
 
-    # 2 Estadísticas individuales
-    players = []
-    for row in range(first_row, last_row + 1):
-        jersey = ws[f'D{row}'].value or 0
-        stats = {}
-        for block, cols in BLOCKS.items():
-            stats_block = {}
-            for col, sym in zip(cols, SYMBOLS[block]):
-                val = ws[f"{col}{row}"].value or 0
-                stats_block[sym] = int(val)
-            stats[block] = stats_block
-        players.append({'jersey': int(jersey), 'stats': stats})
+    if usuarios:
+        ids_seleccionados = [int(x) for x in usuarios.split(",") if x.strip()]
+    else:
+        ids_seleccionados = None
 
-    return jsonify({'team': team, 'players': players})
+    if not categoria or not rama or not division or not partido:
+        flash("No se selecciono categoria", "danger")
+        categorias = [
+        {'value': cat.value, 'text': cat.name}
+        for cat in generalEnum.CategoriaEnum
+        ]
+        ramas = [
+        {'value': r.value, 'text': r.name}
+        for r in generalEnum.RamaEnum
+        ]
+
+        division = [
+        {'value': d.value, 'text': d.name}
+        for d in generalEnum.DivisionEnum
+        ]
+        return render_template('estadisticas/index.html',categorias=categorias, ramas=ramas, division = division)
+    
+    return rellenar_excel(categoria,rama, division, partido, ids_seleccionados) 
+
+
+@estadisticas_bp.route('/usuarios_por_categoria', methods=['GET'])
+def usuarios_por_categoria():
+    categoria = request.args.get("categoria")
+    rama = request.args.get("rama")
+    division = request.args.get("division")
+    
+    if not categoria or not rama or not division:
+        return jsonify({"estado": "error", "mensaje": "No se seleccionó filtros"}), 400
+
+    usuarios = usuarioController.getUsuarioByCategoriaYRama(categoria, rama, division)
+
+    return jsonify({"estado": "ok", "usuarios": usuarios})
+
+@estadisticas_bp.route('/partidos_por_categoria', methods=['GET'])
+def partidos_por_categoria():
+    categoria = request.args.get("categoria")
+    fecha = request.args.get("fecha")
+    rama = request.args.get("rama")
+    division = request.args.get("division")
+
+    if not categoria or not fecha:
+        return jsonify({"estado": "error", "mensaje": "No se seleccionó categoría"}), 400
+
+    partidos = calendarioController.getPartidosByCategoria(fecha,categoria, rama, division)
+
+    return jsonify({"estado": "ok", "partidos": partidos})
+
+
+@estadisticas_bp.route('/partidos_por_categoriayfecha', methods=['GET'])
+def partidos_por_categoriayfecha():
+    categoria = request.args.get("categoria")
+    fecha = request.args.get("fecha")
+
+    if not categoria or not fecha:
+        return jsonify({"estado": "error", "mensaje": "No se seleccionó categoría"}), 400
+
+    partidos = calendarioController.getPartidosByCategoriaYFecha(fecha,categoria)
+
+    return jsonify({"estado": "ok", "partidos": partidos})
+
+

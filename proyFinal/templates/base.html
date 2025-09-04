@@ -110,6 +110,8 @@
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
         <!-- Tu archivo de configuración -->
         <!-- Font Awesome -->
+         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -253,12 +255,17 @@
                   <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección para entrenadores</span>
                 </li>
                 <li class="menu-item">
-                  <a href="/estadisticas" class="menu-link">
+                  <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="menu-link">
                     <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
-                    <div data-i18n="Estadisticas">Estadisticas</div>
+                    <div data-i18n="Estadisticas">Cargar Estadisticas</div>
                   </a>
                 </li>
-
+                <li class="menu-item">
+                  <a href="/estadisticas" class="menu-link">
+                    <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
+                    <div data-i18n="Estadisticas">Ver Estadisticas</div>
+                  </a>
+                </li>
                 <!-- Seccion medios de contacto -->
                 <li class="menu-header mt-2">
                   <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección Medios de Contacto</span>

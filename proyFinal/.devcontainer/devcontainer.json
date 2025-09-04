@@ -5,8 +5,8 @@
   "workspaceFolder": "/workspace",
   "forwardPorts": [5000],
   "overrideCommand": true,
-  "postCreateCommand": "pip install -r requirements.txt && python migrations/migrate.py",
-  "postStartCommand": "python migrations/migrate.py",
+  "postCreateCommand": "pip install -r requirements.txt",  //&& python migrations/migrate.py",
+  //"postStartCommand": "python migrations/migrate.py",
   "customizations": {
     "vscode": {
       "extensions": [

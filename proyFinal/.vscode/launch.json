@@ -2,19 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: index.py",
+      "name": "Python: Flask (Auto Reload)",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/index.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "jinja": true,
-      "exceptionOptions": [
-        {
-          "path": ["SystemExit"],
-          "breakMode": "never"
-        }
-      ]
+      "args": ["run", "--no-debugger"],   // quitá --no-debugger si querés debugger
+      "env": {
+        "FLASK_ENV": "development",
+        "FLASK_DEBUG": "1"
+      }
     }
   ]
 }

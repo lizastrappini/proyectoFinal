@@ -13,7 +13,7 @@ services:
     command:
       - sh
       - -c
-      - python migrations/migrate.py && python ./index.py --host=0.0.0.0 --port=5000 --debug
+      - python ./index.py --host=0.0.0.0 --port=5000 --debug
 
   db:
     image: mysql
