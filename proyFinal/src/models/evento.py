@@ -8,9 +8,11 @@ class Evento(db.Model):
     FechaInicio = db.Column(db.DateTime, nullable=False)
     FechaFin = db.Column(db.DateTime, nullable=False)
     TodoElDia = db.Column(db.Boolean, default=False)
-    Localidad = db.Column(db.String(100), nullable=True)
+    Localidad = db.Column(db.Integer, nullable=True)
     Descripcion = db.Column(db.Text, nullable=True)
     IdCategoria = db.Column(db.Integer, nullable=True)
+    Contrincante = db.Column(db.Integer, nullable=True)
+    
 
     
     def __repr__(self):

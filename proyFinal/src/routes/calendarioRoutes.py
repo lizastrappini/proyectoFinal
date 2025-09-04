@@ -20,8 +20,16 @@ def index():
     {'value': cat.value, 'text': cat.name}
     for cat in generalEnum.CategoriaEnum
     ]
+    contrincantes = [
+    {'value': contrincante.value, 'text': contrincante.name}
+    for contrincante in generalEnum.ContrincantesEnum
+    ]
+    localidades = [
+    {'value': localidad.value, 'text': localidad.name}
+    for localidad in generalEnum.LocalidadEnum
+    ]
 
-    return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias)
+    return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias, contrincantes=contrincantes, localidades=localidades)
 
 @calendario_bp.route('/nuevoEvento', methods=['POST'])
 def nuevo_evento():
@@ -30,14 +38,19 @@ def nuevo_evento():
     fechaInicio = request.form.get('fechaInicio')
     fechaFin = request.form.get('fechaFin')
     todoElDia = request.form.get('todoElDia') == 'on'
-    localidad = request.form.get('localidad')
     descripcion = request.form.get('descripcion')
     idCategoria = request.form.get('categoria')
+    contrintante = request.form.get('contrincante')
+    localidad = request.form.get('localidad')
     fecha_inicio_dt = datetime.fromisoformat(fechaInicio.replace('Z', '')) if fechaInicio else None
     fecha_fin_dt = datetime.fromisoformat(fechaFin.replace('Z', '')) if fechaFin else None
 
     IdTipoEvento = int(tipoEvento[0]) if tipoEvento else None
     IdCategoria = int(idCategoria[0]) if idCategoria else None
+    Contrincante = int(contrintante[0]) if contrintante else None
+    Localidad = int(localidad[0]) if localidad else None
+    
+    
     
     nuevo_evento = Evento(
         Titulo=titulo,
@@ -45,9 +58,11 @@ def nuevo_evento():
         FechaInicio=fecha_inicio_dt,
         FechaFin=fecha_fin_dt,
         TodoElDia=todoElDia,
-        Localidad=localidad,
+        Localidad=Localidad,
         Descripcion=descripcion,
-        IdCategoria = IdCategoria
+        IdCategoria = IdCategoria,
+        Contrincante= Contrincante,
+        
     )
     calendarioController.crearEvento(nuevo_evento)
     return redirect(url_for('calendario.index'))
@@ -58,6 +73,7 @@ def eventos():
     start_str = request.args.get('start')  
     end_str = request.args.get('end')
     tipoEventos = request.args.get('tipoEventos[]')
+    mi_categoria = request.args.get('miCategoria')
 
     if tipoEventos:
         tipos_list = [int(t) for t in tipoEventos.split(',')]
@@ -66,7 +82,7 @@ def eventos():
 
     start = datetime.fromisoformat(start_str.replace('Z', '')) if start_str else None
     end = datetime.fromisoformat(end_str.replace('Z', '')) if end_str else None
-    eventos = calendarioController.obtenerEventos(start, end, tipos_list)
+    eventos = calendarioController.obtenerEventos(start, end, tipos_list, mi_categoria)
     return jsonify(eventos)
     
 @calendario_bp.route('/editarEvento/<int:evento_id>', methods=['PUT'])
@@ -82,10 +98,14 @@ def editar_evento(evento_id):
     evento.FechaInicio = datetime.fromisoformat(data.get('fechaInicio').replace('Z','')) if data.get('fechaInicio') else evento.FechaInicio
     evento.FechaFin = datetime.fromisoformat(data.get('fechaFin').replace('Z','')) if data.get('fechaFin') else evento.FechaFin
     evento.TodoElDia = data.get('todoElDia') == 'on'
-    evento.Localidad = data.get('localidad', evento.Localidad)
     evento.Descripcion = data.get('descripcion', evento.Descripcion)
     idCategoria = data.get('categoria')
     evento.IdCategoria = int(idCategoria) if idCategoria else evento.IdCategoria
+    contrincante = data.get('contrincante')
+    evento.Contrincante = int(contrincante) if contrincante else evento.Contrincante
+    localidad = data.get('localidad')
+    evento.Localidad = int(localidad) if localidad else evento.Localidad
+    
 
     calendarioController.editarEvento(evento)
     return jsonify({'mensaje': 'Evento actualizado correctamente'})
