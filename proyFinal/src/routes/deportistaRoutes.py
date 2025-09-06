@@ -59,7 +59,7 @@ def filtrar():
     if rama and rama.isdigit():
         rama = int(rama)
     
-    data = deportistaController.obtener_deportistas(categoria=categoria, dni=dni,rama=rama, division=division)
+    data = deportistaController.obtener_deportistas(categoria=categoria,dni=dni,rama=rama, division=division) #agregar division=division
     return jsonify({'data': data})
 
 

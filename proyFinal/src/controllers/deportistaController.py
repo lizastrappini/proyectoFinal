@@ -7,13 +7,20 @@ from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum
 from src import db
 from src.utils.Mail import mail
 
-def obtener_deportistas(categoria=None, rama=None , dni=None):
+def obtener_deportistas(categoria=None, division=None, rama=None , dni=None):
     query = Usuario.query.filter_by(IdRol=2)
 
     if categoria:
         try:
             categoria_valor = int(categoria)
             query = query.filter_by(IdCategoria=str(categoria_valor))
+        except KeyError:
+            return []
+    
+    if division:
+        try:
+            division_valor = int(division)
+            query = query.filter_by(IdDivision=str(division_valor))
         except KeyError:
             return []
         
@@ -45,6 +52,7 @@ def obtener_deportistas(categoria=None, rama=None , dni=None):
             rama_nombre = rama_enum.name
         except (ValueError, KeyError):
             rama_nombre = 'Desconocido'
+            
         try:
             division_enum = DivisionEnum(int(e.IdDivision))
             division_nombre = division_enum.name
