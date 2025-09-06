@@ -21,8 +21,16 @@ def index():
     {'value': cat.value, 'text': cat.name}
     for cat in generalEnum.CategoriaEnum
     ]
+    divisiones = [
+    {'value': div.value, 'text': div.name}
+    for div in generalEnum.DivisionEnum
+    ]
+    ramas = [
+    {'value': rama.value, 'text': rama.name}
+    for rama in generalEnum.RamaEnum
+    ]
     notif = notificacionController.obtener_notificaciones()
-    return render_template('notificacion/index.html', notificaciones= notif, categorias= categorias)
+    return render_template('notificacion/index.html', notificaciones= notif, categorias= categorias, divisiones=divisiones, ramas=ramas)
 
 
 @notificacion_bp.route('/obtener', methods=['GET'])
@@ -37,6 +45,8 @@ def nueva_notificacion():
         titulo = request.form.get('titulo')
         descripcion = request.form.get('descripcion')
         categoria_nombre = request.form.get('categoria')
+        division_nombre = request.form.get('division')
+        rama_nombre = request.form.get('rama')
     
         if not categoria_nombre:
             categoria_id = None
@@ -47,15 +57,45 @@ def nueva_notificacion():
             except ValueError:
                 raise ValueError("Categoría inválida")
         
+        if not division_nombre:
+            division_id = None
+        else:
+            try:
+                division_enum = generalEnum.DivisionEnum(int(division_nombre))
+                division_id = division_enum.value
+            except ValueError:
+                raise ValueError("División inválida")
+            
+        if not rama_nombre:
+            rama_id = None
+        else:
+            try:
+                rama_enum = generalEnum.RamaEnum(int(rama_nombre))
+                rama_id = rama_enum.value
+            except ValueError:
+                raise ValueError("Rama inválida")
+        
        
         nueva_notif = Notificacion(
             Titulo = titulo,
             Descripcion= descripcion,
-            IdCategoria=categoria_id
+            IdCategoria=categoria_id,
+            IdDivision=division_id,
+            IdRama=rama_id
         )
         
         if categoria_id:
             usuarios_destino = Usuario.query.filter_by(IdCategoria=categoria_id).all()
+        else:
+            usuarios_destino = Usuario.query.all()
+            
+        if division_id:
+            usuarios_destino = Usuario.query.filter_by(IdDivision=division_id).all()
+        else:
+            usuarios_destino = Usuario.query.all()
+            
+        if rama_id:
+            usuarios_destino = Usuario.query.filter_by(IdRama=rama_id).all()
         else:
             usuarios_destino = Usuario.query.all()
             

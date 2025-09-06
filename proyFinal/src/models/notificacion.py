@@ -6,6 +6,9 @@ class Notificacion(db.Model):
     Titulo = db.Column(db.String(50), nullable=False)
     Descripcion = db.Column(db.Text, nullable=True)
     IdCategoria = db.Column(db.Integer, nullable=True)
+    IdDivision = db.Column(db.Integer, nullable=True)
+    IdRama = db.Column(db.Integer, nullable=True)
+    
 
     def __repr__(self):
         return f"<Notificacion {self.Titulo}>"

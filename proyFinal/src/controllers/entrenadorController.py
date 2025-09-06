@@ -51,6 +51,7 @@ def getUsuarioById(id):
 
 
 def agregarEntrenador(nuevoEntrenador):
+    nuevoEntrenador.Federado = 3
     db.session.add(nuevoEntrenador)
     db.session.commit()
     return nuevoEntrenador

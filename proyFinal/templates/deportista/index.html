@@ -18,13 +18,23 @@
               </button>
             </div>
             <div class="col-12 col-md-2">
-              <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
+              <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoría" >
                 <option value=""></option>
                 {% for cat in categorias %}
                     <option value="{{ cat.value }}">{{ cat.text }}</option>
                 {% endfor %}
               </select>
             </div>
+
+            <div class="col-12 col-md-2">
+              <select id="divisionFiltro" class="select2 form-select" data-placeholder="División" >
+                <option value=""></option>
+                {% for div in divisiones %}
+                    <option value="{{ div.value }}">{{ div.text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="col-12 col-md-2">
               <select id="ramaFiltro" class="select2 form-select" data-placeholder="Rama" >
                 <option value=""></option>
@@ -63,7 +73,7 @@
                   <th>Email</th> 
                   <th>Teléfono</th> 
                   <th>Categorías</th> 
-                  <th>Division</th> 
+                  <th>División</th> 
                   <th>Rama</th> 
                   <th>Estado</th> 
                   <th>Acciones</th>
@@ -250,11 +260,12 @@
 
     function filtrar() {
       const categoria = $('#categoriaFiltro').val();
+      const division = $('#divisionFiltro').val();
       const rama = $('#ramaFiltro').val();
       const dni = $('#deportistaFiltro').val(); 
       console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
       
-      const url = `/deportista/filtrar?categoria=${categoria}&dni=${dni}&rama=${rama}`;
+      const url = `/deportista/filtrar?categoria=${categoria}&dni=${dni}&rama=${rama}&division=${division}`;
 
       if (tabla) {
         tabla.ajax.url(url).load();
@@ -338,7 +349,7 @@
   $(document).ready(function () {
     filtrar(); // carga inicial
 
-    $('#categoriaFiltro,#ramaFiltro, #deportistaFiltro').on('change', function () {
+    $('#categoriaFiltro,#ramaFiltro, #deportistaFiltro,#divisionFiltro').on('change', function () {
       filtrar(); // recarga con nuevos filtros
       });
       $('.btn-export').on('click', function() {
@@ -377,8 +388,8 @@
               errorDiv.textContent = '';
               $('#editDeportistaForm')[0].reset();
               $('#categoria').val(null).trigger('change');
-              $('#rama').val(null).trigger('change');
               $('#division').val(null).trigger('change');
+              $('#rama').val(null).trigger('change');
               $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
               $('#submitBtn').text('Crear');
               $('#tituloAdd').text('Agregar Deportista');
@@ -484,6 +495,7 @@
           function limpiar() {
             $('#categoriaFiltro').val('').trigger('change');
             $('#ramaFiltro').val('').trigger('change');
+            $('#divisionFiltro').val('').trigger('change');
             $('#deportistaFiltro').val('').trigger('change');
             filtrar(); // recargar la tabla sin filtros
 

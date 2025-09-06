@@ -27,11 +27,15 @@ def obtener_notificaciones():
     notificaciones = []
     for e in resultados:
         nombre_categoria = CategoriaEnum(int(e.IdCategoria)).name if e.IdCategoria is not None else "Todas"
+        nombre_division = DivisionEnum(int(e.IdDivision)).name if e.IdDivision is not None else "Todas"
+        nombre_rama = RamaEnum(int(e.IdRama)).name if e.IdRama is not None else "Todas"
         notificaciones.append({
             'id': e.Id,
             'titulo': e.Titulo,
             'descripcion': e.Descripcion,
-            'categoria': nombre_categoria   
+            'categoria': nombre_categoria,   
+            'division': nombre_division,
+            'rama': nombre_rama
         })
 
     return notificaciones

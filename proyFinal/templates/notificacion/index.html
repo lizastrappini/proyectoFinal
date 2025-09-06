@@ -25,8 +25,10 @@
                   <th>Id</th>
                   <th>Título</th>
                   <th>Descripción</th>
-                  <th>Categoria</th>
+                  <th>Categoría</th>
                   {% if current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
+                  <th>División</th>
+                  <th>Rama</th>
                   <th>Acciones</th>
                   {% endif %}
                 </tr>
@@ -58,6 +60,7 @@
                               <label for="modalEditUserFirstName">Título</label>
                             </div>
                           </div>
+
                           <div class="col-12">
                             <div class="form-floating form-floating-outline">
                               <select id="categoria" name="categoria" class="form-select">
@@ -69,6 +72,31 @@
                               <label for="categoria">Categoría</label>
                             </div>
                           </div>
+
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <select id="division" name="division" class="form-select">
+                                <option value="" disabled selected>Seleccioná una división</option>
+                                {% for div in divisiones %}
+                                  <option value="{{ div.value }}">{{ div.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="division">División</label>
+                            </div>
+                          </div>
+
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <select id="rama" name="rama" class="form-select">
+                                <option value="" disabled selected>Seleccioná una rama</option>
+                                {% for rama in ramas %}
+                                  <option value="{{ rama.value }}">{{ rama.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="rama">Rama</label>
+                            </div>
+                          </div>
+
                           <div class="col-12">
                             <div class="form-floating form-floating-outline">
                               <textarea
@@ -122,6 +150,8 @@ function filtrar() {
     { data: 'titulo' },
     { data: 'descripcion' },
     { data: 'categoria' },
+    { data: 'division' },
+    { data: 'rama' }
 
   ];
 
