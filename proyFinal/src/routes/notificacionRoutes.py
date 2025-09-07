@@ -1,4 +1,4 @@
-from operator import or_
+from sqlalchemy import or_
 import secrets
 import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
@@ -14,7 +14,7 @@ notificacion_bp = Blueprint('notificacion', __name__)
 # @notificacion_bp.route('/')
 # def index():
 #     return render_template('notificacion/index.html')
-
+"""
 @notificacion_bp.route('/')
 def index():
     categorias = [
@@ -35,9 +35,35 @@ def index():
 
 @notificacion_bp.route('/obtener', methods=['GET'])
 def obtener():
-    
     notif = notificacionController.obtener_notificaciones()
     return jsonify(data=notif)  
+
+"""
+
+@notificacion_bp.route('/')
+def index():
+    categorias = [
+        {'value': cat.value, 'text': cat.name}
+        for cat in generalEnum.CategoriaEnum
+    ]
+    divisiones = [
+        {'value': div.value, 'text': div.name}
+        for div in generalEnum.DivisionEnum
+    ]
+    ramas = [
+        {'value': rama.value, 'text': rama.name}
+        for rama in generalEnum.RamaEnum
+    ]
+    notif = notificacionController.obtener_notificaciones()
+    return render_template('notificacion/index.html', notificaciones=notif, categorias=categorias, divisiones=divisiones, ramas=ramas)
+
+@notificacion_bp.route('/obtener', methods=['GET'])
+def obtener():
+    notif = notificacionController.obtener_notificaciones()
+    print("DEBUG obtener ->", notif)  # 👈 chequeo en consola
+    return jsonify(data=notif)
+
+
 
 @notificacion_bp.route('/nueva_notificacion', methods=['POST'])
 def nueva_notificacion():
@@ -84,6 +110,18 @@ def nueva_notificacion():
             IdRama=rama_id
         )
         
+        usuarios_query = Usuario.query
+
+        if categoria_id:
+            usuarios_query = usuarios_query.filter_by(IdCategoria=categoria_id)
+        if division_id:
+            usuarios_query = usuarios_query.filter_by(IdDivision=division_id)
+        if rama_id:
+            usuarios_query = usuarios_query.filter_by(IdRama=rama_id)
+
+        usuarios_destino = usuarios_query.all()
+
+        """
         if categoria_id:
             usuarios_destino = Usuario.query.filter_by(IdCategoria=categoria_id).all()
         else:
@@ -98,6 +136,8 @@ def nueva_notificacion():
             usuarios_destino = Usuario.query.filter_by(IdRama=rama_id).all()
         else:
             usuarios_destino = Usuario.query.all()
+           
+        """
             
         for user in usuarios_destino:
             notificacionController.enviar_mail(user.Email, titulo, descripcion)
@@ -135,5 +175,4 @@ def eliminar_notificacion(id):
     else:
         flash('Notificación eliminada exitosamente', 'success')
         return redirect(url_for('notificacion.index'))
-    
     

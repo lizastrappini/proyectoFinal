@@ -17,6 +17,16 @@
                 Limpiar 
               </button>
             </div>
+
+            <div class="col-12 col-md-2">
+              <select id="deportistaFiltro" class="select2 form-select" data-placeholder="Deportista">
+                <option value=""></option>
+                {% for deportista in deportistas %}
+                    <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="col-12 col-md-2">
               <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoría" >
                 <option value=""></option>
@@ -43,14 +53,7 @@
                 {% endfor %}
               </select>
             </div>
-            <div class="col-12 col-md-2">
-              <select id="deportistaFiltro" class="select2 form-select" data-placeholder="Deportista">
-                <option value=""></option>
-                {% for deportista in deportistas %}
-                    <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
-                {% endfor %}
-              </select>
-            </div>
+            
           </div>
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
