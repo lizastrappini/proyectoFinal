@@ -1,0 +1,483 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h1>Estadísticas</h1>
+
+
+  <div class="card mt-5">
+    <div class="card-body">
+      <h5 class="card-title">Selecciona filtros para ver estadísticas</h5>
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-md-2">
+          <div class="form-floating mb-0">
+            <input type="text" class="form-control" id="fechaDescargar" placeholder="Fecha de partido">
+            <label for="fechaDescargar">Fecha</label>
+          </div>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="categoriaDescargar" class="select2 form-select" data-placeholder="Categoría">
+            <option value=""></option>
+            {% for cat in categorias %}
+              <option value="{{ cat.value }}">{{ cat.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="ramaDescargar" class="select2 form-select" data-placeholder="Rama">
+            <option value=""></option>
+            {% for r in ramas %}
+              <option value="{{ r.value }}">{{ r.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="divisionDescargar" class="select2 form-select" data-placeholder="Division">
+            <option value=""></option>
+            {% for d in division %}
+              <option value="{{ d.value }}">{{ d.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <select id="partidoDescargar" class="select2 form-select" data-placeholder="Partido">
+            <option value=""></option>
+            {% for p in partidosDescarga %}
+              <option value="{{ p.value }}">{{ p.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-auto">
+          <button type="button" class="btn btn-success" id="btnDescargar" disabled>Buscar</button>
+        </div>
+        <br>
+        <div class="mt-3">
+            <label class="switch switch-success">
+                <input type="checkbox" id="misEstadisticas" class="switch-input">
+                <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+                </span>
+                <span class="switch-label"><b>Sólo mis estadísticas</b></span>
+            </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<br>
+<br>
+<div class="divestadisticas row g-3">
+
+  <!-- Donut chart (1/3 ancho) -->
+  <div class="col-xxl-4 col-md-6 col-sm-12">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Resultados</h5>
+      </div>
+      <div class="card-body">
+        <div id="partidosResultado" style="height:240px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar chart (2/3 ancho) -->
+  <div class="col-xxl-8 col-md-6 col-sm-12">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Partidos por Categoría</h5>
+      </div>
+      <div class="card-body">
+        <div id="partidosPorCategoria" style="height:240px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-6 col-sm-12">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Bloqueos</h5>
+      </div>
+      <div class="card-body">
+        <div id="bloqueosPartidos" style="height:240px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-4 col-sm-12">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Recepciones</h5>
+      </div>
+      <div class="card-body">
+        <div id="recepcionesPartidos" style="height:240px;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+<script src="../static/js/config.js"></script>   
+<script src="../static/js/charts-apex.js"></script>
+<script src="../static/js/charts-chartjs.js"></script>
+
+
+<script>
+$(document).ready(function() {
+
+   
+  // --- ELEMENTOS ---
+  const $btnDescargar = $('#btnDescargar');
+  const $categoriaDescargar = $('#categoriaDescargar');
+  const $ramaDescargar = $('#ramaDescargar');
+  const $divisionDescargar = $('#divisionDescargar');
+  const $partidoDescargar = $('#partidoDescargar');
+  const $fechaDescargar = $('#fechaDescargar');
+  const $misEstadisticas = $('#misEstadisticas');
+
+  // --- INICIALIZAR SELECT2 ---
+  $('#categoriaDescargar, #ramaDescargar, #divisionDescargar, #partidoDescargar')
+    .select2({ allowClear:true, width:'100%' });
+
+  // --- INICIALIZAR DATEPICKER ---
+  flatpickr("#fechaDescargar", { 
+    locale: "es", 
+    dateFormat: "d-m-Y",
+    maxDate: "today", 
+    mode: "range"
+  });
+
+  // --- HABILITAR BOTÓN SOLO SI HAY FECHA ---
+  function verificarDescargar() {
+    if($fechaDescargar.val()) {
+      $btnDescargar.prop('disabled', false);
+    } else {
+      $btnDescargar.prop('disabled', true);
+    }
+  }
+  $fechaDescargar.on('change', verificarDescargar);
+
+  // --- CARGAR PARTIDOS SEGÚN FILTROS ---
+  function cargarPartidosDescargar() {
+    const fecha = $fechaDescargar.val();
+    const categoria = $categoriaDescargar.val();
+    const rama = $ramaDescargar.val();
+    const division = $divisionDescargar.val();
+
+    if(!fecha || !categoria || !rama || !division) {
+      $partidoDescargar.empty().append('<option value=""></option>').trigger('change.select2');
+      return;
+    }
+
+    $.getJSON("/estadisticas/partidos_por_categoria_mostrar", {
+      fecha, categoria, rama, division
+    }, function(res) {
+      $partidoDescargar.empty().append('<option value=""></option>');
+      if(res.estado === "ok") {
+        res.partidos.forEach(p => {
+          $partidoDescargar.append(new Option(p.text, p.value, false, false));
+        });
+      } else {
+        Swal.fire("Error", res.mensaje, "error");
+      }
+      $partidoDescargar.val(null).trigger('change.select2');
+    });
+  }
+
+  $categoriaDescargar.add($ramaDescargar).add($divisionDescargar).add($fechaDescargar)
+    .on('change', cargarPartidosDescargar);
+
+  // --- CLICK EN BUSCAR: CARGAR GRÁFICOS ---
+  $btnDescargar.on('click', function() {
+    const data = {
+      fecha: $fechaDescargar.val(),
+      categoria: $categoriaDescargar.val(),
+      rama: $ramaDescargar.val(),
+      division: $divisionDescargar.val(),
+      partido: $partidoDescargar.val() || '',
+      misEstadisticas: $misEstadisticas.is(':checked')
+    };
+
+    $.getJSON('/estadisticas/datos_graficos', data, function(res) {
+      if(res.estado !== 'ok') {
+        Swal.fire("Error", res.mensaje, "error");
+        return;
+      }
+
+        resultadoPartidos(res.partidos);
+        partidosPorCategoria(res.partidos);
+        bloqueoPartidos(res.partidos);
+        renderRecepcionesChart(res.partidos);
+    });
+  });
+});
+const partidosResultadoEl = document.querySelector('#partidosResultado');
+const partidosPorCategoriaEl = document.querySelector('#partidosPorCategoria');
+const bloqueosEl = document.querySelector('#bloqueosPartidos');
+const recepcionesPartidosEl = document.querySelector('#recepcionesPartidos');
+
+function resultadoPartidos(estadisticas) {
+  const ganados = estadisticas.partidos_ganados ?? 0;
+  const perdidos = estadisticas.partidos_perdidos ?? 0;
+  const total = ganados + perdidos;
+
+  const partidosResultadoConfig = {
+    chart: {
+      height: 240,
+      parentHeightOffset: 0,
+      type: 'donut'
+    },
+    labels: ['Ganados', 'Perdidos'],
+    series: [ganados, perdidos],
+    colors: [config.colors.success, config.colors.danger],
+    stroke: {
+      width: 5,
+      colors: [config.colors.cardColor] // usa el cardColor definido en config.js
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return parseInt(val);
+        }
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    states: {
+      hover: {
+        filter: { type: 'none' }
+      },
+      active: {
+        filter: { type: 'none' }
+      }
+    },
+    legend: {
+      show: false
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '70%',
+          labels: {
+            show: true,
+            value: {
+              fontSize: '1rem',
+              fontFamily: 'Helvetica Neue',
+              color: config.colors.headingColor,
+              fontWeight: 500,
+              offsetY: 4,
+              formatter: function (val) {
+                return parseInt(val);
+              }
+            },
+            name: {
+              show: true
+            },
+            total: {
+              label: 'Total',
+              show: true,
+              fontSize: '1.2rem',
+              color: config.colors.headingColor,
+              fontWeight: 600,
+              formatter: function(w) {
+                return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+            }
+
+            }
+          }
+        }
+      }
+    }
+  };
+
+  if (partidosResultadoEl) {
+    if (window.partidosResultadoChart) {
+      window.partidosResultadoChart.updateOptions({
+        series: [ganados, perdidos]
+      });
+    } else {
+      window.partidosResultadoChart = new ApexCharts(partidosResultadoEl, partidosResultadoConfig);
+      window.partidosResultadoChart.render();
+    }
+  }
+}
+
+function partidosPorCategoria(estadisticas){
+  const seriesData = estadisticas.partidos_por_categoria;
+  const categories = estadisticas.categorias;
+
+  const configBar = {
+    chart: { type: 'bar', height: 240, toolbar: { show: false } },
+    series: [{ name: 'Partidos', data: seriesData }],
+    plotOptions: {
+      bar: {
+        borderRadius: 10,
+        barHeight: '30%',
+        horizontal: true,
+        distributed: true,
+        startingShape: 'rounded'
+      }
+    },
+    dataLabels: {
+      enabled: false  // <--- quitamos los valores sobre la barra
+    },
+    tooltip: { enabled: false },
+    legend: { show: false },
+    colors: [config.colors.primary, config.colors.success, config.colors.warning, config.colors.info, config.colors.danger],
+    grid: {
+      strokeDashArray: 8,
+      borderColor: config.colors.border,
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+      padding: { top: -18, left: 21, right: 33, bottom: 10 }
+    },
+    xaxis: {
+      categories: categories,
+      tickAmount: Math.max(...seriesData), // <--- fuerza ticks hasta el máximo valor
+      labels: {
+        formatter: function(val) { return Math.round(val); }, // <--- solo enteros
+        style: { fontSize: '13px', colors: config.colors.labelColor, fontFamily: 'Helvetica Neue' }
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
+    },
+    yaxis: {
+      labels: { style: { fontWeight: 500, fontSize: '0.9375rem', colors: config.colors.headingColor, fontFamily: 'Helvetica Neue' } }
+    },
+    states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } }
+  };
+
+  if(partidosPorCategoriaEl) {
+    if(window.partidosPorCategoriaChart) {
+      window.partidosPorCategoriaChart.updateOptions({ series: [{ name: 'Partidos', data: seriesData }], xaxis: { categories } });
+    } else {
+      window.partidosPorCategoriaChart = new ApexCharts(partidosPorCategoriaEl, configBar);
+      window.partidosPorCategoriaChart.render();
+    }
+  }
+}
+
+function bloqueoPartidos(estadisticas) {
+  const positivos = estadisticas.bloqueos_positivos ?? 0;
+  const neutros = estadisticas.bloqueos_neutros ?? 0;
+  const total = positivos + neutros;
+
+  const bloqueosEl = document.querySelector('#bloqueosPartidos');
+  const series = [positivos, neutros];
+
+  if (window.bloqueosChart) {
+    window.bloqueosChart.updateSeries(series);
+  } else {
+    const configBloqueos = {
+      chart: { height: 240, type: 'donut' },
+      labels: ['Positivos', 'Neutros'],
+      series: series,
+      colors: [config.colors.primary, config.colors.info],
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '70%',
+            labels: {
+              show: true,
+              value: {
+                formatter: function(val) { return parseInt(val); }
+              },
+              total: {
+                show: true,
+                label: 'Total',
+                formatter: function(w) { return w.globals.seriesTotals.reduce((a, b) => a + b, 0); }
+              }
+            }
+          }
+        }
+      },
+      legend: { show: false },
+      dataLabels: { enabled: false }
+    };
+    window.bloqueosChart = new ApexCharts(bloqueosEl, configBloqueos);
+    window.bloqueosChart.render();
+  }
+}
+
+function renderRecepcionesChart(estadisticas) {
+  const seriesData = [
+    estadisticas.REE ?? 0,
+    estadisticas.REV ?? 0,
+    estadisticas.RE1 ?? 0,
+    estadisticas.RE2 ?? 0,
+    estadisticas.RE3 ?? 0
+  ];
+  const categories = ['E', 'V', '1', '2', '3'];
+
+  const recepcionesChartEl = document.querySelector('#recepcionesPartidos');
+
+  const recepcionesChartConfig = {
+    chart: {
+      height: 238,
+      type: 'bar',
+      parentHeightOffset: 0,
+      toolbar: { show: false }
+    },
+    plotOptions: {
+    bar: {
+        borderRadius: 12,
+        distributed: true,   // cada barra puede tener su color
+        columnWidth: '50%',
+        endingShape: 'rounded',
+        startingShape: 'rounded'
+    }
+    },
+    series: [{ data: seriesData }],
+    tooltip: { enabled: false },
+    legend: { show: false },
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: '0.9rem',
+        fontWeight: 'bold',
+        colors: ['#000'] // color de los números
+      },
+      formatter: function(val) { return val; }, // mostrar valor exacto
+      offsetY: -6 // que quede encima de la barra
+    },
+    colors: [
+        config.colors_label.warning,  // REE
+        config.colors.warning,        // REV
+        config.colors.success,        // RE1
+        config.colors.info,           // RE2
+        config.colors.danger          // RE3
+        ],
+    grid: { show: false, padding: { top: -15, left: -7, right: -4 } },
+    states: { 
+      hover: { filter: { type: 'none' } }, 
+      active: { filter: { type: 'none' } } 
+    },
+    xaxis: {
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+      categories: categories,
+      labels: { style: { colors: config.colors.bodyColor } }
+    },
+    yaxis: { show: false },
+    responsive: [
+      { breakpoint: 1200, options: { chart: { height: 266 } } }
+    ]
+  };
+
+  if (recepcionesChartEl) {
+    if (window.recepcionesChart) {
+      window.recepcionesChart.updateOptions({ series: [{ data: seriesData }], xaxis: { categories } });
+    } else {
+      window.recepcionesChart = new ApexCharts(recepcionesChartEl, recepcionesChartConfig);
+      window.recepcionesChart.render();
+    }
+  }
+}
+</script>
+{% endblock %}

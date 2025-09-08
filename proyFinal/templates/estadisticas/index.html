@@ -98,8 +98,10 @@
   </div>
 </div>
 
+
 <script>
 $(document).ready(function() {
+  cargarGraficos()
   // --- SELECT2 ---
   $('#categoriaDescargar, #ramaDescargar, #divisionDescargar, #partidoDescargar').select2({ allowClear:true, width:'100%' });
   $('#categoriaSubir, #partidoSubir').select2({ allowClear:true, width:'100%' });
@@ -341,5 +343,36 @@ $categoriaDescargar.add($ramaDescargar).add($divisionDescargar).add($fechaDescar
 $categoriaSubir.add($fechaSubir).on('change', cargarPartidosSubir);
 
 });
+
+function cargarGraficos(){
+   const colorMap = {
+       primary: "#666cff",
+       success: "#72e128",
+       danger: "#ff4d49",
+       info: "#26c6f9"
+   };
+
+   document.querySelectorAll('.chart-progress').forEach(function(el) {
+        const series = el.dataset.series ? parseInt(el.dataset.series) : 0;
+        const colorName = el.dataset.color || 'primary';
+        const color = colorMap[colorName] || '#666cff';
+
+        new ApexCharts(el, {
+            chart: {
+                type: 'radialBar',
+                height: el.offsetHeight,
+            },
+            series: [series],
+            colors: [color],
+            plotOptions: {
+                radialBar: {
+                    hollow: { size: '50%' },
+                    track: { background: '#eee' }
+                }
+            },
+            labels: ['Progress']
+        }).render();
+    });
+}
 </script>
 {% endblock %}

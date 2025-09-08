@@ -62,7 +62,7 @@
         <script src="../static/js/template-customizer.js"></script>
         <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
         <script src="../static/js/front-config.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <!-- Vendors CSS -->
         <link rel="stylesheet" href="../static/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
         <link rel="stylesheet" href="../static/vendor/libs/typeahead-js/typeahead.css" />
@@ -257,13 +257,13 @@
                 <li class="menu-item">
                   <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="menu-link">
                     <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
-                    <div data-i18n="Estadisticas">Cargar Estadisticas</div>
+                    <div data-i18n="Cargar Estadisticas">Cargar Estadisticas</div>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="/estadisticas" class="menu-link">
+                  <a href="/estadisticas/ver" class="menu-link">
                     <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
-                    <div data-i18n="Estadisticas">Ver Estadisticas</div>
+                    <div data-i18n="Ver Estadisticas">Ver Estadisticas</div>
                   </a>
                 </li>
                 <!-- Seccion medios de contacto -->
@@ -553,11 +553,10 @@
       <script src="../static/js/wizard-ex-checkout.js"></script>
       <script src="../static/js/app-calendar-events.js"></script>
       <script src="../static/js/app-calendar.js"></script>
-
-
+<script src="../static/js/config.js"></script>   
+      <script src="../static/js/charts-apex.js"></script>
+      <script src="../static/js/charts-chartjs.js"></script>
       
-
-        
       <script>
 document.addEventListener('DOMContentLoaded', () => {
   const chatBox = document.getElementById('chatbot-box');

@@ -1033,7 +1033,7 @@
         type: 'donut'
       },
       labels: ['Operational', 'Networking', 'Hiring', 'R&D'],
-      series: [42, 7, 25, 25],
+      series: [50, 1, 25, 25],
       colors: [
         chartColors.donut.series1,
         chartColors.donut.series3,

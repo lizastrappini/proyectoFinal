@@ -9,13 +9,15 @@ import io
 import datetime
 import src.controllers.usuarioController as usuarioController
 import src.controllers.calendarioController as calendarioController
+import src.controllers.estadisticaController as estadisticasController
 import src.utils.enums.generalEnum as generalEnum
 from openpyxl.utils import range_boundaries
 from src.models.usuario import Usuario
 from src.models.estadisticaPorPartido import EstadisticaPorPartido
 from src.models.estadisticaUsuarioPartido import EstadisticaUsuarioPartido
-
+from openpyxl.utils import column_index_from_string,range_boundaries
 from src import db
+from sqlalchemy.engine.row import Row
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
 
@@ -23,6 +25,22 @@ estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas'
 @estadisticas_bp.route('/', methods=['GET'])
 def index():
     return render_template('estadisticas/index.html')
+
+@estadisticas_bp.route('/ver', methods=['GET'])
+def ver():
+    categorias = [
+    {'value': cat.value, 'text': cat.name}
+    for cat in generalEnum.CategoriaEnum
+    ]
+    ramas = [
+        {'value': r.value, 'text': r.name}
+        for r in generalEnum.RamaEnum
+    ]
+    division = [
+        {'value': d.value, 'text': d.name}
+        for d in generalEnum.DivisionEnum
+        ]
+    return render_template('estadisticas/ver_estadisticas.html',categorias=categorias, ramas=ramas, division = division)
 
 def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None):
     carpeta_actual = os.path.dirname(__file__)
@@ -75,6 +93,58 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
     )
 
 
+columnas_modelo = {
+    "REE": "REE",
+    "REV": "REV",
+    "RE0": "RE0",   
+    "RE1": "RE1",
+    "RE2": "RE2",
+    "RE3": "RE3",
+    "RETOTAL": "RETOTAL",
+
+    "ROE": "ROE",
+    "ROB": "ROB",
+    "RO0": "RO0",
+    "RO1": "RO1",
+    "RO2": "RO2",
+    "RO3": "RO3",
+    "RO4": "RO4",
+    "ROTOTAL": "ROTOTAL",
+
+    "TRE": "TRE",
+    "TRB": "TRB",
+    "TR0": "TR0",
+    "TR1": "TR1",
+    "TR2": "TR2",
+    "TR3": "TR3",
+    "TR4": "TR4",
+    "TRTOTAL": "TRTOTAL",
+
+    "SA0": "SA0",
+    "SA1": "SA1",
+    "SA2": "SA2",
+    "SA3": "SA3",
+    "SA4": "SA4",
+    "SATOTAL": "SATOTAL",
+
+    "BLP": "BLP",
+    "BLN": "BLN",
+    "BLTOTAL": "BLTOTAL"
+}
+
+
+def get_cell_value(ws, row, col):
+    cell = ws.cell(row=row, column=col)
+    if cell.value is not None:
+        return cell.value
+    # si está dentro de un rango mergeado, agarro la esquina superior izquierda
+    for merged_range in ws.merged_cells.ranges:
+        if cell.coordinate in merged_range:
+            min_col, min_row, _, _ = range_boundaries(str(merged_range))
+            return ws.cell(row=min_row, column=min_col).value
+    return None
+
+
 @estadisticas_bp.route('/subir_estadisticas', methods=['POST'])
 def subir_estadisticas():
     archivo = request.files.get("archivo")
@@ -92,6 +162,9 @@ def subir_estadisticas():
     partido = calendarioController.getPartidosById(idPartido)
     if not partido:
         return jsonify({"estado": "error", "mensaje": "No se encontró el partido seleccionado"}), 400
+
+    if partido.TieneEstadistica:
+        return jsonify({"estado": "error", "mensaje": "El partido ya tiene estadisticas cargadas"}), 400
 
     try:
         wb = openpyxl.load_workbook(archivo)
@@ -132,6 +205,7 @@ def subir_estadisticas():
 
     # ---------- CREAR ESTADISTICA ----------
     try:
+        # ---------- CREAR ESTADISTICA ----------
         estadistica = EstadisticaPorPartido(
             Fecha=fecha,
             IdContrincante=partido.IdContrincante,
@@ -142,38 +216,48 @@ def subir_estadisticas():
             IdPartido=partido.Id
         )
         db.session.add(estadistica)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"estado": "error", "mensaje": f"No se pudo guardar la estadística, intente más tarde"}), 500
 
-    # ---------- LEER JUGADORES ----------
-    try:
+        # ---------- ACTUALIZAR PARTIDO ----------
+        partido.TieneEstadistica = True
+        db.session.add(partido)  
+
+        # ---------- LEER JUGADORES ----------
         fila = 11
         while True:
-            celda_id = ws.cell(row=fila, column=1).value  # columna A
+            celda_id = ws.cell(row=fila, column=1).value
             if not celda_id:
                 break
             try:
                 idUsuario = int(celda_id)
             except ValueError:
-                return jsonify({"estado": "error", "mensaje": f"ID de usuario inválido en fila {fila}"}), 400
+                raise ValueError(f"ID inválido en fila {fila}")
 
             usuario = Usuario.query.get(idUsuario)
             if usuario:
+                valores = {}
+                for idx, campo in enumerate(columnas_modelo, start=3):
+                    valor = get_cell_value(ws, fila, idx)
+                    if valor is None:
+                        raise ValueError(f"Campo {campo} nulo en fila {fila}")
+                    valores[campo] = int(valor)
+
                 rel = EstadisticaUsuarioPartido(
                     IdEstadisticaPorPartido=estadistica.Id,
-                    IdUsuario=idUsuario
+                    IdUsuario=idUsuario,
+                    **valores
                 )
                 db.session.add(rel)
+
             fila += 1
 
+        # ---------- COMMIT FINAL ----------
         db.session.commit()
+        return jsonify({"estado": "ok", "mensaje": "Estadísticas cargadas correctamente"})
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({"estado": "error", "mensaje": f"Error al guardar los jugadores: {str(e)}"}), 500
-
-    return jsonify({"estado": "ok", "mensaje": "Estadísticas cargadas correctamente"})
+        return jsonify({"estado": "error", "mensaje": f"No se pudo guardar los datos: {str(e)}"}), 500
+ 
 
 
 @estadisticas_bp.route('/descargar_plantilla', methods=['GET'])
@@ -265,6 +349,21 @@ def partidos_por_categoria():
 
     return jsonify({"estado": "ok", "partidos": partidos})
 
+@estadisticas_bp.route('/partidos_por_categoria_mostrar', methods=['GET'])
+def partidos_por_categoria_mostrar():
+    categoria = request.args.get("categoria")
+    fecha = request.args.get("fecha")
+    rama = request.args.get("rama")
+    division = request.args.get("division")
+
+    if not categoria or not fecha:
+        return jsonify({"estado": "error", "mensaje": "No se seleccionó categoría"}), 400
+
+    partidos = calendarioController.getPartidosByCategoriaMostrar(fecha,categoria, rama, division)
+
+    return jsonify({"estado": "ok", "partidos": partidos})
+
+
 
 @estadisticas_bp.route('/partidos_por_categoriayfecha', methods=['GET'])
 def partidos_por_categoriayfecha():
@@ -279,3 +378,23 @@ def partidos_por_categoriayfecha():
     return jsonify({"estado": "ok", "partidos": partidos})
 
 
+@estadisticas_bp.route('/datos_graficos', methods=['GET'])
+def datos_graficos():
+    categoria = request.args.get("categoria")
+    fecha = request.args.get("fecha")
+    rama = request.args.get("rama")
+    division = request.args.get("division")
+    partido = request.args.get("partido")
+    misEstadisticas = request.args.get("misEstadisticas", "false").lower() == "true"
+    idUsuario = None
+
+    if(misEstadisticas):
+        idUsuario = session.get('_user_id')
+        misEstadisticas = True
+
+    if not fecha:
+        return jsonify({"estado": "error", "mensaje": "No se seleccionó categoría"}), 400
+
+    partidos = estadisticasController.armarEstadisticas(categoria, rama, division, fecha, partido, idUsuario, misEstadisticas)
+
+    return jsonify({"estado": "ok", "partidos": partidos})
