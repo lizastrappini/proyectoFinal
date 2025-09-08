@@ -149,6 +149,26 @@
                 <label for="categoria">Categoría</label>
               </div>
             
+              <div class="form-floating form-floating-outline mb-5">
+                <select id="rama" name="rama" class="select2 form-select">
+                  <option value="">Selecciona Rama</option>
+                  {% for rama in ramas %}
+                    <option value="{{ rama.value }}">{{ rama.text }}</option>
+                  {% endfor %}
+                </select>
+                <label for="rama">Rama</label>
+              </div>
+
+              <div class="form-floating form-floating-outline mb-5">
+                <select id="division" name="division" class="select2 form-select">
+                  <option value="">Selecciona division</option>
+                  {% for division in divisiones %}
+                    <option value="{{ division.value }}">{{ division.text }}</option>
+                  {% endfor %}
+                </select>
+                <label for="division">Division</label>
+              </div>
+
                <div class="form-floating form-floating-outline mb-5" id="contrincante-wrapper">
                 <select id="contrincante" name="contrincante" class="select2 form-select">
                   <option value="">Selecciona Contrincante</option>
@@ -260,6 +280,8 @@
       $('#categoria').val(selectedEvent.extendedProps.categoria).trigger('change');
       $('#contrincante').val(selectedEvent.extendedProps.contrincante).trigger('change');
       $('#localidad').val(selectedEvent.extendedProps.localidad).trigger('change');
+      $('#rama').val(selectedEvent.extendedProps.rama).trigger('change');
+      $('#division').val(selectedEvent.extendedProps.division).trigger('change');
       $('#descripcion').val(selectedEvent.extendedProps.description);
       $('#eventStartDate').val(selectedEvent.startStr);
       $('#eventEndDate').val(selectedEvent.endStr);

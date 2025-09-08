@@ -29,7 +29,17 @@ def index():
     for localidad in generalEnum.LocalidadEnum
     ]
 
-    return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias, contrincantes=contrincantes, localidades=localidades)
+    ramas = [
+    {'value': rama.value, 'text': rama.name}
+    for rama in generalEnum.RamaEnum
+    ]
+
+    divisiones = [
+    {'value': division.value, 'text': division.name}
+    for division in generalEnum.DivisionEnum
+    ]
+
+    return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias, contrincantes=contrincantes, localidades=localidades, ramas = ramas, divisiones = divisiones)
 
 @calendario_bp.route('/nuevoEvento', methods=['POST'])
 def nuevo_evento():
@@ -42,6 +52,8 @@ def nuevo_evento():
     idCategoria = request.form.get('categoria')
     contrintante = request.form.get('contrincante')
     localidad = request.form.get('localidad')
+    rama = request.form.get('rama')
+    division = request.form.get('division')
     fecha_inicio_dt = datetime.fromisoformat(fechaInicio.replace('Z', '')) if fechaInicio else None
     fecha_fin_dt = datetime.fromisoformat(fechaFin.replace('Z', '')) if fechaFin else None
 
@@ -49,7 +61,8 @@ def nuevo_evento():
     IdCategoria = int(idCategoria[0]) if idCategoria else None
     Contrincante = int(contrintante[0]) if contrintante else None
     Localidad = int(localidad[0]) if localidad else None
-    
+    Rama = int(rama[0]) if rama else None
+    Division = int(division[0]) if division else None
     
     
     nuevo_evento = Evento(
@@ -62,6 +75,8 @@ def nuevo_evento():
         Descripcion=descripcion,
         IdCategoria = IdCategoria,
         IdContrincante= Contrincante,
+        IdDivision= Division,
+        IdRama= Rama
         
     )
     calendarioController.crearEvento(nuevo_evento)
