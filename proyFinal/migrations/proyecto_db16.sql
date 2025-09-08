@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-09-2025 a las 02:27:36
+-- Tiempo de generación: 07-09-2025 a las 21:49:31
 -- Versión del servidor: 9.3.0
 -- Versión de PHP: 8.2.27
 
@@ -99,10 +99,8 @@ TRUNCATE TABLE `EstadisticaPorPartido`;
 --
 
 INSERT INTO `EstadisticaPorPartido` (`Id`, `IdPartido`, `Fecha`, `IdContrincante`, `IdCategoria`, `IdRama`, `IdDivision`, `Resultado`) VALUES
-(13, 1, '2025-07-17 00:00:00', 2, 2, 1, 1, 1),
-(14, 1, '2025-07-17 00:00:00', 2, 2, 1, 1, 1),
-(15, 6, '2025-07-20 00:00:00', 1, 2, 1, 1, 2),
-(16, 7, '2025-07-16 00:00:00', 4, 1, 1, 1, 2);
+(2, 6, '2025-07-17 00:00:00', 2, 2, 1, 1, 1),
+(3, 1, '2025-07-17 00:00:00', 2, 2, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -114,39 +112,7 @@ DROP TABLE IF EXISTS `EstadisticaUsuarioPartido`;
 CREATE TABLE `EstadisticaUsuarioPartido` (
   `Id` int NOT NULL,
   `IdEstadisticaPorPartido` int NOT NULL,
-  `IdUsuario` int NOT NULL,
-  `REE` int NOT NULL,
-  `REV` int NOT NULL,
-  `RE0` int NOT NULL,
-  `RE1` int NOT NULL,
-  `RE2` int NOT NULL,
-  `RE3` int NOT NULL,
-  `RETOTAL` int NOT NULL,
-  `ROE` int NOT NULL,
-  `ROB` int NOT NULL,
-  `RO0` int NOT NULL,
-  `RO1` int NOT NULL,
-  `RO2` int NOT NULL,
-  `RO3` int NOT NULL,
-  `RO4` int NOT NULL,
-  `ROTOTAL` int NOT NULL,
-  `TRE` int NOT NULL,
-  `TRB` int NOT NULL,
-  `TR0` int NOT NULL,
-  `TR1` int NOT NULL,
-  `TR2` int NOT NULL,
-  `TR3` int NOT NULL,
-  `TR4` int NOT NULL,
-  `TRTOTAL` int NOT NULL,
-  `SA0` int NOT NULL,
-  `SA1` int NOT NULL,
-  `SA2` int NOT NULL,
-  `SA3` int NOT NULL,
-  `SA4` int NOT NULL,
-  `SATOTAL` int NOT NULL,
-  `BLP` int NOT NULL,
-  `BLN` int NOT NULL,
-  `BLTOTAL` int NOT NULL
+  `IdUsuario` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -158,12 +124,11 @@ TRUNCATE TABLE `EstadisticaUsuarioPartido`;
 -- Volcado de datos para la tabla `EstadisticaUsuarioPartido`
 --
 
-INSERT INTO `EstadisticaUsuarioPartido` (`Id`, `IdEstadisticaPorPartido`, `IdUsuario`, `REE`, `REV`, `RE0`, `RE1`, `RE2`, `RE3`, `RETOTAL`, `ROE`, `ROB`, `RO0`, `RO1`, `RO2`, `RO3`, `RO4`, `ROTOTAL`, `TRE`, `TRB`, `TR0`, `TR1`, `TR2`, `TR3`, `TR4`, `TRTOTAL`, `SA0`, `SA1`, `SA2`, `SA3`, `SA4`, `SATOTAL`, `BLP`, `BLN`, `BLTOTAL`) VALUES
-(7, 13, 4, 1, 3, 4, 3, 3, 8, 20, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 16, 18, 14),
-(8, 14, 4, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
-(9, 15, 3, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
-(10, 15, 4, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
-(11, 16, 3, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34);
+INSERT INTO `EstadisticaUsuarioPartido` (`Id`, `IdEstadisticaPorPartido`, `IdUsuario`) VALUES
+(1, 2, 1),
+(2, 2, 31),
+(3, 2, 44),
+(4, 3, 4);
 
 -- --------------------------------------------------------
 
@@ -198,13 +163,11 @@ TRUNCATE TABLE `Evento`;
 --
 
 INSERT INTO `Evento` (`Id`, `Titulo`, `Descripcion`, `FechaInicio`, `FechaFin`, `TodoElDia`, `Localidad`, `IdTipoEvento`, `IdCategoria`, `IdRama`, `IdDivision`, `TieneEstadistica`, `IdContrincante`) VALUES
-(1, 'Partido vs NOB', '', '2025-07-17 21:00:00', '2025-07-17 21:00:00', 0, 'Rosario', 2, 2, 1, 1, 1, 2),
+(1, 'Partido vs NOB', '', '2025-07-17 21:00:00', '2025-07-17 21:00:00', 0, 'Rosario', 2, 2, 1, 1, 0, 2),
 (2, 'Venta de pizzas', '', '2025-08-20 11:00:00', '2025-08-20 14:00:00', 1, 'Rosario', 6, 7, NULL, NULL, 0, NULL),
 (3, 'Venta de pizzas', '', '2025-07-24 12:00:00', '2025-07-26 12:00:00', 1, 'Rosario', 6, 3, NULL, NULL, 0, NULL),
 (4, 'Suspension entrenamiento', 'feriado', '2025-07-03 20:00:00', '2025-07-03 21:00:00', 1, 'Rosario', 4, 5, NULL, NULL, 0, NULL),
-(5, 'Partido ', '', '2025-07-20 12:00:00', '2025-07-20 16:00:00', 0, '', 2, 4, NULL, NULL, 0, NULL),
-(6, 'Partido vs Sonder', '', '2025-07-20 12:00:00', '2025-07-20 12:00:00', 0, '1', 2, 2, 1, 1, 1, 1),
-(7, 'Partido vs NN3', '', '2025-07-16 12:00:00', '2025-07-16 12:00:00', 0, '1', 2, 1, 1, 1, 1, 4);
+(5, 'Partido ', '', '2025-07-20 12:00:00', '2025-07-20 16:00:00', 0, '', 2, 4, NULL, NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -328,8 +291,8 @@ CREATE TABLE `Notificacion` (
   `Descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Titulo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `IdCategoria` int DEFAULT NULL,
-  `IdDivision` int DEFAULT NULL,
-  `IdRama` int DEFAULT NULL
+  `idDivision` int DEFAULT NULL,
+  `idRama` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -341,7 +304,7 @@ TRUNCATE TABLE `Notificacion`;
 -- Volcado de datos para la tabla `Notificacion`
 --
 
-INSERT INTO `Notificacion` (`Id`, `Descripcion`, `Titulo`, `IdCategoria`, `IdDivision`, `IdRama`) VALUES
+INSERT INTO `Notificacion` (`Id`, `Descripcion`, `Titulo`, `IdCategoria`, `idDivision`, `idRama`) VALUES
 (2, 'prueba', 'prueba', NULL, NULL, NULL),
 (3, 'hola esta es otra prueba para todos los usuarios', 'prueba 2', NULL, NULL, NULL),
 (5, 'prueba ', 'Entrenamiento', NULL, NULL, NULL),
@@ -351,8 +314,15 @@ INSERT INTO `Notificacion` (`Id`, `Descripcion`, `Titulo`, `IdCategoria`, `IdDiv
 (12, 'mensaje solo para la cat sub 21', 'Partido', 6, NULL, NULL),
 (13, 'prueba envio de emails', 'Entrenamiento', 6, NULL, NULL),
 (14, 'Envio de emails a todos los usuarios', 'Aviso importante', NULL, NULL, NULL),
-(15, 'test', 'test', 2, NULL, NULL),
-(16, 'test', 'test', 2, NULL, NULL);
+(16, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(17, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(20, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(21, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(22, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(23, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(26, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(27, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1),
+(28, 'se adelanta 2 horas', 'Cambio de partido', 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -430,9 +400,9 @@ TRUNCATE TABLE `Usuario`;
 --
 
 INSERT INTO `Usuario` (`Id`, `Nombre`, `Apellido`, `Dni`, `Email`, `Password`, `NombreUsuario`, `IdCategoria`, `Localidad`, `IdEstado`, `Direccion`, `Telefono`, `IdRol`, `Token`, `TokenEnviado`, `FechaVencimientoToken`, `IdRama`, `IdDivision`, `FechaNacimiento`, `CategoriaExtra`, `Federado`) VALUES
-(1, 'Lizaaa', 'Strappini 123', 41906554, 'lizastrappini99@gmail.com', 'scrypt:32768:8:1$4sF0qtQ1R8WfOArE$4b91445b4974ca88e3ca2a6d175f505154d1450a8625b3e5e665e20f8dba3cd4129efbdea4f34780f11cff653b3cf7e9cd0f90cca53db409739447c049dfabe6', 'lizast99', 1, '1', 1, '3 de febrero 1026', '3471630099', 1, NULL, 0, NULL, 0, 0, '2025-09-13 00:00:00', NULL, 1),
-(3, 'Lara', 'Del Coro', 43124684, 'laradelcoro01@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'lara123', 1, '1', 1, 'Maipu 123', '123456789', 2, 'dD1j0uw--OleIL8p2lGGYqosUTXElD5pbm7jLFGxWS4', 1, '2025-07-13 01:55:05', 1, 1, NULL, '2', 2),
-(4, 'Mora', 'Kopech', 43491828, 'morakopech@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'morakopech', 2, '1', 1, 'zeballos 123', '123456789', 2, 'rCXn_mbipXl_q-7RgVjAh7qPy84Adm5ZMJXkVf3iCTI', 1, '2025-07-28 23:33:48', 1, 1, NULL, NULL, 3),
+(1, 'Lizaaa', 'Strappini 123', 41906554, 'lizastrappini99@gmail.com', 'scrypt:32768:8:1$1RQqZoiuA5Jhk8l9$c0ba9bb7977dbced95d5ce702c9436be419c46c0b5ede63b338a88845dd5ec5a4d7265efb8201d5d73a8a68ce6efad35de1186f670dd6f176d45849a2a9b9b9a', 'lizast99', 2, '1', 1, '3 de febrero 1026', '3471630099', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 1),
+(3, 'Lara', 'Del Coro', 43124684, 'laradelcoro01@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'lara123', 7, '1', 1, 'Maipu 123', '123456789', 2, 'dD1j0uw--OleIL8p2lGGYqosUTXElD5pbm7jLFGxWS4', 1, '2025-07-13 01:55:05', 2, 1, NULL, NULL, 2),
+(4, 'Mora', 'Kopech', 43491828, 'morakopech@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'morakopech', 2, '1', 1, 'zeballos 123', '123456789', 1, 'rCXn_mbipXl_q-7RgVjAh7qPy84Adm5ZMJXkVf3iCTI', 1, '2025-07-28 23:33:48', 1, 1, NULL, NULL, 2),
 (28, 'Juan', 'Martinez', 10, 'laradelcoro01+1@gmail.com', 'scrypt:32768:8:1$kTyKA58Cb5HJc1hk$a6bb7be56bb040a3a88651e755debb9b5875d9b558747177bd1979b2814cedcb5ab4f12e70e4dee8827ee4fce63b6bf2bc8fe8a2f2da47cd3f91988d9d415ce7', 'entrenador_10', 6, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 1),
 (30, 'Alan', 'Martinez', 1857295, 'laradelcoro01+3@gmail.com', 'scrypt:32768:8:1$yDBDGsdKWTzNHr3r$255eb0587dba694e454e56d9ff815c1f99ba3c3f9f61d1a470596e63f5786f9bf2c8d5714e2adff1e8605c21383f116b95efca19a611d9e44a62beb63614b5b4', 'entrenador_10', 1, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 2, 2, NULL, NULL, 1),
 (31, 'Lara', 'Admin', 999999, 'laradelcoro01+admin@gmail.com', 'scrypt:32768:8:1$KMso2fhm7yeUgRvx$cbadff5ca677227e08acf6900fc2e146e1683223b3d2acee3020cde7a83925f702e7103e9b5ec008fe95e47fc25ace165de1e473747cf707467677cf0fc94e6a', 'lara_43124684', 2, '2', 1, 'prueba', '3471607768', 1, NULL, 0, NULL, 0, 0, NULL, NULL, 1),
@@ -440,7 +410,9 @@ INSERT INTO `Usuario` (`Id`, `Nombre`, `Apellido`, `Dni`, `Email`, `Password`, `
 (33, 'Lara', 'Entrenador', 7777777, 'laradelcoro01+entrenador@gmail.com', 'scrypt:32768:8:1$hGsGyWQJeiTKgDXn$d6633826fb5558962bae6d6a3a927cd7f00986b84af880d6c4c68b8171574cda1ece271ac2ce3e18f0615e1646ba766e6289299667b0cdda78bcf82b09cff5f7', 'entrenador_7777777', 4, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 3),
 (36, 'Alan', 'Martinez', 101, 'laradelcoro01+33@gmail.com', 'scrypt:32768:8:1$bQILCuCPYRxNCWvj$a0f5934e33ce9df6f30e3e0b84b636bac3e86383d95f25420093e3147d19b926e9061bc75b2510db62ed1fa3bc7a1a89a42b311c84859c12f486b76169ba9849', 'entrenador_101', 3, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, NULL, NULL, 3),
 (37, 'Julian', 'Carlos', 105, 'laradelcoro01+13@gmail.com', 'scrypt:32768:8:1$ghmtx6HR4ccDTbP7$39bc3d06be038c51488ca2a3ce3ad5f24501d64cd190d9f386ceff51be6c4c29133ee73c34907fefa08f7e68c13b20e2fbefeffc49c13f08496b331c53fe70ca', 'entrenador_105', 3, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 3),
-(39, 'Alan', 'Martinez', 1088, 'laradelcoro01+339@gmail.com', 'scrypt:32768:8:1$qDRTVFEVm6aYYStv$fe63ee97092023cf4df2ce9aa0bbdf48877d56b4b5a50e4c4a0750bb3a6acbecea15422c4d73e5e6d2ff8341e72ecb027ac37d43e28dc9be425e52f69ef75be7', 'entrenador_1088', 2, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, NULL, NULL, 3);
+(39, 'Alan', 'Martinez', 1088, 'laradelcoro01+339@gmail.com', 'scrypt:32768:8:1$qDRTVFEVm6aYYStv$fe63ee97092023cf4df2ce9aa0bbdf48877d56b4b5a50e4c4a0750bb3a6acbecea15422c4d73e5e6d2ff8341e72ecb027ac37d43e28dc9be425e52f69ef75be7', 'entrenador_1088', 2, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, NULL, NULL, 3),
+(40, 'Mora', 'Kope', 43491829, 'morakopech+depo@gmail.com', 'scrypt:32768:8:1$R4XtaTFEMez90sSm$669720830b870a4413743e11525f81471defb6c4cb100f5c85dca30959bcc4fd18d569e88b4b2d78e37921b04d4a96dd5bcdbfedddc58f82d32ad8828822918a', 'entrenador_43491829', 7, '1', 1, 'N/A', '34133333', 2, NULL, 0, NULL, 1, 1, '2001-06-09 00:00:00', NULL, 1),
+(41, 'Mora', 'Silvestre', 43491833, 'morakopech+entre@gmail.com', 'scrypt:32768:8:1$0jtPx5dMRaOEXQKi$dfedc1ba81e8333cd372e2760c8fa8ecdbe29f698f0c5b7cc64a7166eb80f6bb5ee76cd61fe3f0e550378762487a5b21f4e876e4723218fe43c6b3ab115d060b', 'entrenador_43491833', 4, '1', 1, 'N/A', '03415064322', 3, NULL, 0, NULL, NULL, NULL, NULL, NULL, 3);
 
 --
 -- Índices para tablas volcadas
@@ -519,25 +491,25 @@ ALTER TABLE `Contacto`
 -- AUTO_INCREMENT de la tabla `EstadisticaPorPartido`
 --
 ALTER TABLE `EstadisticaPorPartido`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `EstadisticaUsuarioPartido`
 --
 ALTER TABLE `EstadisticaUsuarioPartido`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `Evento`
 --
 ALTER TABLE `Evento`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `Notificacion`
 --
 ALTER TABLE `Notificacion`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `Pago`
@@ -549,7 +521,7 @@ ALTER TABLE `Pago`
 -- AUTO_INCREMENT de la tabla `Usuario`
 --
 ALTER TABLE `Usuario`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
