@@ -7,6 +7,7 @@ if (isRtl) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  
   (function () {
     const calendarEl = document.getElementById('calendar'),
       appCalendarSidebar = document.querySelector('.app-calendar-sidebar'),
@@ -31,7 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
       localidad = document.querySelector('#localidad'),
       eventStartDate = document.querySelector('#eventStartDate'),
       eventEndDate = document.querySelector('#eventEndDate'),
-    
+          
+      contrincante = document.querySelector('#contrincante-wrapper'),
+      rama = document.querySelector('#rama'),
+      division = document.querySelector('#division'),
+
       eventLocation = document.querySelector('#eventLocation'),
       eventDescription = document.querySelector('#descripcion'),
       allDaySwitch = document.querySelector('#todoElDia'),
@@ -82,6 +87,71 @@ document.addEventListener('DOMContentLoaded', function () {
         monthSelectorType: 'static',
         inline: true
       });
+    }
+
+function mostrarCamposSegunTipo() {
+  const tipo = tipoEvento.value;
+console.log("tipoEvento:", tipoEvento);
+
+  // Definimos los wrappers directos por id
+  const wrappers = {
+    titulo: document.getElementById('titulo-wrapper'),
+    tipoEvento: document.getElementById('tipoEvento-wrapper'),
+    categoria: document.getElementById('categoria-wrapper'),
+    localidad: document.getElementById('localidad-wrapper'),
+    contrincante: document.getElementById('contrincante-wrapper'),
+    rama: document.getElementById('rama-wrapper'),
+    division: document.getElementById('division-wrapper'),
+    descripcion: document.getElementById('descripcion-wrapper'),
+    todoElDia: document.getElementById('todoElDia-wrapper'),
+    eventStartDate: document.getElementById('fechaInicio-wrapper'),
+    eventEndDate: document.getElementById('fechaFin-wrapper')
+  };
+
+  // Ocultar todos
+  Object.values(wrappers).forEach(w => { if (w) w.style.display = 'none'; });
+
+  if (wrappers.tipoEvento) wrappers.tipoEvento.style.display = 'block';
+
+  // Mostrar según tipo
+  switch (tipo) {
+    case '1': // Entrenamiento
+      [wrappers.tipoEvento, wrappers.titulo, wrappers.eventStartDate]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
+
+    case '2': // Partido
+      [wrappers.tipoEvento, wrappers.titulowrappers.eventStartDate,
+       wrappers.localidad, wrappers.contrincante, wrappers.rama, wrappers.division]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
+
+    case '3': // Vacaciones
+      [wrappers.tipoEvento, wrappers.titulo,
+       wrappers.eventStartDate, wrappers.eventEndDate]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
+
+    case '4':
+    case '5':
+    case '6': // Suspensión, Torneo, Recaudación
+      [wrappers.tipoEvento, wrappers.titulo, wrappers.eventStartDate,
+       wrappers.categoria, wrappers.localidad, wrappers.descripcion]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
+    default:
+    if (wrappers.tipoEvento) wrappers.tipoEvento.style.display = 'block';
+    break;
+  }
+}
+
+    // Event listener
+    if (tipoEvento) {
+      // Escucha cambios de Select2
+      $(tipoEvento).on('change', mostrarCamposSegunTipo);
+
+      // Llamada inicial
+      mostrarCamposSegunTipo();
     }
 
     // Event click function
