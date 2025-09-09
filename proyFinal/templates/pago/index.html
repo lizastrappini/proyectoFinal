@@ -25,21 +25,35 @@
             </select>
           </div>
           <div class="col-12 col-md-2">
-            <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde">
+            <div class="form-floating mb-0">
+            <input type="date" class="form-control" id="fechaDesdeFiltro" placeholder="Fecha Desde">
+            <label for="fechaDesdeFiltro">Fecha Desde</label>
+            </div>
+            <!-- <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde"> -->
           </div>
           <div class="col-12 col-md-2">
-            <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta">
+            <div class="form-floating mb-0">
+            <input type="date" class="form-control" id="fechaHastaFiltro" placeholder="Fecha Hasta">
+            <label for="fechaHastaFiltro">Fecha Hasta</label>
+            </div>
+            <!-- <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta"> -->
           </div>
         </div>
 
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
+            <button id="btnPagarSeleccionados" class="btn btn-outline-primary" disabled>Pagar</button>
             <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
-              <span><i class="ri-external-link-line me-sm-1"></i> 
+              <span><i class="ri-upload-line me-sm-1"></i> 
                 <span class="d-none d-sm-inline-block">Exportar</span>
               </span>
-            </button> 
-            <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
+            </button>
+            <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light"
+             data-bs-target="#importarPago" data-bs-toggle="modal">
+              <i class="ri-download-line me-sm-1"></i> 
+              Importar
+            </a>
+            <a href="javascript:;" class="btn btn-primary" data-bs-target="#addPago" data-bs-toggle="modal">
               Agregar Pago
             </a>
           </div>
@@ -47,6 +61,7 @@
             <table id="tablaPagos" class="table">
               <thead>
                 <tr>
+                  <th><input type="checkbox" id="selectAll"></th>
                   <th>Id</th>
                   <th>Deportista</th>
                   <th>Fecha Pago</th>
@@ -58,9 +73,9 @@
               </thead>
             </table>
           </div>
-                <!-- Modal -->
-                <!-- Agregar User Modal -->
-                <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
+                <!-- Modal Agregar Pago-->
+                <!-- Agregar Pago Modal -->
+                <div class="modal fade" id="addPago" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-lg modal-simple modal-edit-user">
                     <div class="modal-content">
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -70,19 +85,6 @@
                         </div>
                         
                         <form id="editPagosForm" class="row g-5" method="POST" action="{{ url_for('pago.agregar_pago') }}">
-                          <!-- <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline">
-                              <input 
-                                type="int"
-                                id="id"
-                                name="id"
-                                class="form-control"
-                                value=""
-                                placeholder=""
-                                required />
-                              <label for="modalEditUserFirstName">Id</label>
-                            </div>
-                          </div> -->
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="usuario_id" class="form-label">Deportista</label>
@@ -164,6 +166,51 @@
                     </div>
                   </div>
                 </div>
+                <!--/ Edit Pago Modal -->
+                <!-- /Modal -->
+
+
+                <!-- Modal Importar Masivo-->
+                <!-- Improtar Pago  Modal -->
+                <div class="modal fade" id="importarPago" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                    <div class="modal-content">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-body p-0">
+                        <div class="text-center mb-6">
+                          <h4 class="mb-2" id="tituloAdd">Importar Pagos</h4>
+                          <p class="text-muted mb-0">Subí un archivo Excel con las columnas Cuil Deportista | Fecha Pago | Fecha Vencimiento | Importe | Estado Id.</p>
+                          
+                        </div>
+                        <form id="importarPagosForm" class="row g-5" method="POST" action="{{ url_for('pago.importar_pagos') }}" enctype="multipart/form-data">
+                          <div class="mb-4">
+                              <label for="archivoExcel" class="form-label">Seleccionar archivo</label>
+                              <input 
+                                type="file" 
+                                class="form-control form-control-sm" 
+                                id="archivoExcel" 
+                                name="archivoExcel" 
+                                accept=".xlsx,.xls" 
+                                required>
+                                <small class="text-muted">Solo se aceptan archivos .xlsx o .xls</small>
+                            </div>
+                          
+                          <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary" id="btnImportar">Importar</button>
+                            <button
+                              type="reset"
+                              class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              aria-label="Close">
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <!--/ Edit User Modal -->
                 <!-- /Modal -->
           
@@ -200,6 +247,14 @@
             dataSrc: 'data'
           },
           columns: [
+          { 
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row) {
+              return `<input type="checkbox" class="check-pago" data-id="${row.id}">`;
+            }
+          },
           { data: 'id' },
           { data: 'deportista' },
           { data: 'fechaPago' },
@@ -281,12 +336,73 @@
         }); 
       }
     }
-      
+   // Función para mostrar u ocultar el botón Pagar
+function actualizarBotonPagar() {
+    const anyChecked = $('.check-pago:checked').length > 0;
+    $('#btnPagarSeleccionados').prop('disabled', !anyChecked);
+
+    // Actualizar el checkbox de selectAll
+    const allChecked = $('.check-pago').length === $('.check-pago:checked').length;
+    $('#selectAll').prop('checked', allChecked);
+}
+
+// Delegación de eventos para checkboxes (incluso los que se crean después)
+$(document).on('change', '#selectAll', function() {
+    const checked = $(this).is(':checked');
+    $('.check-pago').prop('checked', checked);
+    actualizarBotonPagar();
+});
+
+$(document).on('change', '.check-pago', function() {
+    actualizarBotonPagar();
+});
+
+// Cuando la tabla se dibuja o redibuja
+$('#tablaPagos').on('draw.dt', function() {
+    actualizarBotonPagar();
+});
+// Botón Pagar
+$('#btnPagarSeleccionados').on('click', function() {
+    const idsSeleccionados = $('.check-pago:checked').map(function() { return $(this).data('id'); }).get();
+    if(idsSeleccionados.length === 0) return;
+
+    Swal.fire({
+        title: '¿Confirmar pago de los seleccionados?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, pagar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if(result.isConfirmed) {
+            fetch('/pago/pagar_seleccionados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ ids: idsSeleccionados })
+            })
+            .then(async response => {
+                if(!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al pagar');
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({ icon: 'success', title: 'Pagos actualizados', text: data.message, showConfirmButton: false, timer: 2000 });
+                if(tabla) tabla.ajax.reload();
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+            });
+        }
+    });
+});
+
     $(document).ready(function () {
-    filtrar(); // carga inicial
+      $('#btnPagarSeleccionados').prop('disabled', true);
+      filtrar(); // carga inicial
     
-    $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').on('change', function () {
-    filtrar(); // recarga con nuevos filtros
+      $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').on('change', function () {
+      filtrar(); // recarga con nuevos filtros
     });
 
    
@@ -316,9 +432,11 @@
               $('#tituloAdd').text('Editar Pago');
 
               // Mostrar el modal
-              $('#addUser').modal('show');
+              $('#addPago').modal('show');
+              
+
             }
-              $('#addUser').on('hidden.bs.modal', function () {
+              $('#addPago').on('hidden.bs.modal', function () {
               $('#editPagosForm')[0].reset();
               $('#estado').val(null).trigger('change');
               $('#deportista').val(null).trigger('change');
@@ -356,7 +474,7 @@
                     showConfirmButton: false,
                     timer: 2000
                   });
-                  $('#addUser').modal('hide');
+                  $('#addPago').modal('hide');
                   $('#editPagosForm')[0].reset();
                   $('#estado').val(null).trigger('change');
                   $('#deportista').val(null).trigger('change');
