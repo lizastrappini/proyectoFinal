@@ -254,7 +254,7 @@
                               name="Nombre"
                               class="form-control"
                               value="{{ usuario.nombre }}"
-                              placeholder="Nombre" />
+                              placeholder="Nombre" required />
                             <label for="modalEditUserFirstName">Nombre</label>
                           </div>
                         </div>
@@ -272,7 +272,7 @@
                           </div>
                         </div>
                         <div class="col-12  col-md-6">
-                          <div class="form-floating form-floating-outline">
+                          <div class="form-floating form-floating-outline" readonly>
                             <input
                               type="text"
                               id="Usuario"
@@ -280,7 +280,7 @@
                               class="form-control"
                               value="{{ usuario.usuario }}"
                               placeholder="laradelcoro"
-                              required />
+                              required readonly disabled />
                             <label for="modalEditUserName">Usuario</label>
                           </div>
                         </div>
@@ -306,24 +306,11 @@
                               class="form-control"
                               value="{{ usuario.fechaNacimientoISO }}"
                               placeholder="" 
-                              required/>
+                              required readonly disabled/>
                             <label for="modalEditUserFechaNac">Fecha Nacimiento</label>
                           </div>
                         </div>
-                        <!-- {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-                        <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
-                            <label for="categoria" class="form-label">Categoria</label>
-                            <select class="form-select" id="categoria" name="Categoria" required>
-                              <option value="">Seleccione una categoría</option>
-                              {% for cat in categorias %}
-                                <option value="{{ cat.text }}">{{ cat.text }}</option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                          </div>
-                           {% endif %} -->
-                          <div class="col-12 col-md-6">
+                       <div class="col-12 col-md-6">
                           <div class="form-floating form-floating-outline">
                             <input
                               type="text"
