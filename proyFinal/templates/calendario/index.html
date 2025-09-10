@@ -64,14 +64,15 @@
               <label class="form-check-label" for="select-torneo">Torneo</label>
             </div>
             <div class="form-check mb-5 ms-3 form-check-recaudacion">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" style="background-color: #9b59b6; border-color: #8e44ad;" checked />
               <label class="form-check-label" for="select-recaudacion">Recaudacion</label>
             </div>
             {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-             <div class="form-check mb-5 ms-3 form-check-primary">
-              <input class="form-check-input"  type="checkbox" id="miCategoria" checked />
-              <label class="form-check-label" for="miCategoria">Mi Categoria</label>
+             <div class="form-check mb-5 ms-3 form-check-miCategoria">
+              <input class="form-check-input input-filter" type="checkbox" id="select-miCategoria" value="7" checked />
+              <label class="form-check-label" for="select-miCategoria">Mi Categoria</label>
             </div>
+
             {% endif %}
           </div>
         </div>
@@ -218,182 +219,30 @@
 </div>
 <!-- / Content -->
 
-{% endblock %}
 
-{% block scripts %}
-<script>
-  var selectedEvent = null;
-
-  // Inicializar FullCalendar
-  var calendarEl = document.getElementById('calendar');
-  var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    },
-    events: function(fetchInfo, successCallback, failureCallback) {
-      let tiposSeleccionados = [];
-      $('.input-filter:checked').each(function () {
-        tiposSeleccionados.push($(this).val());
-      });
-
-      if(tiposSeleccionados.length === 0){
-        successCallback([]);
-        return;
-      }
-
-      $.ajax({
-        url: '/eventos',
-        data: {
-          start: fetchInfo.startStr,
-          end: fetchInfo.endStr,
-          'tipoEventos[]': tiposSeleccionados,
-          miCategoria: $('#miCategoria').is(':checked') ? 1 : 0
-        },
-        success: function(response) {
-          successCallback(response);
-        },
-        error: function() {
-          failureCallback();
-        }
-      });
-    },
-    eventClick: function(info) {
-      selectedEvent = info.event;
-      selectedEvent.dbId = info.event.id
-
-      // Mostrar botón eliminar
-      $('.btn-delete-event').removeClass('d-none');
-
-      // Abrir sidebar
-      var offcanvas = new bootstrap.Offcanvas(document.getElementById('addEventSidebar'));
-      offcanvas.show();
-      actualizarContrincante();
-
-      // Rellenar formulario
-      $('#titulo').val(selectedEvent.title);
-      $('#tipoEvento').val(selectedEvent.extendedProps.calendar).trigger('change');
-      actualizarContrincante();
-      $('#categoria').val(selectedEvent.extendedProps.categoria).trigger('change');
-      $('#contrincante').val(selectedEvent.extendedProps.contrincante).trigger('change');
-      $('#localidad').val(selectedEvent.extendedProps.localidad).trigger('change');
-      $('#rama').val(selectedEvent.extendedProps.rama).trigger('change');
-      $('#division').val(selectedEvent.extendedProps.division).trigger('change');
-      $('#descripcion').val(selectedEvent.extendedProps.description);
-      $('#eventStartDate').val(selectedEvent.startStr);
-      $('#eventEndDate').val(selectedEvent.endStr);
-      $('#todoElDia').prop('checked', selectedEvent.allDay);
-    }
-  });
-
-  calendar.render();
-
-  // Crear o actualizar evento
-  $('#eventForm').on('submit', function (e) {
-    e.preventDefault();
-
-    let url = '/nuevoEvento';
-    let type = 'POST';
-
-    if(selectedEvent){
-      url = '/editarEvento/' + selectedEvent.dbId;
-      type = 'PUT';
-    }
-
-    $.ajax({
-      url: url,
-      type: type,
-      data: $(this).serialize(),
-      success: function () {
-        alert(selectedEvent ? 'Evento actualizado correctamente' : 'Evento creado correctamente');
-        calendar.refetchEvents();
-        $('#eventForm')[0].reset();
-        $('.btn-delete-event').addClass('d-none');
-        selectedEvent = null;
-      },
-      error: function (xhr) {
-        let errores = xhr.responseJSON?.errores || ['Error desconocido'];
-        alert('Errores:\n' + errores.join('\n'));
-      }
-    });
-  });
-
-  // Eliminar evento
-  $('.btn-delete-event').on('click', function(e){
-    e.preventDefault();
-    if(!selectedEvent) return;
-
-    if(confirm('¿Deseas eliminar este evento?')){
-      $.ajax({
-        url: '/eliminarEvento/' + selectedEvent.id,
-        type: 'DELETE',
-        success: function(){
-          alert('Evento eliminado correctamente');
-          calendar.refetchEvents();
-          selectedEvent = null;
-          $('.btn-delete-event').addClass('d-none');
-          $('#eventForm')[0].reset();
-        },
-        error: function(){
-          alert('Error al eliminar el evento');
-        }
-      });
-    }
-  });
-
-  // Función para actualizar eventos según filtros
-  function actualizarEventos() {
-    let tiposSeleccionados = [];
-    $('.input-filter:checked').each(function () {
-      tiposSeleccionados.push($(this).val());
-    });
-
-    $('#selectAll').prop('checked', tiposSeleccionados.length === $('.input-filter').length);
-    calendar.refetchEvents();
-  }
-
-  // cambios en filtros individuales
-  $('.input-filter').on('change', actualizarEventos);
-
-  // checkbox "Todos"
-  $('#selectAll').on('change', function() {
-    let checked = $(this).is(':checked');
-    $('.input-filter').prop('checked', checked);
-    actualizarEventos();
-  });
-  $('#miCategoria').on('change', function() {
-  calendar.refetchEvents();
-});
-
- // Función para mostrar u ocultar el campo Contrincante según tipoEvento
-function actualizarContrincante() {
-  let tipo = $('#tipoEvento').val(); // valor del select
-  if(tipo == '{{ TipoEventoEnum.Partido.value }}') {
-    $('#contrincante-wrapper').show();
-    $('#contrincante').prop('disabled', false);
-  } else {
-    $('#contrincante-wrapper').hide();
-    $('#contrincante').prop('disabled', true);
-    $('#contrincante').val(null).trigger('change'); // limpiar Select2 si no es partido
-  }
+<style>
+.fc-event-recaudacion {
+  --fc-event-bg-color: #9b59b6 !important;
+  --fc-event-border-color: #8e44ad !important;
+  color: #fff !important;
 }
 
-// Cuando se abre el modal
-$('#addEventSidebar').on('show.bs.offcanvas', function () {
-  // Ocultar y deshabilitar por defecto
-  $('#contrincante-wrapper').hide();
-  $('#contrincante').prop('disabled', true);
+.fc-event-miCategoria {
+  --fc-event-bg-color: #d47a13 !important;
+  --fc-event-border-color: #d47a13 !important;
+  color: #000 !important;
+}
 
-  // Llamar a la función por si ya hay un valor seleccionado
-  actualizarContrincante();
-});
+.form-check-miCategoria .form-check-input:checked {
+  background-color: #d47a13 !important;
+  border-color: #d47a13 !important;
+}
+.form-check-miCategoria .form-check-input:not(:checked) {
+  background-color: #fff !important;
+  border-color: #d6d6d6 !important;
+}
 
-// Ejecutar al cambiar el tipo de evento (Select2 requiere 'change' de jQuery)
-$('#tipoEvento').on('change', actualizarContrincante);
+  </style>
 
-</script>
+
 {% endblock %}
-
-

@@ -4,7 +4,7 @@ import src.utils.enums.generalEnum  as generalEnum
 from src import db
 from src.models.evento import Evento
 from datetime import datetime
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 def crearEvento(nuevoEvento):
     
@@ -20,6 +20,10 @@ def editarEvento(evento):
      db.session.commit()
 
 def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
+
+    if tipos == []:
+        return []
+    
     filtros = [
         Evento.FechaInicio <= fin,
         Evento.FechaFin >= inicio
@@ -27,8 +31,14 @@ def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
 
     if tipos:
         filtros.append(Evento.IdTipoEvento.in_(tipos))
-    if mi_categoria == "1":  # checkbox marcado
-        filtros.append(Evento.IdCategoria == current_user.IdCategoria)
+
+    if mi_categoria == "1" or mi_categoria is True:
+        filtros.append(
+            or_(
+                Evento.IdCategoria == current_user.IdCategoria,
+                Evento.IdCategoria == None  # incluye los sin categoría
+            )
+        )
 
     eventos = Evento.query.filter(*filtros).all()
     eventosTodos = [
@@ -40,10 +50,10 @@ def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
             "allDay": evento.TodoElDia,
             "extendedProps": {
                 "description": evento.Descripcion,
-                "calendar": [str(evento.IdTipoEvento)],
-                "categoria": [str(evento.IdCategoria)],
-                "contrincante": [str(evento.IdContrincante)],
-                "localidad": [str(evento.Localidad)],
+                "calendar": str(evento.IdTipoEvento),
+                "categoria": str(evento.IdCategoria),
+                "contrincante": str(evento.IdContrincante),
+                "localidad": str(evento.Localidad),
                 
                 
 

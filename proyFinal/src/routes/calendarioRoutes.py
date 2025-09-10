@@ -16,6 +16,9 @@ def index():
     {'value': evento.value, 'text': evento.name}
     for evento in generalEnum.TipoEventoEnum
     ]
+    
+    tipoeventos.append({'value': 7, 'text': 'MiCategoria'})
+
     categorias = [
     {'value': cat.value, 'text': cat.name}
     for cat in generalEnum.CategoriaEnum
@@ -64,7 +67,22 @@ def nuevo_evento():
     Rama = int(rama[0]) if rama else None
     Division = int(division[0]) if division else None
     
-    
+    if(IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value):
+        titulo = f"Partido {generalEnum.CategoriaEnum(IdCategoria).name} {generalEnum.RamaEnum(Rama).name} {generalEnum.DivisionEnum(Division).name} vs {generalEnum.ContrincantesEnum(Contrincante).name}"
+        fecha_fin_dt = fecha_inicio_dt
+
+    if(IdTipoEvento == generalEnum.TipoEventoEnum.Recaudacion.value or IdTipoEvento == generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value or IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value):
+        fecha_fin_dt = fecha_inicio_dt
+
+    if(IdTipoEvento == generalEnum.TipoEventoEnum.Vacaciones.value):
+        idCategoria = None
+        Rama = None
+        Division = None
+        Contrincante = None
+       
+    if(IdTipoEvento == generalEnum.TipoEventoEnum.Torneo.value):
+        titulo = f"Torneo {generalEnum.CategoriaEnum(IdCategoria).name} {generalEnum.RamaEnum(Rama).name} {generalEnum.DivisionEnum(Division).name}"
+
     nuevo_evento = Evento(
         Titulo=titulo,
         IdTipoEvento=IdTipoEvento,
@@ -79,6 +97,7 @@ def nuevo_evento():
         IdRama= Rama
         
     )
+
     calendarioController.crearEvento(nuevo_evento)
     return redirect(url_for('calendario.index'))
 
@@ -88,16 +107,24 @@ def eventos():
     start_str = request.args.get('start')  
     end_str = request.args.get('end')
     tipoEventos = request.args.get('tipoEventos[]')
-    mi_categoria = request.args.get('miCategoria')
+
+    mi_categoria = False
 
     if tipoEventos:
         tipos_list = [int(t) for t in tipoEventos.split(',')]
     else:
         tipos_list = []
 
+    if 7 in tipos_list:
+        mi_categoria = True
+        tipos_list = [t for t in tipos_list if t != 7]
+    else:
+        mi_categoria = False
+
     start = datetime.fromisoformat(start_str.replace('Z', '')) if start_str else None
     end = datetime.fromisoformat(end_str.replace('Z', '')) if end_str else None
     eventos = calendarioController.obtenerEventos(start, end, tipos_list, mi_categoria)
+
     return jsonify(eventos)
     
 @calendario_bp.route('/editarEvento/<int:evento_id>', methods=['PUT'])

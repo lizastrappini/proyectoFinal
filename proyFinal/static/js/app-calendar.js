@@ -14,12 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
       addEventSidebar = document.getElementById('addEventSidebar'),
       appOverlay = document.querySelector('.app-overlay'),
        tipoEventoColor = {
-            1: 'primary',
-            2: 'success',
-            3: 'danger',
-            4: 'warning',
-            5: 'info',
-            6: 'recaudacion',
+             "1": "primary",
+  "2": "success",
+  "3": "danger",
+  "4": "warning",
+  "5": "info",
+  "6": "recaudacion",
+  "7": "miCategoria"
           },
       offcanvasTitle = document.querySelector('.offcanvas-title'),
       btnToggleSidebar = document.querySelector('.btn-toggle-sidebar'),
@@ -121,7 +122,7 @@ console.log("tipoEvento:", tipoEvento);
       break;
 
     case '2': // Partido
-      [wrappers.tipoEvento, wrappers.titulowrappers.eventStartDate,
+      [wrappers.tipoEvento, wrappers.categoria, wrappers.eventStartDate,
        wrappers.localidad, wrappers.contrincante, wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
@@ -134,6 +135,11 @@ console.log("tipoEvento:", tipoEvento);
 
     case '4':
     case '5':
+       [wrappers.tipoEvento, wrappers.titulo,
+       wrappers.eventStartDate, wrappers.eventEndDate, wrappers.categoria, wrappers.rama, wrappers.division]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
+
     case '6': // Suspensión, Torneo, Recaudación
       [wrappers.tipoEvento, wrappers.titulo, wrappers.eventStartDate,
        wrappers.categoria, wrappers.localidad, wrappers.descripcion]
@@ -214,15 +220,27 @@ console.log("tipoEvento:", tipoEvento);
 
     // Filter events by calender
     function selectedCalendars() {
-      let selected = [],
-        filterInputChecked = [].slice.call(document.querySelectorAll('.input-filter:checked'));
+  const allBox = document.querySelector('input[data-value="all"]');
+  const checked = document.querySelectorAll('.input-filter:checked');
+  let selected = [];
 
-      filterInputChecked.forEach(item => {
-        selected.push(item.getAttribute('data-value'));
-      });
+  console.log("todos: ", allBox, "marcados:", checked);
+  // Caso 1: solo "Todos" marcado
+  if (allBox && allBox.checked && checked.length === 1) {
+    return ['1','2','3','4','5','6']; // todos los tipos de evento
+  }
 
-      return selected;
+  // Caso 2: hay específicos marcados
+  checked.forEach(item => {
+    const val = item.getAttribute('data-value');
+    if (val !== 'all') {
+      selected.push(val.toLowerCase());
     }
+  });
+
+  // Caso 3: ninguno marcado → devuelve vacío
+  return selected;
+}
 
     // --------------------------------------------------------------------------------------------------
     // AXIOS: fetchEvents
@@ -264,6 +282,66 @@ console.log("tipoEvento:", tipoEvento);
     let calendar = new Calendar(calendarEl, {
       locale: 'es',
       initialView: 'dayGridMonth',
+        eventDisplay: 'block', // fuerza apariencia "block" (no dot)
+        eventDidMount: function (info) {
+          if (info.view.type !== 'dayGridMonth') return;
+
+          const palette = {
+            "1": { bg: 'var(--bs-primary)',  border: 'var(--bs-primary)',  color: '#fff' },
+            "2": { bg: 'var(--bs-success)',  border: 'var(--bs-success)',  color: '#fff' },
+            "3": { bg: 'var(--bs-danger)',   border: 'var(--bs-danger)',   color: '#fff' },
+            "4": { bg: 'var(--bs-warning)',  border: 'var(--bs-warning)',  color: '#000' },
+            "5": { bg: 'var(--bs-info)',     border: 'var(--bs-info)',     color: '#000' },
+            "6": { bg: '#9b59b6',            border: '#8e44ad',            color: '#fff' }, // Recaudación
+            "7": { bg: '#d47a13',            border: '#d47a13',            color: '#fff' }  // MiCategoría
+          };
+
+          const tipo = String(info.event.extendedProps.calendar);
+          const p = palette[tipo];
+          if (!p) return;
+
+          // 🎨 Aplicar solo al contenedor
+          info.el.style.backgroundColor = p.bg;
+          info.el.style.borderColor = p.border;
+          info.el.style.color = p.color;
+
+          // Por si FC usa variables CSS
+          info.el.style.setProperty('--fc-event-bg-color', p.bg);
+          info.el.style.setProperty('--fc-event-border-color', p.border);
+
+          // Texto: aseguramos contraste
+          const main = info.el.querySelector('.fc-event-main');
+          if (main) main.style.color = p.color;
+
+          // Extras que ya tenías
+          info.el.style.overflow = 'hidden';
+          info.el.style.maxWidth = '100%';
+          info.el.style.borderRadius = '4px';
+
+          const frame = info.el.querySelector('.fc-event-main-frame');
+          if (frame) frame.style.display = 'block';
+
+          const title = info.el.querySelector('.fc-event-title');
+          if (title) {
+            title.style.whiteSpace = 'normal';
+            title.style.wordBreak = 'break-word';
+            title.style.lineHeight = '1.2';
+          }
+
+          if (tipo === "7") {
+            const miCatCheck = document.querySelector('#select-miCategoria');
+            if (miCatCheck && miCatCheck.checked) {
+              info.el.style.backgroundColor = '#d47a13';
+              info.el.style.borderColor = '#d47a13';
+              info.el.style.color = '#000';
+            } else {
+              // si el checkbox no está marcado, que quede sin color
+              info.el.style.backgroundColor = '';
+              info.el.style.borderColor = '';
+              info.el.style.color = '';
+            }
+          }
+        },
        displayEventTime: false,
        buttonText: {
         dayGridMonth: 'Mes',
@@ -271,19 +349,22 @@ console.log("tipoEvento:", tipoEvento);
         timeGridDay: 'Día',
         listMonth: 'Lista'
       },
+      eventColor: null,
+eventBackgroundColor: null,
+eventBorderColor: null,
        events: {
-          url: '/eventos',
-          method: 'GET',
-          extraParams: function() {
-            const checkedBoxes = document.querySelectorAll('input[name="tipoEventos[]"]:checked');
-            const params = {};
-            params['tipoEventos[]'] = [];
-            checkedBoxes.forEach(cb => {
-              params['tipoEventos[]'].push(cb.value);
-            });
-            return params;
-          }
-        },
+    url: '/eventos',
+    method: 'GET',
+    extraParams: function() {
+      const checkedBoxes = document.querySelectorAll('input[name="tipoEventos[]"]:checked');
+      const params = {};
+      params['tipoEventos[]'] = [];
+      checkedBoxes.forEach(cb => {
+        params['tipoEventos[]'].push(cb.value);
+      });
+      return params;
+    }
+  },
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
       editable: true,
       dragScroll: true,
@@ -303,10 +384,11 @@ console.log("tipoEvento:", tipoEvento);
       initialDate: new Date(),
       navLinks: true, // can click day/week names to navigate views
       eventClassNames: function ({ event: calendarEvent }) {
-        const tipo = calendarEvent.extendedProps.calendar; // ← ahora es un número
-        const colorClass = tipoEventoColor[tipo];
-        return colorClass ? ['fc-event-' + colorClass] : [];
-      },
+  const tipo = String(calendarEvent.extendedProps.calendar);
+  const colorClass = tipoEventoColor[tipo];
+  console.log("tipo:", tipo, "clase:", colorClass);
+  return colorClass ? ['fc-event-' + colorClass] : [];
+},
       dateClick: function (info) {
         let date = moment(info.date).format('YYYY-MM-DD');
         resetValues();
