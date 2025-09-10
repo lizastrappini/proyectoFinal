@@ -90,7 +90,7 @@ def editUsuario():
         'Nombre': request.form.get('Nombre'),
         'Apellido': request.form.get('Apellido'),
         'Email': request.form.get('Email'),
-        'NombreUsuario': request.form.get('Usuario'),
+        # 'NombreUsuario': request.form.get('Usuario'),
         'Direccion': request.form.get('Direccion'),
         'Localidad': request.form.get('Localidad'),
         'Telefono': request.form.get('Telefono'),

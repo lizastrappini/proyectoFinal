@@ -1,9 +1,15 @@
+import datetime
+from decimal import Decimal
 import secrets
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
+import openpyxl
 from src.controllers import deportistaController, pagosController
 from src.models.usuario import Usuario
 from src.models.pago import Pago
 from werkzeug.security import generate_password_hash
+import os
+from werkzeug.utils import secure_filename
+
 
 from src.utils.enums import generalEnum
 
@@ -64,8 +70,8 @@ def agregar_pago():
             FechaPago= fechaPago,
             FechaVencimiento=fechaVencimiento,
             Importe=importe,
-            Estado= estado_id,
-            Usuario_id =int(usuario_id)
+            IdEstado= estado_id,
+            IdUsuario =int(usuario_id)
         )
         pagosController.agregarPago(nuevo_pago)
         
@@ -82,9 +88,109 @@ def agregar_pago():
         else:
             flash(f'Error al crear pago: {mensaje_error}', 'danger')
             return redirect(url_for('pago.index'))
+  
+    
+@pago_bp.route('/importar_pagos', methods=['POST'])
+def importar_pagos():
+    try:
+        archivo = request.files.get("archivoExcel")
+        if not archivo:
+            raise ValueError("Debe subir un archivo Excel")
+        
+        # ---------- ABRIR ARCHIVO ----------
+        try:
+            wb = openpyxl.load_workbook(archivo)
+            ws = wb.active
+        except Exception:
+            raise ValueError("No se pudo abrir el archivo Excel")
 
+        # ---------- VALIDAR ENCABEZADOS ----------
+        encabezados = ["Cuil Deportista", "Fecha Pago", "Fecha Vencimiento", "Importe", "IdEstado"]
+        for idx, esperado in enumerate(encabezados, start=1):
+            valor = str(ws.cell(row=1, column=idx).value).strip() if ws.cell(row=1, column=idx).value else ""
+            if valor != esperado:
+                raise ValueError(f"El encabezado en la columna {idx} debe ser '{esperado}'")
 
+        # ---------- LEER FILAS ----------
+        fila = 2
+        registros_creados = 0
+        errores = []
 
+        while True:
+            dni = ws.cell(row=fila, column=1).value
+            if not dni:  # fin del archivo
+                break
+            
+            usuario = Usuario.query.filter_by(Dni=str(dni).strip()).first()
+            if not usuario:
+                raise ValueError(f"Fila {fila}: No existe un usuario con DNI {dni}")
+                fila += 1
+                continue
+
+            try:
+                fecha_pago_val = ws.cell(row=fila, column=2).value
+                fecha_venc_val = ws.cell(row=fila, column=3).value
+                importe_val = ws.cell(row=fila, column=4).value
+                id_estado = ws.cell(row=fila, column=5).value
+
+              
+                if not id_estado:
+                    raise ValueError("Estado inválido o no seleccionado")
+                if not fecha_pago_val or not fecha_venc_val:
+                    raise ValueError("Las fechas son obligatorias")
+                if not importe_val:
+                    raise ValueError("El importe es obligatorio")
+
+                # Parseo fechas si vienen en string
+                fecha_pago = fecha_pago_val
+                fecha_vencimiento = fecha_venc_val
+                if isinstance(fecha_pago_val, str):
+                    fecha_pago = datetime.datetime.strptime(fecha_pago_val, "%d-%m-%Y")
+                if isinstance(fecha_venc_val, str):
+                    fecha_vencimiento = datetime.datetime.strptime(fecha_venc_val, "%d-%m-%Y")
+
+                # Importe
+                importe = Decimal(str(importe_val))
+
+                nuevo_pago = Pago(
+                    FechaPago=fecha_pago,
+                    FechaVencimiento=fecha_vencimiento,
+                    Importe=importe,
+                    IdEstado=int(id_estado),
+                    IdUsuario=usuario.Id
+                )
+                pagosController.agregarPago(nuevo_pago)
+                registros_creados += 1
+
+            except Exception as e:
+                errores.append(f"Fila {fila}: {str(e)}")
+
+            fila += 1
+
+        # ---------- RESPUESTA ----------
+        if errores:
+            mensaje = f"Se importaron {registros_creados} pagos, con errores en algunas filas: {errores}"
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': mensaje}), 400
+            else:
+                flash(mensaje, 'danger')
+                return redirect(url_for('pago.index'))
+
+        mensaje_ok = f"Se importaron {registros_creados} pagos correctamente"
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': mensaje_ok}), 200
+        else:
+            flash(mensaje_ok, 'success')
+            return redirect(url_for('pago.index'))
+
+    except Exception as e:
+        mensaje_error = str(e)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': mensaje_error}), 400
+        else:
+            flash(f"Error al importar pagos: {mensaje_error}", 'danger')
+            return redirect(url_for('pago.index'))
+        
 @pago_bp.route('/editar/<int:id>', methods=['POST'])
 def editar_pago(id):
     pago = pagosController.obtener_pago_por_id(id)
@@ -106,8 +212,8 @@ def editar_pago(id):
     pago.FechaPago = fechaPago
     pago.FechaVencimiento = fechaVencimiento
     pago.Importe = importe
-    pago.Estado = generalEnum.EstadoPagoEnum[estado_nombre].value
-    pago.Usuario_id = usuario_id
+    pago.IdEstado = generalEnum.EstadoPagoEnum[estado_nombre].value
+    pago.IdUsuario= usuario_id
     
 
     pagosController.actualizar_pago(pago)
@@ -140,4 +246,20 @@ def eliminar_pago(id):
     
     
 
+@pago_bp.route('/pagar_seleccionados', methods=['POST'])
+def pagar_seleccionados():
+    try:
+        data = request.get_json()
+        ids = data.get('ids', [])
+        if not ids:
+            return jsonify({'success': False, 'message': 'No se seleccionaron pagos'}), 400
+        
+        pagos = Pago.query.filter(Pago.Id.in_(ids)).all()
+        for pago in pagos:
+            pago.IdEstado = 1  # id de "Pago"
+            pagosController.actualizar_pago(pago)
+
+        return jsonify({'success': True, 'message': f'{len(pagos)} pagos actualizados a Pago'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
 
