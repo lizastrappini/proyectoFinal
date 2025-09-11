@@ -3,6 +3,7 @@ import secrets
 import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
 from src.controllers import deportistaController
+from src.controllers.usuarioController import enviar_mail_categoria
 from src.models.usuario import Usuario
 from werkzeug.security import generate_password_hash
 
@@ -80,10 +81,15 @@ def agregar_deportista():
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
+        categoriaExtra = request.form.get('categoriaExtra')
+        
         
 
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
+            raise ValueError("Categoría inválida o no seleccionada")
+        
+        if not categoriaExtra or categoriaExtra not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
         
         if not rama_nombre or rama_nombre not in generalEnum.RamaEnum.__members__:
@@ -97,8 +103,7 @@ def agregar_deportista():
         # categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
-        # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
-        # Generar contraseña aleatoria segura
+        categoriaExtraId = generalEnum.CategoriaEnum[categoriaExtra].value
         federado_id = generalEnum.FederadoEnum[federado_nombre].value
         caracteres = string.ascii_letters + string.digits  # letras + números
         password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
@@ -122,7 +127,7 @@ def agregar_deportista():
             IdDivision = division_id,
             Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
-            NombreUsuario=f"entrenador_{dni}",
+            NombreUsuario=f"{nombre}_{dni}",
             Localidad= 1,
             IdEstado=1,
             Direccion="N/A",
@@ -131,7 +136,8 @@ def agregar_deportista():
             Token=None,
             TokenEnviado=False,
             FechaVencimientoToken=None,
-            Federado = federado_id
+            Federado = federado_id,
+            CategoriaExtra = categoriaExtraId
         )
         deportistaController.agregarDeportista(nuevo_deportista)
         deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
@@ -177,16 +183,18 @@ def editar_deportista(dni):
             email_usuario = Usuario.query.filter_by(Email=nuevo_email).first()
             if email_usuario:
                 raise ValueError(f"Ya existe un usuario con el mismo email")
-
+        
+        categoria_vieja = deportista.IdCategoria
         
         nombre = request.form.get('nombre')
         apellido = request.form.get('apellido')
         fechaNacimiento = request.form.get('fechaNacimiento')
         telefono = request.form.get('telefono')
-        categoria_nombre = request.form.get('categoria')
+        # nueva_cat = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
+        categoria_extra = request.form.get('categoriaExtra')
         
 
         # Actualiza campos
@@ -202,8 +210,16 @@ def editar_deportista(dni):
         deportista.IdRama = generalEnum.RamaEnum[rama_nombre].value
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
         deportista.Federado = generalEnum.FederadoEnum[federado_nombre].value
+        # deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
+        deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
         
-
+        
+        if deportista.IdCategoria != categoria_vieja:
+            enviar_mail_categoria(
+                deportista.Email,
+                deportista.Nombre,
+                generalEnum.CategoriaEnum(deportista.IdCategoria).name
+            )
         deportistaController.actualizar_deportista(deportista)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

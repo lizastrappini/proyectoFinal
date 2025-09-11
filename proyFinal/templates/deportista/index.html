@@ -187,6 +187,17 @@
                             </select>
                           </div>
                           </div>
+                           <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="4">
+                            <label for="categoriaExtra" class="form-label">Categoría Extra</label>
+                            <select class="form-select" id="categoriaExtra" name="categoriaExtra">
+                              <option value="">Seleccione una categoria</option>
+                              {% for cat in categorias %}
+                                <option value="{{ cat.text }}">{{ cat.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
                         
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
@@ -214,8 +225,8 @@
 
                           
                           <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
-                            <label for="rama" class="form-label">Federado</label>
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
+                            <label for="federado" class="form-label">Federado</label>
                             <select class="form-select" id="federado" name="federado" required>
                               <option value="">Seleccione si es federado o no</option>
                               {% for federado in federados %}
@@ -248,12 +259,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-                  }); -->
 
   {% endblock %}
 
@@ -356,11 +361,9 @@
       filtrar(); // recarga con nuevos filtros
       });
       $('.btn-export').on('click', function() {
-    tabla.button('.buttons-excel').trigger();
-      });
-    });
-
-
+        tabla.button('.buttons-excel').trigger();
+          });
+        });
               function editarFila(rowIndex) {
               const tabla = $('#tablaDeportista').DataTable();
               const data = tabla.row(rowIndex).data();
@@ -374,6 +377,7 @@
               $('#federado').val(data.federado).trigger('change');
               $('#telefono').val(data.telefono);
               $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+              $('#categoriaExtra').val(data.categoriaExtra).trigger('change');
               $('#division').val(data.division).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
               $('#rama').val(data.rama).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
 

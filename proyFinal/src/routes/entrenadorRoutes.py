@@ -82,7 +82,7 @@ def agregar_entrenador():
             IdCategoria = categoria_id,
             Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
-            NombreUsuario=f"entrenador_{dni}",
+            NombreUsuario=f"{nombre}_{dni}",
             Localidad= 1,
             IdEstado=1,
             Direccion="N/A",
@@ -90,7 +90,8 @@ def agregar_entrenador():
             IdRol=3,
             Token=None,
             TokenEnviado=False,
-            FechaVencimientoToken=None
+            FechaVencimientoToken=None,
+            Federado = 3
         )
         entrenadorController.agregarEntrenador(nuevo_entrenador)
         entrenadorController.enviar_mail_alta_entrenador(nuevo_entrenador, password_plana)

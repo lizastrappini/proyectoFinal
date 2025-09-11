@@ -33,7 +33,7 @@ def login():
         login_user(usuario, remember = True) 
         flash("Bienvenido!", "success")
         return redirect(url_for('usuarios.listar_usuarios'))
-        # return redirect(url_for('inicio_bp.index')) esta me la dio el chat
+       
     else:
         flash("Usuario o contraseña incorrectos", "danger")
         return render_template('usuario/index.html')
@@ -90,21 +90,11 @@ def editUsuario():
         'Nombre': request.form.get('Nombre'),
         'Apellido': request.form.get('Apellido'),
         'Email': request.form.get('Email'),
-        # 'NombreUsuario': request.form.get('Usuario'),
         'Direccion': request.form.get('Direccion'),
         'Localidad': request.form.get('Localidad'),
         'Telefono': request.form.get('Telefono'),
         'Categoria': request.form.get('Categoria'),
-        'FechaNacimiento': None,
-        
-        
     }
-    fecha_str = request.form.get('FechaNacimiento')
-    if fecha_str:
-        try:
-            usuarioModel['FechaNacimiento'] = datetime.strptime(fecha_str, "%Y-%m-%d").date()
-        except ValueError:
-            usuarioModel['FechaNacimiento'] = None
 
     usuario = usuarioController.getUsuarioById(id)
 

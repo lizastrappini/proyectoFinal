@@ -16,9 +16,7 @@ from werkzeug.security import check_password_hash
 from sqlalchemy import and_, cast, Date, or_, and_
 from datetime import date
 
-# def loginUser(email,password):
-#     usuario = Usuario.query.filter_by(Email=email, Password=password).first() 
-#     return usuario
+
 def loginUser(username, password):
     usuario = Usuario.query.filter_by(NombreUsuario=username).first()
     if usuario and check_password_hash(usuario.Password, password):
@@ -52,7 +50,7 @@ def miCuenta(id):
             'federado': generalEnum.FederadoEnum(usuario.Federado).name,
             'fechaNacimiento': usuario.FechaNacimiento.strftime('%d/%m/%Y') if usuario.FechaNacimiento else None,
             'fechaNacimientoISO': usuario.FechaNacimiento.strftime('%Y-%m-%d') if usuario.FechaNacimiento else None,
-            # 'fechaNacimiento' : usuario.FechaNacimiento
+            
         }
 
 
@@ -63,16 +61,8 @@ def getUsuarioById(id):
 def update(id, datos):
     usuario = Usuario.query.filter_by(Id=id).first()
 
-    # Convertir a enum de forma segura
-    # try:
-    #     localidad_enum = generalEnum.LocalidadEnum(int(datos.get('Localidad', 0)))
-    #     valor_localidad = localidad_enum.value
-        
-    # except (ValueError, KeyError):
-    #     valor_localidad = generalEnum.LocalidadEnum.NoDefinido.value
-
     if usuario:
-        categoria_vieja = usuario.IdCategoria
+        # categoria_vieja = usuario.IdCategoria
         if 'Nombre' in datos:
             usuario.Nombre = datos['Nombre']
         if 'Apellido' in datos:
@@ -87,25 +77,15 @@ def update(id, datos):
             usuario.Localidad = datos['Localidad']
         if 'Telefono' in datos:
             usuario.Telefono = datos['Telefono']
-        if 'FechaNacimiento' in datos:
-            usuario.FechaNacimiento = datos['FechaNacimiento']
-            
-        # Actualizar categoría automáticamente
-        if usuario.FechaNacimiento:
-            usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
-        else:
-            usuario.IdCategoria = generalEnum.CategoriaEnum.NoEspecificada.value
-
-
-        # usuario.IdCategoria = deportistaController.calcular_categoria_por_fecha(usuario.FechaNacimiento)
+    
 
         db.session.commit()
-        if usuario.IdCategoria != categoria_vieja:
-            enviar_mail_categoria(
-                usuario.Email,
-                usuario.Nombre,
-                generalEnum.CategoriaEnum(usuario.IdCategoria).name
-            )
+        # if usuario.IdCategoria != categoria_vieja:
+        #     enviar_mail_categoria(
+        #         usuario.Email,
+        #         usuario.Nombre,
+        #         generalEnum.CategoriaEnum(usuario.IdCategoria).name
+        #     )
 
         return usuario
 

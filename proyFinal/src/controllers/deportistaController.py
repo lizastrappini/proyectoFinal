@@ -1,6 +1,8 @@
 from datetime import date
 from flask import current_app, render_template, url_for
 from flask_mail import Message
+from src.controllers.usuarioController import enviar_mail_categoria
+from src.models import usuario
 from src.models.usuario import Usuario
 from src.utils.enums import generalEnum
 from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, FederadoEnum, RamaEnum
