@@ -1,8 +1,7 @@
 'use strict';
 
-var direction = 'ltr';  // o 'rtl' según tu lógica
-
-if (isRtl) {
+var direction = 'ltr';
+if (typeof isRtl !== 'undefined' && isRtl) {
   direction = 'rtl';
 }
 
@@ -134,9 +133,13 @@ console.log("tipoEvento:", tipoEvento);
       break;
 
     case '4':
+      [wrappers.tipoEvento, wrappers.titulo,
+       wrappers.eventStartDate, wrappers.categoria, wrappers.rama, wrappers.division]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
     case '5':
        [wrappers.tipoEvento, wrappers.titulo,
-       wrappers.eventStartDate, wrappers.eventEndDate, wrappers.categoria, wrappers.rama, wrappers.division]
+       wrappers.eventStartDate, wrappers.eventEndDate, wrappers.categoria, wrappers.rama, wrappers.division, wrappers.localidad]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
@@ -163,40 +166,107 @@ console.log("tipoEvento:", tipoEvento);
     // Event click function
     function eventClick(info) {
       eventToUpdate = info.event;
+
       if (eventToUpdate.url) {
         info.jsEvent.preventDefault();
         window.open(eventToUpdate.url, '_blank');
       }
+
       bsAddEventSidebar.show();
-      // For update event set offcanvas title text: Update Event
-      if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Actualizar Evento';
+
+      // ✅ leemos el rol del data-attribute del calendario
+      const userRole = parseInt(idRolUsuario.dataset.userRole || '0', 10);
+
+      if (userRole === 2) {
+      if (offcanvasTitle) offcanvasTitle.innerHTML = 'Detalle del Evento';
+      if (btnSubmit) btnSubmit.classList.add('d-none');
+      if (btnDeleteEvent) btnDeleteEvent.classList.add('d-none');
+
+      const form = document.getElementById('eventForm');
+      if (form) form.classList.add('d-none');  
+      if (eventDetails) {
+        eventDetails.classList.remove('d-none');
+        eventDetails.innerHTML = `<p>Cargando...</p>`;
       }
-      btnSubmit.innerHTML = 'Actualizar';
-      btnSubmit.classList.add('btn-update-event');
-      btnSubmit.classList.remove('btn-add-event');
-      btnDeleteEvent.classList.remove('d-none');
 
-      eventTitle.value = eventToUpdate.title;
-      localidad.value  =eventToUpdate.localidad;
-      categoria.value = eventToUpdate.categoria;
-      tipoEvento.value = eventToUpdate.extendedProps.tipoEvento;
-      start.setDate(eventToUpdate.start, true, 'Y-m-d');
-      eventToUpdate.allDay === true ? (allDaySwitch.checked = true) : (allDaySwitch.checked = false);
-      eventToUpdate.end !== null
-        ? end.setDate(eventToUpdate.end, true, 'Y-m-d')
-        : end.setDate(eventToUpdate.start, true, 'Y-m-d');
-      eventToUpdate.extendedProps.description !== undefined
-        ? (eventDescription.value = eventToUpdate.extendedProps.description)
-        : null;
+      fetch(`/evento/${eventToUpdate.id}`)
+        .then(res => res.json())
+        .then(data => {
+if (eventDetails) {
+  let html = '';
 
-      // // Call removeEvent function
-      // btnDeleteEvent.addEventListener('click', e => {
-      //   removeEvent(parseInt(eventToUpdate.id));
-      //   // eventToUpdate.remove();
-      //   bsAddEventSidebar.hide();
-      // });
-    }
+  // título destacado
+  if (data.titulo) {
+    html += `<h4 class="mb-3 text-center">📆${data.titulo}</h4>`;
+  }
+
+  // helper para renderizar solo si hay valor
+  const renderField = (label, value) => {
+    if (!value) return '';
+    return `
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">${label}</span>
+        <span>${value}</span>
+      </li>
+    `;
+  };
+
+  // abrimos la lista
+  html += '<ul class="list-group mb-3">';
+
+  html += renderField('Inicio', data.fechaInicio);
+  html += renderField('Fin', data.fechaFin);
+  html += renderField('Tipo', data.tipoEvento);
+  html += renderField('Categoría', data.categoria);
+  html += renderField('Rama', data.rama);
+  html += renderField('División', data.division);
+  html += renderField('Localidad', data.localidad);
+  html += renderField('Contrincante', data.contrincante);
+  html += renderField('Descripción', data.descripcion);
+
+  // cerramos la lista
+  html += '</ul>';
+
+  eventDetails.innerHTML = html || '<p class="text-muted">No hay información disponible.</p>';
+}
+        });
+      return;
+  }
+
+  // ------- MODO EDICIÓN (Admin/Entrenador) -------
+  if (offcanvasTitle) offcanvasTitle.innerHTML = 'Actualizar Evento';
+  if (btnSubmit) {
+    btnSubmit.innerHTML = 'Actualizar';
+    btnSubmit.classList.add('btn-update-event');
+    btnSubmit.classList.remove('btn-add-event', 'd-none');
+  }
+  if (btnDeleteEvent) btnDeleteEvent.classList.remove('d-none');
+
+  // oculto detalle si quedó visible
+  if (eventDetails) {
+    eventDetails.classList.add('d-none');
+    eventDetails.innerHTML = '';
+  }
+  const form = document.getElementById('eventForm');
+  if (form) form.classList.remove('d-none');
+
+  // Completar los campos SOLO si existen (rol 1/3)
+  if (eventTitle) eventTitle.value = eventToUpdate.title || '';
+  if (localidad) localidad.value = eventToUpdate.localidad || '';
+  if (categoria) categoria.value = eventToUpdate.categoria || '';
+  if (tipoEvento) tipoEvento.value = eventToUpdate.extendedProps?.tipoEvento || eventToUpdate.extendedProps?.calendar || '';
+
+  if (typeof start !== 'undefined' && start && eventToUpdate.start) {
+    start.setDate(eventToUpdate.start, true, 'Y-m-d');
+  }
+  if (allDaySwitch) allDaySwitch.checked = !!eventToUpdate.allDay;
+  if (typeof end !== 'undefined' && end) {
+    end.setDate(eventToUpdate.end || eventToUpdate.start, true, 'Y-m-d');
+  }
+  if (eventDescription && typeof eventToUpdate.extendedProps?.description !== 'undefined') {
+    eventDescription.value = eventToUpdate.extendedProps.description || '';
+  }
+}
 
     // Modify sidebar toggler
     function modifyToggler() {
@@ -226,9 +296,10 @@ console.log("tipoEvento:", tipoEvento);
 
   console.log("todos: ", allBox, "marcados:", checked);
   // Caso 1: solo "Todos" marcado
-  if (allBox && allBox.checked && checked.length === 1) {
-    return ['1','2','3','4','5','6']; // todos los tipos de evento
-  }
+if (allBox && allBox.checked) {
+  // devolver todos los valores de los checkboxes que existan en el DOM
+  return [...document.querySelectorAll('.input-filter')].map(cb => cb.value);
+}
 
   // Caso 2: hay específicos marcados
   checked.forEach(item => {
@@ -276,6 +347,9 @@ console.log("tipoEvento:", tipoEvento);
       successCallback(selectedEvents);
       // }
     }
+
+      const idRolUsuario = document.getElementById('idRolUsuario');
+      const userRole = parseInt(idRolUsuario.dataset.userRole, 10);
 
     // Init FullCalendar
     // ------------------------------------------------
@@ -362,6 +436,7 @@ eventBorderColor: null,
       checkedBoxes.forEach(cb => {
         params['tipoEventos[]'].push(cb.value);
       });
+      console.log("extraParams (rol 2):", params);
       return params;
     }
   },
@@ -405,6 +480,8 @@ eventBorderColor: null,
         eventStartDate.value = date;
         eventEndDate.value = date;
       },
+
+
       eventClick: function (info) {
         eventClick(info);
       },
@@ -415,14 +492,15 @@ eventBorderColor: null,
         modifyToggler();
       }
     });
-
+console.log("calendarEl:", calendarEl);
     // Render calendar
     calendar.render();
     // Modify sidebar toggler
     modifyToggler();
 
     const eventForm = document.getElementById('eventForm');
-    const fv = FormValidation.formValidation(eventForm, {
+if (eventForm && typeof FormValidation !== 'undefined') {
+  const fv = FormValidation.formValidation(eventForm, {
       fields: {
         eventTitle: {
           validators: {
@@ -459,14 +537,9 @@ eventBorderColor: null,
         autoFocus: new FormValidation.plugins.AutoFocus()
       }
     })
-      .on('core.form.valid', function () {
-        // Jump to the next step when all fields in the current step are valid
-        isFormValid = true;
-      })
-      .on('core.form.invalid', function () {
-        // if fields are invalid
-        isFormValid = false;
-      });
+       .on('core.form.valid', () => { isFormValid = true; })
+    .on('core.form.invalid', () => { isFormValid = false; });
+  }
 
     // Sidebar Toggle Btn
     if (btnToggleSidebar) {
@@ -556,65 +629,67 @@ eventBorderColor: null,
 
     // Add new event
     // ------------------------------------------------
-    btnSubmit.addEventListener('click', e => {
-      if (btnSubmit.classList.contains('btn-add-event')) {
-        if (isFormValid) {
-          let newEvent = {
-            id: calendar.getEvents().length + 1,
-            title: eventTitle.value,
-            start: eventStartDate.value,
-            end: eventEndDate.value,
-            startStr: eventStartDate.value,
-            endStr: eventEndDate.value,
-            categoria: categoria.value,
-            tipoEvento: tipoEvento.value,
-            localidad: localidad.value,
-            display: 'block',
-            extendedProps: {
-              calendar: tipoEvento.value,
-              description: eventDescription.value
+    if (btnSubmit) {
+      btnSubmit.addEventListener('click', e => {
+        if (btnSubmit.classList.contains('btn-add-event')) {
+          if (isFormValid) {
+            let newEvent = {
+              id: calendar.getEvents().length + 1,
+              title: eventTitle.value,
+              start: eventStartDate.value,
+              end: eventEndDate.value,
+              startStr: eventStartDate.value,
+              endStr: eventEndDate.value,
+              categoria: categoria.value,
+              tipoEvento: tipoEvento.value,
+              localidad: localidad.value,
+              display: 'block',
+              extendedProps: {
+                calendar: tipoEvento.value,
+                description: eventDescription.value
+              }
+            };
+            
+            if (allDaySwitch.checked) {
+              newEvent.allDay = true;
             }
-          };
-          
-          if (allDaySwitch.checked) {
-            newEvent.allDay = true;
+            addEvent(newEvent);
+            bsAddEventSidebar.hide();
           }
-          addEvent(newEvent);
-          bsAddEventSidebar.hide();
+        } else {
+          // Update event
+          // ------------------------------------------------
+          if (isFormValid) {
+            let eventData = {
+              id: eventToUpdate.id,
+              title: eventTitle.value,
+              start: eventStartDate.value,
+              end: eventEndDate.value,
+              categoria: categoria.value,
+              tipoEvento: tipoEvento.value,
+              localidad: localidad.value,
+              extendedProps: {
+                calendar: tipoEvento.value,
+                description: eventDescription.value
+              },
+              display: 'block',
+              allDay: allDaySwitch.checked ? true : false
+            };
+
+            updateEvent(eventData);
+            bsAddEventSidebar.hide();
+          }
         }
-      } else {
-        // Update event
-        // ------------------------------------------------
-        if (isFormValid) {
-          let eventData = {
-            id: eventToUpdate.id,
-            title: eventTitle.value,
-            start: eventStartDate.value,
-            end: eventEndDate.value,
-            categoria: categoria.value,
-            tipoEvento: tipoEvento.value,
-            localidad: localidad.value,
-            extendedProps: {
-              calendar: tipoEvento.value,
-              description: eventDescription.value
-            },
-            display: 'block',
-            allDay: allDaySwitch.checked ? true : false
-          };
-
-          updateEvent(eventData);
-          bsAddEventSidebar.hide();
-        }
-      }
-    });
-
-    // Call removeEvent function
-    btnDeleteEvent.addEventListener('click', e => {
-      removeEvent(parseInt(eventToUpdate.id));
-      // eventToUpdate.remove();
-      bsAddEventSidebar.hide();
-    });
-
+      });
+    }
+    if (btnDeleteEvent) {
+      // Call removeEvent function
+      btnDeleteEvent.addEventListener('click', e => {
+        removeEvent(parseInt(eventToUpdate.id));
+        // eventToUpdate.remove();
+        bsAddEventSidebar.hide();
+      });
+    }
     // Reset event form inputs values
     // ------------------------------------------------
     function resetValues() {
@@ -627,22 +702,23 @@ eventBorderColor: null,
 
     // When modal hides reset input values
     addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
-      calendar.setOption('locale', 'es');
       resetValues();
     });
 
     // Hide left sidebar if the right sidebar is open
-    btnToggleSidebar.addEventListener('click', e => {
-      if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Agregar Evento';
-      }
-      btnSubmit.innerHTML = 'Agregar';
-      btnSubmit.classList.remove('btn-update-event');
-      btnSubmit.classList.add('btn-add-event');
-      btnDeleteEvent.classList.add('d-none');
-      appCalendarSidebar.classList.remove('show');
-      appOverlay.classList.remove('show');
-    });
+    if (btnToggleSidebar) {
+      btnToggleSidebar.addEventListener('click', e => {
+        if (offcanvasTitle) offcanvasTitle.innerHTML = 'Agregar Evento';
+        if (btnSubmit) {
+          btnSubmit.innerHTML = 'Agregar';
+          btnSubmit.classList.remove('btn-update-event');
+          btnSubmit.classList.add('btn-add-event');
+        }
+        if (btnDeleteEvent) btnDeleteEvent.classList.add('d-none');
+        appCalendarSidebar.classList.remove('show');
+        appOverlay.classList.remove('show');
+      });
+    }
 
     // Calender filter functionality
     // ------------------------------------------------
@@ -679,29 +755,3 @@ eventBorderColor: null,
 });
 
 
-document.getElementById('eventForm').addEventListener('submit', function (e) {
-  e.preventDefault(); // evitar que se envíe el form de forma tradicional
-
-  const formData = new FormData(this);
-
-  document.querySelectorAll('input[name="tipoEventos[]"]:checked').forEach(input => {
-    formData.append('tipoEventos[]', input.value);
-    });
-    for (let pair of formData.entries()) {
-      console.log(pair[0]+ ': ' + pair[1]);
-    }
-  fetch('/calendario/nuevoEvento', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => {
-    if (response.ok) {
-      // Ocultás el modal y recargás eventos
-      calendar.refetchEvents();
-      // Ocultar el sidebar si querés
-      bsAddEventSidebar.hide();
-    } else {
-      alert('Error al guardar el evento');
-    }
-  });
-});

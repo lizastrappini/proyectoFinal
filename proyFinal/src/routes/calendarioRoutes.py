@@ -3,7 +3,7 @@ import src.controllers.usuarioController as usuarioController
 import src.controllers.calendarioController as calendarioController
 from flask import session
 import src.utils.enums.generalEnum  as generalEnum
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.models.evento import Evento
 
 calendario_bp = Blueprint('calendario', __name__)
@@ -69,10 +69,10 @@ def nuevo_evento():
     
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value):
         titulo = f"Partido {generalEnum.CategoriaEnum(IdCategoria).name} {generalEnum.RamaEnum(Rama).name} {generalEnum.DivisionEnum(Division).name} vs {generalEnum.ContrincantesEnum(Contrincante).name}"
-        fecha_fin_dt = fecha_inicio_dt
+        fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)  
 
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Recaudacion.value or IdTipoEvento == generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value or IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value):
-        fecha_fin_dt = fecha_inicio_dt
+        fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)  
 
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Vacaciones.value):
         idCategoria = None
@@ -89,7 +89,7 @@ def nuevo_evento():
         FechaInicio=fecha_inicio_dt,
         FechaFin=fecha_fin_dt,
         TodoElDia=todoElDia,
-        Localidad=Localidad,
+        IdLocalidad=Localidad,
         Descripcion=descripcion,
         IdCategoria = IdCategoria,
         IdContrincante= Contrincante,
@@ -117,9 +117,10 @@ def eventos():
 
     if 7 in tipos_list:
         mi_categoria = True
-        tipos_list = [t for t in tipos_list if t != 7]
+        if len(tipos_list) == 1:
+            tipos_list = [e.value for e in generalEnum.TipoEventoEnum]
     else:
-        mi_categoria = False
+        tipos_list = [t for t in tipos_list if t != 7]
 
     start = datetime.fromisoformat(start_str.replace('Z', '')) if start_str else None
     end = datetime.fromisoformat(end_str.replace('Z', '')) if end_str else None
@@ -146,7 +147,7 @@ def editar_evento(evento_id):
     contrincante = data.get('contrincante')
     evento.IdContrincante = int(contrincante) if contrincante else evento.IdContrincante
     localidad = data.get('localidad')
-    evento.Localidad = int(localidad) if localidad else evento.Localidad
+    evento.IdLocalidad = int(localidad) if localidad else evento.IdLocalidad
     
 
     calendarioController.editarEvento(evento)
@@ -167,3 +168,65 @@ def partidosByCategoria(fecha, categoria):
     eventos = calendarioController.getPartidosByCategoria(fecha,categoria)
 
     return jsonify(eventos)
+
+@calendario_bp.route("/evento/<int:evento_id>")
+def evento_detalle(evento_id):
+    evento = calendarioController.getEventoById(evento_id)
+
+    tipo = evento.IdTipoEvento
+    data = {"id": evento.Id, "tipo": tipo}
+
+    if tipo == generalEnum.TipoEventoEnum.Entrenamiento.value:
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
+            "titulo": evento.Titulo,
+            "fechaInicio": evento.FechaInicio.isoformat()
+        })
+
+    elif tipo == generalEnum.TipoEventoEnum.Partido.value:
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
+            "categoria": generalEnum.CategoriaEnum(evento.IdCategoria).name if evento.IdCategoria else None,
+            "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M"),
+            "localidad": generalEnum.LocalidadEnum(evento.IdLocalidad).name if evento.IdLocalidad else None,
+            "contrincante": generalEnum.ContrincantesEnum(evento.IdContrincante).name if evento.IdContrincante else None,
+            "rama": generalEnum.RamaEnum(evento.IdRama).name if evento.IdRama else None,
+            "division": generalEnum.DivisionEnum(evento.IdDivision).name if evento.IdDivision else None
+        })
+
+    elif tipo == generalEnum.TipoEventoEnum.Vacaciones.value:
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
+            "titulo": evento.Titulo,
+            "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M"),
+            "fechaFin": evento.FechaFin.strftime("%d-%m-%Y %H:%M") if evento.FechaFin else None
+        })
+
+    elif tipo in (generalEnum.TipoEventoEnum.Torneo.value, generalEnum.TipoEventoEnum.Recaudacion.value):
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
+            "titulo": evento.Titulo,
+            "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M"),
+            "fechaFin": evento.FechaFin.strftime("%d-%m-%Y %H:%M") if evento.FechaFin else None,
+            "categoria": generalEnum.CategoriaEnum(evento.IdCategoria).name if evento.IdCategoria else None,
+            "rama": generalEnum.RamaEnum(evento.IdRama).name if evento.IdRama else None,
+            "division": generalEnum.DivisionEnum(evento.IdDivision).name if evento.IdDivision else None,
+            "localidad" : generalEnum.LocalidadEnum(evento.IdLocalidad).name if evento.IdLocalidad else None,
+        })
+
+    elif tipo == generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value:
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
+            "titulo": evento.Titulo,
+            "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M"),
+            "categoria": generalEnum.CategoriaEnum(evento.IdCategoria).name if evento.IdCategoria else None,
+            "localidad": generalEnum.LocalidadEnum(evento.IdLocalidad).name if evento.IdLocalidad else None,
+            "descripcion": evento.Descripcion
+        })
+
+    else:
+        data.update({
+            "tipoEvento": generalEnum.TipoEventoEnum(tipo).name
+        })
+
+    return jsonify(data)

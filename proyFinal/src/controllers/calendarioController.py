@@ -53,7 +53,7 @@ def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
                 "calendar": str(evento.IdTipoEvento),
                 "categoria": str(evento.IdCategoria),
                 "contrincante": str(evento.IdContrincante),
-                "localidad": str(evento.Localidad),
+                "localidad": str(evento.IdLocalidad),
                 
                 
 
@@ -140,10 +140,11 @@ def getPartidosByCategoriaYFecha(inicio, categoria):
     return eventosTodos
 
 
-def getPartidosById(id):
+def getEventoById(id):
     
     evento = Evento.query.filter(
         Evento.Id == id
     ).first()
 
     return evento
+

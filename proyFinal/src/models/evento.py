@@ -8,7 +8,7 @@ class Evento(db.Model):
     FechaInicio = db.Column(db.DateTime, nullable=False)
     FechaFin = db.Column(db.DateTime, nullable=False)
     TodoElDia = db.Column(db.Boolean, default=False)
-    Localidad = db.Column(db.Integer, nullable=True)
+    IdLocalidad = db.Column(db.Integer, nullable=True)
     Descripcion = db.Column(db.Text, nullable=True)
     IdCategoria = db.Column(db.Integer, nullable=True)
     TieneEstadistica = db.Column(db.Boolean, default=False)

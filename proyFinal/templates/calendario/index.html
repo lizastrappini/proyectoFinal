@@ -44,32 +44,32 @@
 
           <div class="app-calendar-events-filter text-heading">
             <div class="form-check form-check-danger mb-5 ms-3">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-vacaciones" value="{{ TipoEventoEnum.Vacaciones.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-vacaciones" value="{{ TipoEventoEnum.Vacaciones.value }}" data-value="{{ TipoEventoEnum.Vacaciones.value }}" checked />
               <label class="form-check-label" for="select-vacaciones">Vacaciones</label>
             </div>
             <div class="form-check mb-5 ms-3">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-entrenamiento" value="{{ TipoEventoEnum.Entrenamiento.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-entrenamiento" value="{{ TipoEventoEnum.Entrenamiento.value }}" data-value="{{ TipoEventoEnum.Entrenamiento.value }}" checked />
               <label class="form-check-label" for="select-entrenamiento">Entrenamiento</label>
             </div>
             <div class="form-check form-check-warning mb-5 ms-3">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-suspension" value="{{ TipoEventoEnum.SuspensionEntrenamiento.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-suspension" value="{{ TipoEventoEnum.SuspensionEntrenamiento.value }}" data-value="{{ TipoEventoEnum.SuspensionEntrenamiento.value }}" checked />
               <label class="form-check-label" for="select-suspension">Suspension Entrenamiento</label>
             </div>
             <div class="form-check form-check-success mb-5 ms-3">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-partido" value="{{ TipoEventoEnum.Partido.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-partido" value="{{ TipoEventoEnum.Partido.value }}" data-value="{{ TipoEventoEnum.Partido.value }}" checked />
               <label class="form-check-label" for="select-partido">Partido</label>
             </div>
             <div class="form-check form-check-info mb-5 ms-3">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-torneo" value="{{ TipoEventoEnum.Torneo.value }}" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-torneo" value="{{ TipoEventoEnum.Torneo.value }}" data-value="{{ TipoEventoEnum.Torneo.value }}" checked />
               <label class="form-check-label" for="select-torneo">Torneo</label>
             </div>
             <div class="form-check mb-5 ms-3 form-check-recaudacion">
-              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" style="background-color: #9b59b6; border-color: #8e44ad;" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-recaudacion" value="{{ TipoEventoEnum.Recaudacion.value }}" data-value="{{ TipoEventoEnum.Recaudacion.value }}" checked />
               <label class="form-check-label" for="select-recaudacion">Recaudacion</label>
             </div>
             {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
              <div class="form-check mb-5 ms-3 form-check-miCategoria">
-              <input class="form-check-input input-filter" type="checkbox" id="select-miCategoria" value="7" checked />
+              <input class="form-check-input input-filter" name="tipoEventos[]" type="checkbox" id="select-miCategoria" value="7" data-value="7" checked />
               <label class="form-check-label" for="select-miCategoria">Mi Categoria</label>
             </div>
 
@@ -90,142 +90,151 @@
         <div class="app-overlay"></div>
 
         <!-- FullCalendar Offcanvas -->
-        <div
-          class="offcanvas offcanvas-end event-sidebar"
-          tabindex="-1"
-          id="addEventSidebar"
-          aria-labelledby="addEventSidebarLabel">
+        <!-- FullCalendar Offcanvas -->
+<div
+  class="offcanvas offcanvas-end event-sidebar"
+  tabindex="-1"
+  id="addEventSidebar"
+  aria-labelledby="addEventSidebarLabel">
 
-          {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
-          <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="addEventSidebarLabel">Nuevo Evento</h5>
-            <button
-              type="button"
-              class="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"></button>
-          </div>
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title" id="addEventSidebarLabel">Evento</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
 
-          <div class="offcanvas-body">
-            <form class="event-form pt-0" id="eventForm" action="/nuevoEvento" method="POST">
-              
+  <div class="offcanvas-body">
+    <!-- ✅ Contenedor de detalle (Rol 2: Deportista) -->
+    <div id="eventDetails" class="d-none"></div>
 
-              <div class="form-floating form-floating-outline mb-5" id="tipoEvento-wrapper">
-                <select id="tipoEvento" name="tipoEvento" class="select2 form-select" required>
-                  <option value="">Selecciona Tipo</option>
-                  {% for evento in tipoeventos %}
-                    <option value="{{ evento.value }}">{{ evento.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="tipoEvento">Tipo</label>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="titulo-wrapper">
-                <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Titulo Evento" required/>
-                <label for="titulo">Titulo</label>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="fechaInicio-wrapper">
-                <input type="text" class="form-control" id="eventStartDate" name="fechaInicio" placeholder="Fecha Inicio" required/>
-                <label for="eventStartDate">Fecha Inicio</label>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="fechaFin-wrapper">
-                <input type="text" class="form-control" id="eventEndDate" name="fechaFin" placeholder="Fecha Fin" required />
-                <label for="eventEndDate">Fecha Fin</label>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="todoElDia-wrapper">
-                <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input allDay-switch" id="todoElDia" name="todoElDia"  />
-                  <label class="form-check-label" for="todoElDia">Todo el día</label>
-                </div>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="categoria-wrapper">
-                <select id="categoria" name="categoria" class="select2 form-select">
-                  <option value="">Selecciona Categoria</option>
-                  {% for categoria in categorias %}
-                    <option value="{{ categoria.value }}">{{ categoria.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="categoria">Categoría</label>
-              </div>
-            
-              <div class="form-floating form-floating-outline mb-5" id="rama-wrapper">
-                <select id="rama" name="rama" class="select2 form-select">
-                  <option value="">Selecciona Rama</option>
-                  {% for rama in ramas %}
-                    <option value="{{ rama.value }}">{{ rama.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="rama">Rama</label>
-              </div>
-
-              <div class="form-floating form-floating-outline mb-5" id="division-wrapper">
-                <select id="division" name="division" class="select2 form-select">
-                  <option value="">Selecciona division</option>
-                  {% for division in divisiones %}
-                    <option value="{{ division.value }}">{{ division.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="division">Division</label>
-              </div>
-
-               <div class="form-floating form-floating-outline mb-5" id="contrincante-wrapper">
-                <select id="contrincante" name="contrincante" class="select2 form-select">
-                  <option value="">Selecciona Contrincante</option>
-                  {% for contrincante in contrincantes %}
-                    <option value="{{ contrincante.value }}">{{ contrincante.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="contrincante">Contrincante</label>
-              </div>
-           
-               <div class="form-floating form-floating-outline mb-5" id="localidad-wrapper">
-                <select id="localidad" name="localidad" class="select2 form-select">
-                  <option value="">Selecciona Localidad</option>
-                  {% for localidad in localidades %}
-                    <option value="{{ localidad.value }}">{{ localidad.text }}</option>
-                  {% endfor %}
-                </select>
-                <label for="localidad">Localidad</label>
-              </div>
-              
-              <div class="form-floating form-floating-outline mb-5" id="descripcion-wrapper">
-                <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
-                <label for="descripcion">Descripción</label>
-              </div>
-
-              <div class="mb-5 d-flex justify-content-sm-between justify-content-start my-6 gap-2">
-                <div class="d-flex">
-                  <button type="submit" id="addEventBtn" class="btn btn-primary btn-add-event me-4">
-                    Agregar
-                  </button>
-                  <button type="reset" class="btn btn-outline-secondary btn-cancel me-sm-0 me-1" data-bs-dismiss="offcanvas">
-                    Cancelar
-                  </button>
-                </div>
-                <button class="btn btn-outline-danger btn-delete-event d-none">Eliminar</button>
-              </div>
-            </form>
-          </div>
-          {% endif %}
+    {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
+      <!-- ✅ Formulario de edición (Rol 1: Admin / Rol 3: Entrenador) -->
+      <form class="event-form pt-0" id="eventForm" action="/nuevoEvento" method="POST">
+        
+        <div class="form-floating form-floating-outline mb-5" id="tipoEvento-wrapper">
+          <select id="tipoEvento" name="tipoEvento" class="select2 form-select" required>
+            <option value="">Selecciona Tipo</option>
+            {% for evento in tipoeventos %}
+              <option value="{{ evento.value }}">{{ evento.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="tipoEvento">Tipo</label>
         </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="titulo-wrapper">
+          <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Titulo Evento" required/>
+          <label for="titulo">Titulo</label>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="fechaInicio-wrapper">
+          <input type="text" class="form-control" id="eventStartDate" name="fechaInicio" placeholder="Fecha Inicio" required/>
+          <label for="eventStartDate">Fecha Inicio</label>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="fechaFin-wrapper">
+          <input type="text" class="form-control" id="eventEndDate" name="fechaFin" placeholder="Fecha Fin" required />
+          <label for="eventEndDate">Fecha Fin</label>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="todoElDia-wrapper">
+          <div class="form-check form-switch">
+            <input type="checkbox" class="form-check-input allDay-switch" id="todoElDia" name="todoElDia"  />
+            <label class="form-check-label" for="todoElDia">Todo el día</label>
+          </div>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="categoria-wrapper">
+          <select id="categoria" name="categoria" class="select2 form-select">
+            <option value="">Selecciona Categoria</option>
+            {% for categoria in categorias %}
+              <option value="{{ categoria.value }}">{{ categoria.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="categoria">Categoría</label>
+        </div>
+      
+        <div class="form-floating form-floating-outline mb-5" id="rama-wrapper">
+          <select id="rama" name="rama" class="select2 form-select">
+            <option value="">Selecciona Rama</option>
+            {% for rama in ramas %}
+              <option value="{{ rama.value }}">{{ rama.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="rama">Rama</label>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="division-wrapper">
+          <select id="division" name="division" class="select2 form-select">
+            <option value="">Selecciona division</option>
+            {% for division in divisiones %}
+              <option value="{{ division.value }}">{{ division.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="division">Division</label>
+        </div>
+
+        <div class="form-floating form-floating-outline mb-5" id="contrincante-wrapper">
+          <select id="contrincante" name="contrincante" class="select2 form-select">
+            <option value="">Selecciona Contrincante</option>
+            {% for contrincante in contrincantes %}
+              <option value="{{ contrincante.value }}">{{ contrincante.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="contrincante">Contrincante</label>
+        </div>
+     
+        <div class="form-floating form-floating-outline mb-5" id="localidad-wrapper">
+          <select id="localidad" name="localidad" class="select2 form-select">
+            <option value="">Selecciona Localidad</option>
+            {% for localidad in localidades %}
+              <option value="{{ localidad.value }}">{{ localidad.text }}</option>
+            {% endfor %}
+          </select>
+          <label for="localidad">Localidad</label>
+        </div>
+        
+        <div class="form-floating form-floating-outline mb-5" id="descripcion-wrapper">
+          <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+          <label for="descripcion">Descripción</label>
+        </div>
+
+        <div class="mb-5 d-flex justify-content-sm-between justify-content-start my-6 gap-2">
+          <div class="d-flex">
+            <button type="submit" id="addEventBtn" class="btn btn-primary btn-add-event me-4">
+              Agregar
+            </button>
+            <button type="reset" class="btn btn-outline-secondary btn-cancel me-sm-0 me-1" data-bs-dismiss="offcanvas">
+              Cancelar
+            </button>
+          </div>
+          <button class="btn btn-outline-danger btn-delete-event d-none">Eliminar</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+
+
       </div>
       <!-- /Calendar & Modal -->
     </div>
   </div>
 </div>
+<div id="idRolUsuario" data-user-role="{{ current_user.IdRol }}"></div>
 <!-- / Content -->
 
 
 <style>
-.fc-event-recaudacion {
+.fc-event-.form-check-recaudacion {
   --fc-event-bg-color: #9b59b6 !important;
   --fc-event-border-color: #8e44ad !important;
   color: #fff !important;
 }
+.form-check-recaudacion .form-check-input:checked {
+  background-color: #9b59b6 !important;
+  border-color: #9b59b6 !important;
+}
+
 
 .fc-event-miCategoria {
   --fc-event-bg-color: #d47a13 !important;
@@ -245,4 +254,37 @@
   </style>
 
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+  const formNuevoEvento = document.getElementById('eventForm');
+
+if (formNuevoEvento) {
+  formNuevoEvento.addEventListener('submit', function (e) {
+    e.preventDefault(); // evitar que se envíe el form de forma tradicional
+
+    const formData = new FormData(this);
+
+    document.querySelectorAll('input[name="tipoEventos[]"]:checked')
+      .forEach(input => {
+        formData.append('tipoEventos[]', input.value);
+      });
+
+    fetch('/calendario/nuevoEvento', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        calendar.refetchEvents();
+        bsAddEventSidebar.hide();
+      } else {
+        alert('Error al guardar el evento');
+      }
+    });
+  });
+}
+</script>
 {% endblock %}
