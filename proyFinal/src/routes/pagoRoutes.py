@@ -34,7 +34,9 @@ def index():
 @pago_bp.route('/obtener', methods=['GET'])
 def obtener():
     pagos = pagosController.obtener_pagos()
-    return jsonify(data=pagos)  
+    return jsonify(data=pagos)
+
+  
 
 @pago_bp.route('/filtrar')
 def filtrar():
