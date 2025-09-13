@@ -2,6 +2,7 @@ from datetime import datetime
 import secrets
 import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
+import openpyxl
 from src.controllers import deportistaController
 from src.controllers.usuarioController import enviar_mail_categoria
 from src.models.usuario import Usuario
@@ -286,3 +287,28 @@ def cambiar_estado(dni):
     })
 
 
+# @deportista_bp.route('/subir_comprobante', methods=['POST'])
+# def subir_comrpobante():
+#     deportista = deportistaController.obtener_deportista_por_dni(dni)
+
+#     if not deportista:
+#         return jsonify({'success': False, 'message': 'Deportista no encontrado'}), 404
+
+#     # Alternar estado
+#     if int(deportista.IdEstado) == generalEnum.EstadoEnum.Activo:
+#         deportista.IdEstado = generalEnum.EstadoEnum.Inactivo
+#     else:
+#         deportista.IdEstado = generalEnum.EstadoEnum.Activo
+
+#     deportistaController.actualizar_deportista(deportista)
+
+#     return jsonify({
+#         'success': True,
+#         'message': 'Estado actualizado',
+#         'nuevo_estado': generalEnum.EstadoEnum(int(deportista.IdEstado)).name,
+   
+#     })
+
+
+
+    

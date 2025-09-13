@@ -2,10 +2,10 @@
 -- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Servidor: db
--- Tiempo de generación: 13-09-2025 a las 03:12:40
--- Versión del servidor: 9.3.0
--- Versión de PHP: 8.2.27
+-- Host: db
+-- Generation Time: Sep 13, 2025 at 02:53 AM
+-- Server version: 9.3.0
+-- PHP Version: 8.2.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `proyecto_db`
+-- Database: `proyecto_db`
 --
 CREATE DATABASE IF NOT EXISTS `proyecto_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE `proyecto_db`;
@@ -26,7 +26,7 @@ USE `proyecto_db`;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Calendario`
+-- Table structure for table `Calendario`
 --
 
 DROP TABLE IF EXISTS `Calendario`;
@@ -38,14 +38,14 @@ CREATE TABLE `Calendario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Calendario`
+-- Truncate table before insert `Calendario`
 --
 
 TRUNCATE TABLE `Calendario`;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Contacto`
+-- Table structure for table `Contacto`
 --
 
 DROP TABLE IF EXISTS `Contacto`;
@@ -57,12 +57,12 @@ CREATE TABLE `Contacto` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Contacto`
+-- Truncate table before insert `Contacto`
 --
 
 TRUNCATE TABLE `Contacto`;
 --
--- Volcado de datos para la tabla `Contacto`
+-- Dumping data for table `Contacto`
 --
 
 INSERT INTO `Contacto` (`Id`, `Titulo`, `Valor`, `prueba`) VALUES
@@ -74,7 +74,7 @@ INSERT INTO `Contacto` (`Id`, `Titulo`, `Valor`, `prueba`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `EstadisticaPorPartido`
+-- Table structure for table `EstadisticaPorPartido`
 --
 
 DROP TABLE IF EXISTS `EstadisticaPorPartido`;
@@ -90,25 +90,24 @@ CREATE TABLE `EstadisticaPorPartido` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `EstadisticaPorPartido`
+-- Truncate table before insert `EstadisticaPorPartido`
 --
 
 TRUNCATE TABLE `EstadisticaPorPartido`;
 --
--- Volcado de datos para la tabla `EstadisticaPorPartido`
+-- Dumping data for table `EstadisticaPorPartido`
 --
 
 INSERT INTO `EstadisticaPorPartido` (`Id`, `IdPartido`, `Fecha`, `IdContrincante`, `IdCategoria`, `IdRama`, `IdDivision`, `Resultado`) VALUES
 (13, 1, '2025-07-17 00:00:00', 2, 2, 1, 1, 1),
 (14, 1, '2025-07-17 00:00:00', 2, 2, 1, 1, 1),
 (15, 6, '2025-07-20 00:00:00', 1, 2, 1, 1, 2),
-(16, 7, '2025-07-16 00:00:00', 4, 1, 1, 1, 2),
-(17, 8, '2025-09-06 00:00:00', 3, 3, 1, 2, 1);
+(16, 7, '2025-07-16 00:00:00', 4, 1, 1, 1, 2);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `EstadisticaUsuarioPartido`
+-- Table structure for table `EstadisticaUsuarioPartido`
 --
 
 DROP TABLE IF EXISTS `EstadisticaUsuarioPartido`;
@@ -151,12 +150,12 @@ CREATE TABLE `EstadisticaUsuarioPartido` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `EstadisticaUsuarioPartido`
+-- Truncate table before insert `EstadisticaUsuarioPartido`
 --
 
 TRUNCATE TABLE `EstadisticaUsuarioPartido`;
 --
--- Volcado de datos para la tabla `EstadisticaUsuarioPartido`
+-- Dumping data for table `EstadisticaUsuarioPartido`
 --
 
 INSERT INTO `EstadisticaUsuarioPartido` (`Id`, `IdEstadisticaPorPartido`, `IdUsuario`, `REE`, `REV`, `RE0`, `RE1`, `RE2`, `RE3`, `RETOTAL`, `ROE`, `ROB`, `RO0`, `RO1`, `RO2`, `RO3`, `RO4`, `ROTOTAL`, `TRE`, `TRB`, `TR0`, `TR1`, `TR2`, `TR3`, `TR4`, `TRTOTAL`, `SA0`, `SA1`, `SA2`, `SA3`, `SA4`, `SATOTAL`, `BLP`, `BLN`, `BLTOTAL`) VALUES
@@ -164,13 +163,12 @@ INSERT INTO `EstadisticaUsuarioPartido` (`Id`, `IdEstadisticaPorPartido`, `IdUsu
 (8, 14, 4, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
 (9, 15, 3, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
 (10, 15, 4, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
-(11, 16, 3, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34),
-(12, 17, 36, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34);
+(11, 16, 3, 1, 3, 4, 3, 3, 8, 18, 3, 3, 6, 2, 8, 15, 2, 33, 2, 1, 4, 2, 8, 3, 2, 19, 1, 3, 5, 2, 5, 16, 18, 14, 34);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Evento`
+-- Table structure for table `Evento`
 --
 
 DROP TABLE IF EXISTS `Evento`;
@@ -181,9 +179,9 @@ CREATE TABLE `Evento` (
   `FechaInicio` datetime NOT NULL,
   `FechaFin` datetime NOT NULL,
   `TodoElDia` tinyint(1) NOT NULL,
-  `IdLocalidad` int DEFAULT NULL,
+  `Localidad` varchar(50) DEFAULT NULL,
   `IdTipoEvento` int NOT NULL,
-  `IdCategoria` int DEFAULT NULL,
+  `IdCategoria` int NOT NULL,
   `IdRama` int DEFAULT NULL,
   `IdDivision` int DEFAULT NULL,
   `TieneEstadistica` tinyint(1) NOT NULL,
@@ -191,46 +189,27 @@ CREATE TABLE `Evento` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Evento`
+-- Truncate table before insert `Evento`
 --
 
 TRUNCATE TABLE `Evento`;
 --
--- Volcado de datos para la tabla `Evento`
+-- Dumping data for table `Evento`
 --
 
-INSERT INTO `Evento` (`Id`, `Titulo`, `Descripcion`, `FechaInicio`, `FechaFin`, `TodoElDia`, `IdLocalidad`, `IdTipoEvento`, `IdCategoria`, `IdRama`, `IdDivision`, `TieneEstadistica`, `IdContrincante`) VALUES
-(1, 'Partido vs NOB', '', '2025-07-17 21:00:00', '2025-07-17 21:00:00', 0, 1, 2, 2, 1, 1, 1, 2),
-(2, 'Venta de pizzas', '', '2025-08-20 11:00:00', '2025-08-20 14:00:00', 1, 1, 6, 7, NULL, NULL, 0, NULL),
-(3, 'Venta de pizzas', '', '2025-07-24 12:00:00', '2025-07-26 12:00:00', 1, 2, 6, 3, NULL, NULL, 0, NULL),
-(4, 'Suspension entrenamiento', 'feriado', '2025-07-03 20:00:00', '2025-07-03 21:00:00', 1, 3, 4, 5, NULL, NULL, 0, NULL),
-(5, 'Partido ', '', '2025-07-20 12:00:00', '2025-07-20 16:00:00', 0, 4, 2, 4, NULL, NULL, 0, NULL),
-(6, 'Partido vs Sonder', '', '2025-07-20 12:00:00', '2025-07-20 12:00:00', 0, 1, 2, 2, 1, 1, 1, 1),
-(7, 'Partido vs NN3', '', '2025-07-16 12:00:00', '2025-07-16 12:00:00', 0, 1, 2, 1, 1, 1, 1, 4),
-(8, 'Partido vs nautico', '', '2025-09-06 12:00:00', '2025-09-06 12:00:00', 0, 1, 2, 3, 1, 2, 1, 3),
-(9, 'Partido Sub14 Masculino B vs Sonder', '', '2025-09-12 12:00:00', '2025-09-12 12:00:00', 0, 1, 2, 3, 2, 2, 0, 1),
-(10, 'Venta de pizzas', 'test', '2025-09-18 12:00:00', '2025-09-18 12:00:00', 0, 1, 6, 5, NULL, NULL, 0, NULL),
-(11, 'Suspension entrenamiento', '', '2025-09-23 12:00:00', '2025-09-23 12:01:00', 0, 1, 4, 6, NULL, NULL, 0, NULL),
-(13, 'Torneo', '', '2025-09-26 12:00:00', '2025-09-28 12:00:00', 0, NULL, 5, 4, 2, 2, 0, NULL),
-(14, 'Torneo Sub21 Femenino A', '', '2025-09-20 12:00:00', '2025-09-21 12:00:00', 0, NULL, 5, 6, 1, 1, 0, NULL),
-(15, 'Torneo Sub16 Femenino B', '', '2025-09-01 12:00:00', '2025-09-02 12:00:00', 0, 8, 5, 4, 1, 2, 0, NULL),
-(16, 'Torneo Sub12 Femenino B', '', '2025-08-04 12:00:00', '2025-08-05 12:00:00', 0, 7, 5, 1, 1, 2, 0, NULL),
-(17, 'Venta de empanadas', '', '2025-09-25 15:00:00', '2025-09-25 15:01:00', 0, 1, 6, 3, NULL, NULL, 0, NULL),
-(18, 'Entrenamiento Sub18 Femenino A', 'Evento creado masivamente', '2025-09-16 18:00:00', '2025-09-16 19:30:00', 0, NULL, 1, 5, 1, 1, 0, NULL),
-(19, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-06 20:00:00', '2025-10-06 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(20, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-08 20:00:00', '2025-10-08 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(21, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-10 20:00:00', '2025-10-10 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(22, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-13 20:00:00', '2025-10-13 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(23, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-15 20:00:00', '2025-10-15 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(24, 'Entrenamiento Primera Femenino A', 'Evento creado masivamente', '2025-10-17 20:00:00', '2025-10-17 21:30:00', 0, NULL, 1, 7, 1, 1, 0, NULL),
-(25, 'Vacaciones de invierno', '', '2025-09-15 12:00:00', '2025-09-18 12:00:00', 0, NULL, 3, NULL, NULL, NULL, 0, NULL),
-(26, 'Entrenamiento Sub12 Femenino A', '', '2025-10-21 17:00:00', '2025-10-21 17:01:00', 0, NULL, 1, 1, 1, 1, 0, NULL),
-(27, 'Entrenamiento Sub12 Masculino B', 'Evento creado masivamente', '2025-10-23 17:00:00', '2025-10-23 18:30:00', 0, NULL, 1, 1, 2, 2, 0, NULL);
+INSERT INTO `Evento` (`Id`, `Titulo`, `Descripcion`, `FechaInicio`, `FechaFin`, `TodoElDia`, `Localidad`, `IdTipoEvento`, `IdCategoria`, `IdRama`, `IdDivision`, `TieneEstadistica`, `IdContrincante`) VALUES
+(1, 'Partido vs NOB', '', '2025-07-17 21:00:00', '2025-07-17 21:00:00', 0, 'Rosario', 2, 2, 1, 1, 1, 2),
+(2, 'Venta de pizzas', '', '2025-08-20 11:00:00', '2025-08-20 14:00:00', 1, 'Rosario', 6, 7, NULL, NULL, 0, NULL),
+(3, 'Venta de pizzas', '', '2025-07-24 12:00:00', '2025-07-26 12:00:00', 1, 'Rosario', 6, 3, NULL, NULL, 0, NULL),
+(4, 'Suspension entrenamiento', 'feriado', '2025-07-03 20:00:00', '2025-07-03 21:00:00', 1, 'Rosario', 4, 5, NULL, NULL, 0, NULL),
+(5, 'Partido ', '', '2025-07-20 12:00:00', '2025-07-20 16:00:00', 0, '', 2, 4, NULL, NULL, 0, NULL),
+(6, 'Partido vs Sonder', '', '2025-07-20 12:00:00', '2025-07-20 12:00:00', 0, '1', 2, 2, 1, 1, 1, 1),
+(7, 'Partido vs NN3', '', '2025-07-16 12:00:00', '2025-07-16 12:00:00', 0, '1', 2, 1, 1, 1, 1, 4);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `faq`
+-- Table structure for table `faq`
 --
 
 DROP TABLE IF EXISTS `faq`;
@@ -242,12 +221,12 @@ CREATE TABLE `faq` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `faq`
+-- Truncate table before insert `faq`
 --
 
 TRUNCATE TABLE `faq`;
 --
--- Volcado de datos para la tabla `faq`
+-- Dumping data for table `faq`
 --
 
 INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`) VALUES
@@ -267,7 +246,7 @@ INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `migrations_applied`
+-- Table structure for table `migrations_applied`
 --
 
 DROP TABLE IF EXISTS `migrations_applied`;
@@ -277,12 +256,12 @@ CREATE TABLE `migrations_applied` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `migrations_applied`
+-- Truncate table before insert `migrations_applied`
 --
 
 TRUNCATE TABLE `migrations_applied`;
 --
--- Volcado de datos para la tabla `migrations_applied`
+-- Dumping data for table `migrations_applied`
 --
 
 INSERT INTO `migrations_applied` (`filename`, `applied_at`) VALUES
@@ -340,7 +319,7 @@ INSERT INTO `migrations_applied` (`filename`, `applied_at`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Notificacion`
+-- Table structure for table `Notificacion`
 --
 
 DROP TABLE IF EXISTS `Notificacion`;
@@ -354,31 +333,31 @@ CREATE TABLE `Notificacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Notificacion`
+-- Truncate table before insert `Notificacion`
 --
 
 TRUNCATE TABLE `Notificacion`;
 --
--- Volcado de datos para la tabla `Notificacion`
+-- Dumping data for table `Notificacion`
 --
 
 INSERT INTO `Notificacion` (`Id`, `Descripcion`, `Titulo`, `IdCategoria`, `IdDivision`, `IdRama`) VALUES
-(2, 'prueba', 'prueba', 4, NULL, NULL),
-(3, 'hola esta es otra prueba para todos los usuarios', 'prueba 2', 5, NULL, NULL),
+(2, 'prueba', 'prueba', NULL, NULL, NULL),
+(3, 'hola esta es otra prueba para todos los usuarios', 'prueba 2', NULL, NULL, NULL),
 (5, 'prueba ', 'Entrenamiento', NULL, NULL, NULL),
-(9, 'prueba', 'Entrenamiento', NULL, NULL, NULL),
+(9, 'prueba', 'Entrenamiento', 7, NULL, NULL),
 (10, 'mensaje general', 'Partido Sub 18', NULL, NULL, NULL),
-(11, 'mensaje para cat 18', 'Partido Sub 18', NULL, NULL, NULL),
-(12, 'mensaje solo para la cat sub 21', 'Partido', NULL, NULL, NULL),
-(13, 'prueba envio de emails', 'Entrenamiento', NULL, NULL, NULL),
+(11, 'mensaje para cat 18', 'Partido Sub 18', 5, NULL, NULL),
+(12, 'mensaje solo para la cat sub 21', 'Partido', 6, NULL, NULL),
+(13, 'prueba envio de emails', 'Entrenamiento', 6, NULL, NULL),
 (14, 'Envio de emails a todos los usuarios', 'Aviso importante', NULL, NULL, NULL),
-(15, 'test', 'test', NULL, NULL, NULL),
-(16, 'test', 'test', NULL, NULL, NULL);
+(15, 'test', 'test', 2, NULL, NULL),
+(16, 'test', 'test', 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Pago`
+-- Table structure for table `Pago`
 --
 
 DROP TABLE IF EXISTS `Pago`;
@@ -388,32 +367,37 @@ CREATE TABLE `Pago` (
   `FechaVencimiento` datetime NOT NULL,
   `IdEstado` int DEFAULT NULL,
   `Importe` int NOT NULL,
-  `IdUsuario` int DEFAULT NULL
+  `IdUsuario` int DEFAULT NULL,
+  `Comprobante` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Pago`
+-- Truncate table before insert `Pago`
 --
 
 TRUNCATE TABLE `Pago`;
 --
--- Volcado de datos para la tabla `Pago`
+-- Dumping data for table `Pago`
 --
 
-INSERT INTO `Pago` (`Id`, `FechaPago`, `FechaVencimiento`, `IdEstado`, `Importe`, `IdUsuario`) VALUES
-(3, '2025-07-28 00:00:00', '2025-07-31 00:00:00', 1, 17000, 3),
-(4, '2025-08-01 00:00:00', '2025-08-06 00:00:00', 1, 17000, 3),
-(5, '2025-07-27 00:00:00', '2025-07-31 00:00:00', 2, 17000, 30),
-(6, '2025-07-27 00:00:00', '2025-07-29 00:00:00', 3, 17000, 3),
-(7, '2025-08-06 00:00:00', '2025-08-09 00:00:00', 3, 1600, 30),
-(8, '2025-07-29 00:00:00', '2025-08-01 00:00:00', 2, 2400, 3),
-(9, '2025-07-24 00:00:00', '2025-07-09 00:00:00', 1, 18000, 32),
-(10, '2025-08-03 00:00:00', '2025-08-03 00:00:00', 2, 8500, 30);
+INSERT INTO `Pago` (`Id`, `FechaPago`, `FechaVencimiento`, `IdEstado`, `Importe`, `IdUsuario`, `Comprobante`) VALUES
+(3, '2025-07-28 00:00:00', '2025-07-31 00:00:00', 2, 17000, 3, NULL),
+(4, '2025-08-01 00:00:00', '2025-08-06 00:00:00', 1, 17000, 3, NULL),
+(5, '2025-07-27 00:00:00', '2025-07-31 00:00:00', 1, 17000, 30, NULL),
+(6, '2025-07-27 00:00:00', '2025-07-29 00:00:00', 1, 17000, 3, NULL),
+(7, '2025-08-06 00:00:00', '2025-08-09 00:00:00', 1, 1600, 30, NULL),
+(8, '2025-07-29 00:00:00', '2025-08-01 00:00:00', 1, 2400, 3, NULL),
+(9, '2025-07-24 00:00:00', '2025-07-09 00:00:00', 1, 18000, 32, NULL),
+(10, '2025-08-03 00:00:00', '2025-08-03 00:00:00', 1, 8500, 30, NULL),
+(11, '2025-09-08 00:00:00', '2025-09-09 00:00:00', 1, 28500, 30, NULL),
+(12, '2025-09-13 00:36:59', '2025-09-13 00:36:59', 1, 18500, 31, NULL),
+(15, '2025-09-13 01:45:46', '2025-09-13 01:45:46', 1, 46000, 46, 'uploads/comprobante_15_Screenshot_2024-07-23_142628.png'),
+(16, '2025-09-13 01:45:46', '2025-09-13 01:45:46', 3, 15000, 46, 'uploads/comprobante_16_Screenshot_2024-07-23_142628.png');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `Usuario`
+-- Table structure for table `Usuario`
 --
 
 DROP TABLE IF EXISTS `Usuario`;
@@ -442,51 +426,54 @@ CREATE TABLE `Usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Truncar tablas antes de insertar `Usuario`
+-- Truncate table before insert `Usuario`
 --
 
 TRUNCATE TABLE `Usuario`;
 --
--- Volcado de datos para la tabla `Usuario`
+-- Dumping data for table `Usuario`
 --
 
 INSERT INTO `Usuario` (`Id`, `Nombre`, `Apellido`, `Dni`, `Email`, `Password`, `NombreUsuario`, `IdCategoria`, `Localidad`, `IdEstado`, `Direccion`, `Telefono`, `IdRol`, `Token`, `TokenEnviado`, `FechaVencimientoToken`, `IdRama`, `IdDivision`, `FechaNacimiento`, `CategoriaExtra`, `Federado`) VALUES
-(1, 'Lizaaa', 'Strappini 123', 41906554, 'lizastrappini99@gmail.com', 'scrypt:32768:8:1$TkuXgqifo8KOANqD$031a85fab581addce10403ecdb7e3e95ce85bba8e240d3965ab1ac8f0f10a0c672a21f1d69a67145598f37651d81a63e2e79ec0081364eace5d2cb2ce1f9f6bb', 'lizast99', 1, '1', 1, '3 de febrero 1026', '3471630099', 2, NULL, 0, NULL, 1, 1, '2025-09-13 00:00:00', '7', 1),
-(3, 'Lara', 'Del Coro', 43124684, 'laradelcoro01@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'lara123', 1, '1', 1, 'Maipu 123', '123456789', 2, 'dD1j0uw--OleIL8p2lGGYqosUTXElD5pbm7jLFGxWS4', 1, '2025-07-13 01:55:05', 1, 1, NULL, '2', 2),
+(1, 'Lizaaa', 'Strappini 123', 41906554, 'lizastrappini99@gmail.com', 'scrypt:32768:8:1$4sF0qtQ1R8WfOArE$4b91445b4974ca88e3ca2a6d175f505154d1450a8625b3e5e665e20f8dba3cd4129efbdea4f34780f11cff653b3cf7e9cd0f90cca53db409739447c049dfabe6', 'lizast99', 1, '1', 1, '3 de febrero 1026', '3471630099', 1, NULL, 0, NULL, 0, 0, '2025-09-13 00:00:00', NULL, 1),
+(3, 'Lara', 'Del Coro', 43124684, 'laradelcoro01@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'lara123', 1, '1', 1, 'Maipu 123', '123456789', 2, 'dD1j0uw--OleIL8p2lGGYqosUTXElD5pbm7jLFGxWS4', 1, '2025-07-13 01:55:05', 1, 1, NULL, '1', 2),
 (4, 'Mora', 'Kopech', 43491828, 'morakopech@gmail.com', 'scrypt:32768:8:1$skZXySNsJhr5jHAC$bb2e25039ac655ac1ed634f698b2bdaa0b51c96559b843c57b696815f9921f5f6c32f8fb9577986774af5a667141ea62b125454076a3489bcfb41cde7e760094', 'morakopech', 2, '1', 1, 'zeballos 123', '123456789', 2, 'rCXn_mbipXl_q-7RgVjAh7qPy84Adm5ZMJXkVf3iCTI', 1, '2025-07-28 23:33:48', 1, 1, NULL, NULL, 3),
 (28, 'Juan', 'Martinez', 10, 'laradelcoro01+1@gmail.com', 'scrypt:32768:8:1$kTyKA58Cb5HJc1hk$a6bb7be56bb040a3a88651e755debb9b5875d9b558747177bd1979b2814cedcb5ab4f12e70e4dee8827ee4fce63b6bf2bc8fe8a2f2da47cd3f91988d9d415ce7', 'entrenador_10', 6, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 1),
 (30, 'Alan', 'Martinez', 1857295, 'laradelcoro01+3@gmail.com', 'scrypt:32768:8:1$yDBDGsdKWTzNHr3r$255eb0587dba694e454e56d9ff815c1f99ba3c3f9f61d1a470596e63f5786f9bf2c8d5714e2adff1e8605c21383f116b95efca19a611d9e44a62beb63614b5b4', 'entrenador_10', 1, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 2, 2, NULL, NULL, 1),
-(31, 'Lara', 'Admin', 999999, 'laradelcoro01+admin@gmail.com', 'scrypt:32768:8:1$KMso2fhm7yeUgRvx$cbadff5ca677227e08acf6900fc2e146e1683223b3d2acee3020cde7a83925f702e7103e9b5ec008fe95e47fc25ace165de1e473747cf707467677cf0fc94e6a', 'lara_43124684', 2, '2', 1, 'prueba', '3471607768', 1, NULL, 0, NULL, 0, 0, NULL, NULL, 1),
-(32, 'Lara', 'Deportista', 55555555, 'laradelcoro01+deportista@gmail.com', 'scrypt:32768:8:1$frTvzxvpmjIgfqJ6$3766aeb21ee22476392e2da0afb79f51c3b821e14b834f57ca87e751e42ce6b378f6ca3c384018b5e606dbcafd9277f509fefc27320d6e3ce0a59d3393e0d43f', 'entrenador_55555555', 6, '2', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 1, NULL, NULL, 1),
+(31, 'Lara', 'Admin', 999999, 'laradelcoro01+admin@gmail.com', 'scrypt:32768:8:1$KMso2fhm7yeUgRvx$cbadff5ca677227e08acf6900fc2e146e1683223b3d2acee3020cde7a83925f702e7103e9b5ec008fe95e47fc25ace165de1e473747cf707467677cf0fc94e6a', 'lara_43124684', 5, '12', 1, 'prueba', '3471607768', 1, NULL, 0, NULL, 0, 0, '2001-05-24 20:07:57', NULL, 1),
+(32, 'Lara', 'Deportista', 55555555, 'laradelcoro01+deportista@gmail.com', 'scrypt:32768:8:1$frTvzxvpmjIgfqJ6$3766aeb21ee22476392e2da0afb79f51c3b821e14b834f57ca87e751e42ce6b378f6ca3c384018b5e606dbcafd9277f509fefc27320d6e3ce0a59d3393e0d43f', 'entrenador_55555555', 6, '2', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 1, 1, NULL, NULL, 1),
 (33, 'Lara', 'Entrenador', 7777777, 'laradelcoro01+entrenador@gmail.com', 'scrypt:32768:8:1$hGsGyWQJeiTKgDXn$d6633826fb5558962bae6d6a3a927cd7f00986b84af880d6c4c68b8171574cda1ece271ac2ce3e18f0615e1646ba766e6289299667b0cdda78bcf82b09cff5f7', 'entrenador_7777777', 4, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 3),
-(36, 'Alan', 'Martinez', 101, 'laradelcoro01+33@gmail.com', 'scrypt:32768:8:1$bQILCuCPYRxNCWvj$a0f5934e33ce9df6f30e3e0b84b636bac3e86383d95f25420093e3147d19b926e9061bc75b2510db62ed1fa3bc7a1a89a42b311c84859c12f486b76169ba9849', 'entrenador_101', 3, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, NULL, NULL, 3),
+(36, 'Alan', 'Martinez', 10151857, 'laradelcoro01+33@gmail.com', 'scrypt:32768:8:1$bQILCuCPYRxNCWvj$a0f5934e33ce9df6f30e3e0b84b636bac3e86383d95f25420093e3147d19b926e9061bc75b2510db62ed1fa3bc7a1a89a42b311c84859c12f486b76169ba9849', 'entrenador_101', 1, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, '2025-09-10 00:00:00', NULL, 3),
 (37, 'Julian', 'Carlos', 105, 'laradelcoro01+13@gmail.com', 'scrypt:32768:8:1$ghmtx6HR4ccDTbP7$39bc3d06be038c51488ca2a3ce3ad5f24501d64cd190d9f386ceff51be6c4c29133ee73c34907fefa08f7e68c13b20e2fbefeffc49c13f08496b331c53fe70ca', 'entrenador_105', 3, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, 0, 0, NULL, NULL, 3),
-(39, 'Alan', 'Martinez', 1088, 'laradelcoro01+339@gmail.com', 'scrypt:32768:8:1$qDRTVFEVm6aYYStv$fe63ee97092023cf4df2ce9aa0bbdf48877d56b4b5a50e4c4a0750bb3a6acbecea15422c4d73e5e6d2ff8341e72ecb027ac37d43e28dc9be425e52f69ef75be7', 'entrenador_1088', 2, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, NULL, NULL, 3);
+(39, 'Alan', 'Martinez', 10884578, 'laradelcoro01+339@gmail.com', 'scrypt:32768:8:1$qDRTVFEVm6aYYStv$fe63ee97092023cf4df2ce9aa0bbdf48877d56b4b5a50e4c4a0750bb3a6acbecea15422c4d73e5e6d2ff8341e72ecb027ac37d43e28dc9be425e52f69ef75be7', 'entrenador_1088', 6, '1', 1, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 2, '2007-05-10 00:00:00', NULL, 3),
+(41, 'Entrenador', 'Prueba', 15935469, 'laradelcoro01+prueba@gmail.com', 'scrypt:32768:8:1$jzsuHL2rBsk38pvL$201e047622e750f08b2a84623d75de46be58b0c09efd440187cd329a0a74eeaed8e0d72caaa2ef260f2701e24c5f623ed3df3a740efaad0d6140302d73f7606b', 'entrenador_15935469', 4, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, NULL, NULL, NULL, NULL, 3),
+(42, 'Entrenador', 'Prueba', 14265356, 'laradelcoro01+prueba2@gmail.com', 'scrypt:32768:8:1$gWi1nPmjtbDa0351$a08e3a4245c9a5ee5c8aad7e82ed37220b4c687fcb3312cbfba26093375e2b345c75249e3fee801cc4426e78ee445b47da5ca9f10331922564f7da7109a1762b', 'entrenador_14265356', 3, '1', 1, 'N/A', '03471607768', 3, NULL, 0, NULL, NULL, NULL, NULL, NULL, 3),
+(46, 'Deportistas', 'Prueba', 45284957, 'laradelcoro01+prueba3@gmail.com', 'scrypt:32768:8:1$nBrMPnn89DEj1DnH$02785fbfaf4010923e673812181b226eabb23a8efff4276f2211487294f00de9f681e2b8b5dc64401a0412fe97793f345fb10c869a6fc8915066bf9f0ab462f5', 'Deportistas_45284957', 7, '1', 2, 'N/A', '03471607768', 2, NULL, 0, NULL, 1, 1, '2001-10-26 00:00:00', '3', 1);
 
 --
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `Calendario`
+-- Indexes for table `Calendario`
 --
 ALTER TABLE `Calendario`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `Contacto`
+-- Indexes for table `Contacto`
 --
 ALTER TABLE `Contacto`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `EstadisticaPorPartido`
+-- Indexes for table `EstadisticaPorPartido`
 --
 ALTER TABLE `EstadisticaPorPartido`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `EstadisticaUsuarioPartido`
+-- Indexes for table `EstadisticaUsuarioPartido`
 --
 ALTER TABLE `EstadisticaUsuarioPartido`
   ADD PRIMARY KEY (`Id`),
@@ -494,25 +481,31 @@ ALTER TABLE `EstadisticaUsuarioPartido`
   ADD KEY `IdUsuario` (`IdUsuario`);
 
 --
--- Indices de la tabla `Evento`
+-- Indexes for table `Evento`
 --
 ALTER TABLE `Evento`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `Notificacion`
+-- Indexes for table `faq`
+--
+ALTER TABLE `faq`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `Notificacion`
 --
 ALTER TABLE `Notificacion`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `Pago`
+-- Indexes for table `Pago`
 --
 ALTER TABLE `Pago`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `Usuario`
+-- Indexes for table `Usuario`
 --
 ALTER TABLE `Usuario`
   ADD PRIMARY KEY (`Id`),
@@ -521,56 +514,56 @@ ALTER TABLE `Usuario`
   ADD UNIQUE KEY `Email` (`Email`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `Calendario`
+-- AUTO_INCREMENT for table `Calendario`
 --
 ALTER TABLE `Calendario`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `Contacto`
+-- AUTO_INCREMENT for table `Contacto`
 --
 ALTER TABLE `Contacto`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de la tabla `EstadisticaPorPartido`
+-- AUTO_INCREMENT for table `EstadisticaPorPartido`
 --
 ALTER TABLE `EstadisticaPorPartido`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT de la tabla `EstadisticaUsuarioPartido`
+-- AUTO_INCREMENT for table `EstadisticaUsuarioPartido`
 --
 ALTER TABLE `EstadisticaUsuarioPartido`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT de la tabla `Evento`
+-- AUTO_INCREMENT for table `Evento`
 --
 ALTER TABLE `Evento`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT de la tabla `Notificacion`
+-- AUTO_INCREMENT for table `Notificacion`
 --
 ALTER TABLE `Notificacion`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT de la tabla `Pago`
+-- AUTO_INCREMENT for table `Pago`
 --
 ALTER TABLE `Pago`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT de la tabla `Usuario`
+-- AUTO_INCREMENT for table `Usuario`
 --
 ALTER TABLE `Usuario`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

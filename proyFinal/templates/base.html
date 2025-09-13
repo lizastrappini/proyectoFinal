@@ -219,6 +219,16 @@
                 </li>
                 {% endif %}
 
+                 <!-- Mis Pagos -->
+                {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
+                <li class="menu-item">
+                  <a href="/mipago" class="menu-link ">
+                    <i class="menu-icon tf-icons ri-bank-card-2-line"></i>
+                    <div data-i18n="Mis Pagos">Mis Pagos</div>
+                  </a>
+                </li>
+                {% endif %}
+
                 <!-- Deportistas -->
                 {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
                 <li class="menu-item">
@@ -228,9 +238,7 @@
                   </a>
                 </li>
                 {% endif %}
-
-
-                <!-- Entrenadores -->
+                
                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
                   <li class="menu-item">
                     <a href="/entrenador" class="menu-link ">
@@ -239,8 +247,6 @@
                     </a>
                   </li>
                 {% endif %}
-
-                 <!-- Entrenadores -->
                  
                   <li class="menu-item">
                     <a href="/notificacion" class="menu-link ">
@@ -254,12 +260,15 @@
                 <li class="menu-header mt-2">
                   <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección para entrenadores</span>
                 </li>
+                 {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
                 <li class="menu-item">
                   <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="menu-link">
                     <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
                     <div data-i18n="Cargar Estadisticas">Cargar Estadisticas</div>
                   </a>
                 </li>
+                {% endif %}
+
                 <li class="menu-item">
                   <a href="/estadisticas/ver" class="menu-link">
                     <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>

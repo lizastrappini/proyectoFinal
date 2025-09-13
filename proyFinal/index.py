@@ -17,6 +17,7 @@ from src.models.usuario import Usuario
 from src.routes.usuarioRoutes import usuario_bp
 from src.routes.calendarioRoutes import calendario_bp
 from src.routes.pagoRoutes import pago_bp
+from src.routes.misPagosRoutes import mispago_bp
 from src.routes.inicioRoutes import inicio_bp
 from src.routes.entrenadorRoutes import entrenador_bp
 from src.routes.deportistaRoutes import deportista_bp
@@ -37,6 +38,7 @@ db.init_app(app)
 app.register_blueprint(usuario_bp)
 app.register_blueprint(calendario_bp)
 app.register_blueprint(pago_bp, url_prefix='/pago')
+app.register_blueprint(mispago_bp, url_prefix='/mipago')
 app.register_blueprint(inicio_bp)
 app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')

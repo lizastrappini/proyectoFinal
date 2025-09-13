@@ -1,0 +1,286 @@
+  {% extends "base.html" %}
+
+  {% block content %}
+
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <!-- Basic Bootstrap Table -->
+      <div class="card">
+        <h2 class="card-header">Mis Cuotas</h2>
+        <div class="card-body">
+
+        <div class="d-flex row mb-5 gx-5">
+          <div class="col d-flex justify-content-end">
+            <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
+              Limpiar 
+            </button>
+          </div>
+          <div class="col-12 col-md-2">
+            <select id="estadoFiltro" class="select2 form-select" data-placeholder="Estado" >
+              <option value=""></option>
+              {% for estado in estados %}
+                  <option value="{{ estado.value }}">{{ estado.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <div class="form-floating mb-0">
+            <input type="date" class="form-control" id="fechaDesdeFiltro" placeholder="Fecha Desde">
+            <label for="fechaDesdeFiltro">Fecha Desde</label>
+            </div>
+            <!-- <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde"> -->
+          </div>
+          <div class="col-12 col-md-2">
+            <div class="form-floating mb-0">
+            <input type="date" class="form-control" id="fechaHastaFiltro" placeholder="Fecha Hasta">
+            <label for="fechaHastaFiltro">Fecha Hasta</label>
+            </div>
+            <!-- <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta"> -->
+          </div>
+        </div>
+          <div class="table-responsive text-nowrap">
+            <table id="tablaPagos" class="table">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Fecha Pago</th>
+                  <th>Fecha Vencimiento</th>
+                  <th>Importe</th> 
+                  <th>Estado</th> 
+                  <th>Comprobante</th> 
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+
+
+                <div class="modal fade" id="modalComprobante" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                    <div class="modal-content">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-body p-0">
+                        <div class="text-center mb-6">
+                          <h4 class="mb-2" id="tituloAdd">Subir comprobante</h4>
+                          <p class="text-muted mb-0">Subi el comprobante de pago</p>
+                          
+                        </div>
+                        <form id="formComprobante">
+                          <div class="mb-4">
+                              <label for="archivoExcel" class="form-label">Seleccionar archivo</label>
+                              <input 
+                                type="file" 
+                                class="form-control form-control-sm" 
+                                id="fileComprobante" 
+                                name="fileComprobante" 
+                                accept= ".pdf,.jpg,.jpeg,.png" 
+                                required>
+                                <small class="text-muted">Solo se aceptan archivos .pdf,.jpg,.jpeg,.png </small>
+                            </div>
+                          
+                          <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary" id="btnImportar">Subir</button>
+                            <button
+                              type="reset"
+                              class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              aria-label="Close">
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+  
+
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+
+  {% block scripts %}
+  <script>
+
+    let tabla = null;
+    let pagoIdSeleccionado = null;
+
+    function filtrar() {
+      const estado = $('#estadoFiltro').val();
+      const fechaDesde = $('#fechaDesdeFiltro').val();
+      const fechaHasta = $('#fechaHastaFiltro').val();
+      
+      const params = new URLSearchParams();
+      if (estado) params.append('estado', estado);
+      if (fechaDesde) params.append('fechaDesde', fechaDesde);
+      if (fechaHasta) params.append('fechaHasta', fechaHasta);
+
+      const url = `/mipago/filtrar?${params.toString()}`;
+
+
+      if (tabla) {
+        tabla.ajax.url(url).load();
+      } else {
+        tabla = $('#tablaPagos').DataTable({
+          ajax: {
+            url: url,
+            dataSrc: 'data'
+          },
+          columns: [
+          { data: 'id' },
+          { data: 'fechaPago' },
+          { data: 'fechaVencimiento' },
+          {
+          data: 'importe',
+          render: function (data) {
+            return `$ ${parseFloat(data).toLocaleString('es-AR')}`;
+            }
+          },
+          {
+            data: 'estado',
+            render: function (data, type, row) {
+              let badgeClass = '';
+
+              if (data === 'Pago') {
+                badgeClass = 'bg-label-success';
+              } else if (data === 'Pendiente') {
+                badgeClass = 'bg-label-warning';
+              } else if (data === 'NoPago') {
+                badgeClass = 'bg-label-danger';
+              } else {
+                badgeClass = 'bg-label-secondary';
+              }
+
+              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
+            }
+          },
+          {
+            data: 'comprobante',
+            render: function(data, type, row) {
+              return data === 'Cargado' ? '<span class="badge rounded-pill bg-label-success">Cargado</span>' : 'No Cargado';
+            }
+          },
+
+        
+          
+          {
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row, meta) {
+           
+            return `
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ri-more-2-line"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="subirComprobante(${row.id})">
+                    <i class="ri-upload-line me-1"></i> Subir Comprobante
+                  </a>                 
+                </div>
+              </div>
+            `;
+          }
+
+          }
+          ],
+          paging: false,
+          info: false,
+          searching: false,
+          ordering: true,
+          dom: 'frtip',  // <-- importante para mostrar botones
+          buttons: [
+            {
+              extend: 'excelHtml5',
+              text: 'Exportar a Excel',
+              title: 'Pagos',
+              className: 'buttons-excel',
+              exportOptions: {
+                columns: ':not(:last-child)' // Excluir columna acciones
+              }
+            }
+          ],
+          initComplete: function () {
+            $('#tablaPagos')
+              .removeClass('dataTable no-footer stripe hover')
+              .addClass('table');
+          }
+          
+        }); 
+      }
+    }
+   
+   $(document).ready(function () {
+      
+      filtrar(); // carga inicial
+    
+      $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').on('change', function () {
+      filtrar(); // recarga con nuevos filtros
+    });
+    });
+
+
+
+function subirComprobante(idPago) {
+  pagoIdSeleccionado = idPago;
+  const modal = new bootstrap.Modal(document.getElementById("modalComprobante"));
+  modal.show();
+}
+
+$("#formComprobante").on("submit", function(e) {
+  e.preventDefault();
+
+  const fileInput = $("#fileComprobante")[0];
+  if (fileInput.files.length === 0) {
+    Swal.fire("Error", "Debe seleccionar un archivo", "error");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  $.ajax({
+    url: `/mipago/subir_comprobante/${pagoIdSeleccionado}`,
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function(resp) {
+      if (resp.success) {
+        Swal.fire("Éxito", "Comprobante subido correctamente", "success");
+        $("#modalComprobante").modal("hide");
+        $("#tablaPagos").DataTable().ajax.reload();
+      } else {
+        Swal.fire("Error", resp.error || "No se pudo subir", "error");
+      }
+    },
+    error: function(xhr) {
+      Swal.fire("Error", xhr.responseJSON?.error || "Error en el servidor", "error");
+    }
+  });
+});
+
+  function limpiar() {
+  $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').val('').trigger('change');
+  filtrar(); // recargar la tabla sin filtros 
+  }
+  </script>
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+  <!-- DataTables y Buttons JS -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  {% endblock %}
+

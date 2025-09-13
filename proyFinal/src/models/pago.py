@@ -8,6 +8,8 @@ class Pago(db.Model):
     FechaVencimiento = db.Column(db.DateTime)
     FechaPago = db.Column(db.DateTime)
     Importe = db.Column(db.Numeric(16,2))
+    Comprobante = db.Column(db.String(255), nullable=True)
+
     
 
     IdUsuario = db.Column(db.Integer, db.ForeignKey('Usuario.Id'), nullable=False)
