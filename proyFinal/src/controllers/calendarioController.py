@@ -4,7 +4,7 @@ import src.utils.enums.generalEnum  as generalEnum
 from src import db
 from src.models.evento import Evento
 from datetime import datetime
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 
 def crearEvento(nuevoEvento):
     
@@ -13,17 +13,18 @@ def crearEvento(nuevoEvento):
     return nuevoEvento
 
 def eliminarEvento(evento):
-    db.session.remove(evento)
-    db.session.commit()
+    db.session.delete(evento)   
+    db.session.commit() 
     
 def editarEvento(evento):
      db.session.commit()
 
-def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
+from sqlalchemy import or_, and_
 
-    if tipos == []:
+def obtenerEventos(inicio, fin, tipos, mi_categoria=None):
+    if not tipos:
         return []
-    
+
     filtros = [
         Evento.FechaInicio <= fin,
         Evento.FechaFin >= inicio
@@ -33,33 +34,49 @@ def obtenerEventos(inicio,fin,tipos,mi_categoria=None):
         filtros.append(Evento.IdTipoEvento.in_(tipos))
 
     if mi_categoria == "1" or mi_categoria is True:
-        filtros.append(
-            or_(
-                Evento.IdCategoria == current_user.IdCategoria,
-                Evento.IdCategoria == None  # incluye los sin categoría
-            )
+        # Parsear categorías extra
+        categorias_extra = []
+        if getattr(current_user, "categoriaExtra", None):
+            categorias_extra = [
+                int(x.strip()) for x in current_user.categoriaExtra.split(",") if x.strip().isdigit()
+            ]
+
+        # Condición de categoría válida (IdCategoria del user o en extras)
+        filtro_categoria = or_(
+            Evento.IdCategoria == current_user.IdCategoria,
+            Evento.IdCategoria.in_(categorias_extra) if categorias_extra else False
         )
 
+        # Filtro completo: rama + división + (categoría válida)
+        filtro_final = and_(
+            Evento.IdRama == current_user.IdRama,
+            Evento.IdDivision == current_user.IdDivision,
+            filtro_categoria
+        )
+
+        filtros.append(filtro_final)
+
     eventos = Evento.query.filter(*filtros).all()
+
     eventosTodos = [
         {
             "id": evento.Id,
             "title": evento.Titulo,
             "start": evento.FechaInicio.isoformat(),
-            "end": evento.FechaFin.isoformat(),
+            "end": evento.FechaFin.isoformat() if evento.FechaFin else None,
             "allDay": evento.TodoElDia,
             "extendedProps": {
                 "description": evento.Descripcion,
                 "calendar": str(evento.IdTipoEvento),
-                "categoria": str(evento.IdCategoria),
-                "contrincante": str(evento.IdContrincante),
-                "localidad": str(evento.IdLocalidad),
-                
-                
-
+                "categoria": str(evento.IdCategoria) if evento.IdCategoria else None,
+                "rama": str(evento.IdRama) if evento.IdRama else None,
+                "division": str(evento.IdDivision) if evento.IdDivision else None,
+                "contrincante": str(evento.IdContrincante) if evento.IdContrincante else None,
+                "localidad": str(evento.IdLocalidad) if evento.IdLocalidad else None,
             }
         } for evento in eventos
     ]
+
     return eventosTodos
 
 def getPartidosByCategoria(inicio, categoria, rama, division):

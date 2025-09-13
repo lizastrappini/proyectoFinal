@@ -304,9 +304,7 @@
                                     <h6 class="mb-0 me-auto">Notificaciones</h6>
                                     <div class="d-flex align-items-center">
                                       <span class="badge rounded-pill bg-label-primary fs-xsmall me-2">{{ notificaciones|length }} nuevas</span>
-                                      <a href="javascript:void(0)" class="btn btn-text-secondary rounded-pill btn-icon dropdown-notifications-all waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Marcar todo como leído">
-                                        <i class="ri-mail-open-line text-heading ri-20px"></i>
-                                      </a>
+
                                     </div>
                                   </div>
                                 </li>
@@ -345,7 +343,7 @@
                                     {% endfor %}
                                   </ul>
                                 </li>
-
+                               {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
                                 <!-- Footer -->
                                 <li class="border-top">
                                   <div class="d-grid p-4">
@@ -354,6 +352,7 @@
                                     </a>
                                   </div>
                                 </li>
+                                {% endif %}
                               </ul>
                             </li>
 
@@ -418,7 +417,7 @@
                         transform: translateX(-50%);
                         z-index: 1050;  
                         width: 90%;
-                        max-width: 200px;
+                        max-width: 400px;
                         text-align: center;
                     ">
                     {% with mensajes = get_flashed_messages(with_categories=true) %}

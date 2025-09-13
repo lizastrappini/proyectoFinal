@@ -5,6 +5,14 @@ if (typeof isRtl !== 'undefined' && isRtl) {
   direction = 'rtl';
 }
 
+function parseDDMMYYYY_HHmm(str) {
+  if (!str) return null;
+  const m = str.match(/^(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?$/);
+  if (!m) return null;
+  const [, dd, mm, yyyy, HH = '00', II = '00'] = m;
+  return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(HH), Number(II));
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   
   (function () {
@@ -14,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
       appOverlay = document.querySelector('.app-overlay'),
        tipoEventoColor = {
              "1": "primary",
-  "2": "success",
-  "3": "danger",
-  "4": "warning",
-  "5": "info",
-  "6": "recaudacion",
-  "7": "miCategoria"
+            "2": "success",
+            "3": "danger",
+            "4": "warning",
+            "5": "info",
+            "6": "recaudacion",
+            "7": "miCategoria"
           },
       offcanvasTitle = document.querySelector('.offcanvas-title'),
       btnToggleSidebar = document.querySelector('.btn-toggle-sidebar'),
@@ -32,7 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
       localidad = document.querySelector('#localidad'),
       eventStartDate = document.querySelector('#eventStartDate'),
       eventEndDate = document.querySelector('#eventEndDate'),
-          
+
+      eventEndDateMasivo = document.querySelector('#eventEndDateMasivo'),
+      eventStartDateMasivo = document.querySelector('#eventStartDateMasivo'),
+      horaInicioMasivo = document.querySelector('#horaInicioMasivo'),
+
       contrincante = document.querySelector('#contrincante-wrapper'),
       rama = document.querySelector('#rama'),
       division = document.querySelector('#division'),
@@ -57,7 +69,10 @@ document.addEventListener('DOMContentLoaded', function () {
       var start = eventStartDate.flatpickr({
         locale: flatpickr.l10ns.es,
         enableTime: true,
-        altFormat: 'Y-m-dTH:i:S',
+        altInput: true,            // 👈 agrega un input visible
+        altFormat: "d-m-Y H:i",    // 👈 lo que ve el usuario
+        dateFormat: "Y-m-d H:i:S",  // 👈 lo que se guarda/envía
+        minDate: "today",
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -71,7 +86,10 @@ document.addEventListener('DOMContentLoaded', function () {
       var end = eventEndDate.flatpickr({
         locale: flatpickr.l10ns.es,
         enableTime: true,
-        altFormat: 'Y-m-dTH:i:S',
+        altInput: true,            // 👈 agrega un input visible
+        altFormat: "d-m-Y H:i",    // 👈 lo que ve el usuario
+        dateFormat: "Y-m-d H:i:S",   // 👈 lo que se guarda/envía
+        minDate: "today",
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -79,6 +97,75 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
+
+    if (eventStartDateMasivo) {
+      var start = eventStartDateMasivo.flatpickr({
+        locale: flatpickr.l10ns.es,
+        altInput: true,            // 👈 agrega un input visible
+        altFormat: "d-m-Y ",    // 👈 lo que ve el usuario
+        dateFormat: "Y-m-d ",   // 👈 lo que se guarda/envía
+        minDate: "today",  
+        onReady: function (selectedDates, dateStr, instance) {
+          if (instance.isMobile) {
+            instance.mobileInput.setAttribute('step', null);
+          }
+        }
+      });
+    }
+
+    if (eventEndDateMasivo) {
+      var end = eventEndDateMasivo.flatpickr({
+        locale: flatpickr.l10ns.es,
+        altInput: true,            // 👈 agrega un input visible
+        altFormat: "d-m-Y ",    // 👈 lo que ve el usuario
+        dateFormat: "Y-m-d ",   // 👈 lo que se guarda/envía
+        minDate: "today",   
+        onReady: function (selectedDates, dateStr, instance) {
+          if (instance.isMobile) {
+            instance.mobileInput.setAttribute('step', null);
+          }
+        }
+      });
+    }
+
+
+if (horaInicioMasivo) {
+  var start = horaInicioMasivo.flatpickr({
+    locale: flatpickr.l10ns.es,
+    enableTime: true,
+    noCalendar: true,         // 👈 solo muestra horas/minutos
+    time_24hr: true,          // 👈 formato 24h
+    altInput: true,           
+    altFormat: "H:i",         // 👈 lo que ve el usuario
+    dateFormat: "H:i",        // 👈 lo que se envía al backend
+    onReady: function (selectedDates, dateStr, instance) {
+      if (instance.isMobile) {
+        instance.mobileInput.setAttribute('step', null);
+      }
+    }
+  });
+}
+
+  const btnNuevoEventoMasivo = document.getElementById('btnNuevoEventoMasivo');
+
+  if (btnNuevoEventoMasivo) {
+    btnNuevoEventoMasivo.addEventListener('click', e => {
+      // Limpiar valores del form
+      resetValues();
+      bsAddEventSidebar.show();
+
+      // Personalizar modal
+      if (offcanvasTitle) {
+        offcanvasTitle.innerHTML = 'Agregar Evento Masivo';
+      }
+      if (btnSubmit) {
+        btnSubmit.innerHTML = 'Agregar';
+        btnSubmit.classList.remove('btn-update-event', 'btn-add-event');
+        btnSubmit.classList.add('btn-add-event-masivo');
+      }
+      if (btnDeleteEvent) btnDeleteEvent.classList.add('d-none');
+    });
+}
 
     // Inline sidebar calendar (flatpicker)
     if (inlineCalendar) {
@@ -89,11 +176,9 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-function mostrarCamposSegunTipo() {
-  const tipo = tipoEvento.value;
-console.log("tipoEvento:", tipoEvento);
+function mostrarCamposSegunTipo(forceTipo = null, ocultarTipo = false) {
+  const tipo = String(forceTipo ?? tipoEvento.value ?? '');
 
-  // Definimos los wrappers directos por id
   const wrappers = {
     titulo: document.getElementById('titulo-wrapper'),
     tipoEvento: document.getElementById('tipoEvento-wrapper'),
@@ -111,48 +196,46 @@ console.log("tipoEvento:", tipoEvento);
   // Ocultar todos
   Object.values(wrappers).forEach(w => { if (w) w.style.display = 'none'; });
 
-  if (wrappers.tipoEvento) wrappers.tipoEvento.style.display = 'block';
+  // Mostrar el selector de tipo solo si no estamos en edición
+  if (!ocultarTipo && wrappers.tipoEvento) {
+    wrappers.tipoEvento.style.display = 'block';
+  }
 
-  // Mostrar según tipo
   switch (tipo) {
     case '1': // Entrenamiento
-      [wrappers.tipoEvento, wrappers.titulo, wrappers.eventStartDate]
+      [wrappers.eventStartDate, wrappers.categoria, wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
     case '2': // Partido
-      [wrappers.tipoEvento, wrappers.categoria, wrappers.eventStartDate,
+      [wrappers.categoria, wrappers.eventStartDate,
        wrappers.localidad, wrappers.contrincante, wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
     case '3': // Vacaciones
-      [wrappers.tipoEvento, wrappers.titulo,
-       wrappers.eventStartDate, wrappers.eventEndDate]
+      [wrappers.titulo, wrappers.eventStartDate, wrappers.eventEndDate]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
-    case '4':
-      [wrappers.tipoEvento, wrappers.titulo,
-       wrappers.eventStartDate, wrappers.categoria, wrappers.rama, wrappers.division]
-        .forEach(w => w && (w.style.display = 'block'));
-      break;
-    case '5':
-       [wrappers.tipoEvento, wrappers.titulo,
-       wrappers.eventStartDate, wrappers.eventEndDate, wrappers.categoria, wrappers.rama, wrappers.division, wrappers.localidad]
+    case '4': // Torneo
+      [wrappers.titulo, wrappers.eventStartDate, wrappers.categoria, wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
-    case '6': // Suspensión, Torneo, Recaudación
-      [wrappers.tipoEvento, wrappers.titulo, wrappers.eventStartDate,
-       wrappers.categoria, wrappers.localidad, wrappers.descripcion]
+    case '5': // Recaudación
+      [wrappers.titulo, wrappers.eventStartDate, wrappers.eventEndDate,
+       wrappers.categoria, wrappers.rama, wrappers.division, wrappers.localidad]
         .forEach(w => w && (w.style.display = 'block'));
       break;
-    default:
-    if (wrappers.tipoEvento) wrappers.tipoEvento.style.display = 'block';
-    break;
+
+    case '6': // Suspensión
+      [wrappers.titulo, wrappers.eventStartDate, wrappers.categoria, wrappers.localidad, wrappers.descripcion]
+        .forEach(w => w && (w.style.display = 'block'));
+      break;
   }
 }
+
 
     // Event listener
     if (tipoEvento) {
@@ -233,40 +316,73 @@ if (eventDetails) {
       return;
   }
 
-  // ------- MODO EDICIÓN (Admin/Entrenador) -------
-  if (offcanvasTitle) offcanvasTitle.innerHTML = 'Actualizar Evento';
-  if (btnSubmit) {
-    btnSubmit.innerHTML = 'Actualizar';
-    btnSubmit.classList.add('btn-update-event');
-    btnSubmit.classList.remove('btn-add-event', 'd-none');
-  }
-  if (btnDeleteEvent) btnDeleteEvent.classList.remove('d-none');
-
-  // oculto detalle si quedó visible
-  if (eventDetails) {
-    eventDetails.classList.add('d-none');
-    eventDetails.innerHTML = '';
-  }
-  const form = document.getElementById('eventForm');
-  if (form) form.classList.remove('d-none');
-
-  // Completar los campos SOLO si existen (rol 1/3)
-  if (eventTitle) eventTitle.value = eventToUpdate.title || '';
-  if (localidad) localidad.value = eventToUpdate.localidad || '';
-  if (categoria) categoria.value = eventToUpdate.categoria || '';
-  if (tipoEvento) tipoEvento.value = eventToUpdate.extendedProps?.tipoEvento || eventToUpdate.extendedProps?.calendar || '';
-
-  if (typeof start !== 'undefined' && start && eventToUpdate.start) {
-    start.setDate(eventToUpdate.start, true, 'Y-m-d');
-  }
-  if (allDaySwitch) allDaySwitch.checked = !!eventToUpdate.allDay;
-  if (typeof end !== 'undefined' && end) {
-    end.setDate(eventToUpdate.end || eventToUpdate.start, true, 'Y-m-d');
-  }
-  if (eventDescription && typeof eventToUpdate.extendedProps?.description !== 'undefined') {
-    eventDescription.value = eventToUpdate.extendedProps.description || '';
-  }
+// ------- MODO EDICIÓN (Admin/Entrenador) -------
+if (offcanvasTitle) offcanvasTitle.innerHTML = 'Actualizar Evento';
+if (btnSubmit) {
+  btnSubmit.innerHTML = 'Actualizar';
+  btnSubmit.classList.add('btn-update-event');
+  btnSubmit.classList.remove('btn-add-event', 'd-none');
 }
+if (btnDeleteEvent) btnDeleteEvent.classList.remove('d-none');
+
+const form = document.getElementById('eventForm');
+if (form) {
+  form.classList.remove('d-none');
+  form.action = `/updateEvento/${eventToUpdate.id}`; // 👈 POST al enviar
+}
+const inputId = document.getElementById('eventoId');
+if (inputId) inputId.value = eventToUpdate.id;
+
+// 👇 GET para obtener datos
+fetch(`/evento/${eventToUpdate.id}`)
+  .then(res => res.json())
+  .then(data => {
+    // textos
+    if (eventTitle) eventTitle.value = data.titulo || '';
+    if (eventDescription) eventDescription.value = data.descripcion || '';
+
+    // selects (IDs)
+    if (categoria) $(categoria).val(data.IdCategoria || '').trigger('change');
+    if (rama)      $(rama).val(data.IdRama || '').trigger('change');
+    if (division)  $(division).val(data.IdDivision || '').trigger('change');
+    if (localidad) $(localidad).val(data.IdLocalidad || '').trigger('change');
+    if (contrincante) $(contrincante).val(data.IdContrincante || '').trigger('change');
+
+    // tipo para decidir wrappers (ocultando el select de tipo)
+    const tipoStr = String(data.tipo || '');
+    if (tipoEvento) tipoEvento.value = tipoStr;
+    mostrarCamposSegunTipo(tipoStr, true);
+
+    // fechas (ISO → Date)
+    if (eventStartDate && data.fechaInicioFormat) {
+      flatpickr(eventStartDate, {
+        locale: flatpickr.l10ns.es,
+        enableTime: true,
+        altInput: true,
+        altFormat: "d-m-Y H:i",
+        dateFormat: "Y-m-d H:i:S",
+        defaultDate: new Date(data.fechaInicioFormat)
+      });
+    }
+    if (eventEndDate && data.fechaFinFormat) {
+      flatpickr(eventEndDate, {
+        locale: flatpickr.l10ns.es,
+        enableTime: true,
+        altInput: true,
+        altFormat: "d-m-Y H:i",
+        dateFormat: "Y-m-d H:i:S",
+        defaultDate: new Date(data.fechaFinFormat)
+      });
+    }
+
+    if (allDaySwitch) allDaySwitch.checked = !!data.todoElDia;
+})
+.catch(() => {
+  // fallback: mostrar el selector si algo falla
+  mostrarCamposSegunTipo('', false);
+});
+
+} // 👈 cierra el bloque eventClick para rol 1/3
 
     // Modify sidebar toggler
     function modifyToggler() {
@@ -313,6 +429,41 @@ if (allBox && allBox.checked) {
   return selected;
 }
 
+const deleteBtn = document.getElementById('deleteEventBtn');
+if (deleteBtn) {
+  deleteBtn.onclick = () => {
+    const id = document.getElementById('eventoId').value;
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará el evento permanentemente.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+      didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/eliminarEvento/${id}`, {
+          method: "POST"  // o DELETE si tu backend lo soporta
+        })
+        .then(() => {
+          Swal.fire("Eliminado", "El evento fue eliminado correctamente.", "success");
+          calendar.refetchEvents();
+          bsAddEventSidebar.hide();
+        })
+        .catch(() => {
+          Swal.fire("Error", "No se pudo eliminar el evento.", "error");
+        });
+      }
+    });
+  };
+}
     // --------------------------------------------------------------------------------------------------
     // AXIOS: fetchEvents
     // * This will be called by fullCalendar to fetch events. Also this can be used to refetch events.
@@ -416,13 +567,25 @@ if (allBox && allBox.checked) {
             }
           }
         },
+        height: '100%',        // ocupa todo el espacio de su columna
+      contentHeight: 'auto', // se adapta al alto disponible
+      handleWindowResize: true,
        displayEventTime: false,
        buttonText: {
         dayGridMonth: 'Mes',
-        timeGridWeek: 'Semana',
-        timeGridDay: 'Día',
         listMonth: 'Lista'
       },
+      viewDidMount: function(info) {
+    if (info.view.type === 'listMonth') {
+      // Limitar alto solo para listMonth
+      info.el.querySelector('.fc-scroller').style.maxHeight = '600px';
+      info.el.querySelector('.fc-scroller').style.overflowY = 'auto';
+    } else {
+      // En otras vistas lo dejamos normal
+      info.el.querySelector('.fc-scroller').style.maxHeight = '';
+      info.el.querySelector('.fc-scroller').style.overflowY = '';
+    }
+  },
       eventColor: null,
 eventBackgroundColor: null,
 eventBorderColor: null,
@@ -453,7 +616,7 @@ eventBorderColor: null,
       headerToolbar: {
         locale: 'es',
         start: 'sidebarToggle, prev,next, title',
-        end: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        end: 'dayGridMonth,listMonth'
       },
       direction: direction,
       initialDate: new Date(),

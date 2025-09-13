@@ -3,8 +3,9 @@ import src.controllers.usuarioController as usuarioController
 import src.controllers.calendarioController as calendarioController
 from flask import session
 import src.utils.enums.generalEnum  as generalEnum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from src.models.evento import Evento
+from flask_login import current_user
 
 calendario_bp = Blueprint('calendario', __name__)
 
@@ -19,30 +20,42 @@ def index():
     
     tipoeventos.append({'value': 7, 'text': 'MiCategoria'})
 
-    categorias = [
-    {'value': cat.value, 'text': cat.name}
-    for cat in generalEnum.CategoriaEnum
-    ]
-    contrincantes = [
-    {'value': contrincante.value, 'text': contrincante.name}
-    for contrincante in generalEnum.ContrincantesEnum
-    ]
-    localidades = [
-    {'value': localidad.value, 'text': localidad.name}
-    for localidad in generalEnum.LocalidadEnum
-    ]
+    usuario = current_user
+    user = usuarioController.getUsuarioById(usuario.Id)
 
-    ramas = [
-    {'value': rama.value, 'text': rama.name}
-    for rama in generalEnum.RamaEnum
-    ]
+    if user and (user.IdRol == generalEnum.RolEnum.Entrenador.value or user.IdRol == generalEnum.RolEnum.Admin.value):
+        categorias = [
+        {'value': cat.value, 'text': cat.name}
+        for cat in generalEnum.CategoriaEnum
+        ]
 
-    divisiones = [
-    {'value': division.value, 'text': division.name}
-    for division in generalEnum.DivisionEnum
-    ]
+        contrincantes = [
+        {'value': contrincante.value, 'text': contrincante.name}
+        for contrincante in generalEnum.ContrincantesEnum
+        ]
 
-    return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias, contrincantes=contrincantes, localidades=localidades, ramas = ramas, divisiones = divisiones)
+        localidades = [
+        {'value': localidad.value, 'text': localidad.name}
+        for localidad in generalEnum.LocalidadEnum
+        ]
+
+        ramas = [
+        {'value': rama.value, 'text': rama.name}
+        for rama in generalEnum.RamaEnum
+        ]
+
+        divisiones = [
+        {'value': division.value, 'text': division.name}
+        for division in generalEnum.DivisionEnum
+        ]
+
+        dias = [
+        {'value': dia.value, 'text': dia.name}
+        for dia in generalEnum.DiasEnum
+        ]
+        return render_template('calendario/index.html', tipoeventos=tipoeventos, categorias=categorias, contrincantes=contrincantes, localidades=localidades, ramas = ramas, divisiones = divisiones, dias = dias)
+
+    return render_template('calendario/index.html', tipoeventos=tipoeventos)
 
 @calendario_bp.route('/nuevoEvento', methods=['POST'])
 def nuevo_evento():
@@ -67,12 +80,28 @@ def nuevo_evento():
     Rama = int(rama[0]) if rama else None
     Division = int(division[0]) if division else None
     
+    if IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value:
+        evento_existente = Evento.query.filter(
+            Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value,
+            Evento.IdCategoria == IdCategoria,
+            Evento.IdRama == Rama,
+            Evento.IdDivision == Division,
+            Evento.FechaInicio == fecha_inicio_dt  
+        ).first()
+
+        if evento_existente:
+            flash("⚠️ Ya existe un entrenamiento para esa categoría en la misma fecha y horario.", "danger")
+            return redirect(url_for('calendario.index'))
+    
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value):
         titulo = f"Partido {generalEnum.CategoriaEnum(IdCategoria).name} {generalEnum.RamaEnum(Rama).name} {generalEnum.DivisionEnum(Division).name} vs {generalEnum.ContrincantesEnum(Contrincante).name}"
         fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)  
 
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Recaudacion.value or IdTipoEvento == generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value or IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value):
         fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)  
+
+    if(IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value):
+         titulo = f"Entrenamiento {generalEnum.CategoriaEnum(IdCategoria).name} {generalEnum.RamaEnum(Rama).name} {generalEnum.DivisionEnum(Division).name}"
 
     if(IdTipoEvento == generalEnum.TipoEventoEnum.Vacaciones.value):
         idCategoria = None
@@ -128,40 +157,6 @@ def eventos():
 
     return jsonify(eventos)
     
-@calendario_bp.route('/editarEvento/<int:evento_id>', methods=['PUT'])
-def editar_evento(evento_id):
-    evento = Evento.query.get(evento_id)
-    if not evento:
-        return jsonify({'error': 'Evento no encontrado'}), 404
-
-    data = request.form
-    evento.Titulo = data.get('titulo', evento.Titulo)
-    tipoEvento = data.get('tipoEvento')
-    evento.IdTipoEvento = int(tipoEvento) if tipoEvento else evento.IdTipoEvento
-    evento.FechaInicio = datetime.fromisoformat(data.get('fechaInicio').replace('Z','')) if data.get('fechaInicio') else evento.FechaInicio
-    evento.FechaFin = datetime.fromisoformat(data.get('fechaFin').replace('Z','')) if data.get('fechaFin') else evento.FechaFin
-    evento.TodoElDia = data.get('todoElDia') == 'on'
-    evento.Descripcion = data.get('descripcion', evento.Descripcion)
-    idCategoria = data.get('categoria')
-    evento.IdCategoria = int(idCategoria) if idCategoria else evento.IdCategoria
-    contrincante = data.get('contrincante')
-    evento.IdContrincante = int(contrincante) if contrincante else evento.IdContrincante
-    localidad = data.get('localidad')
-    evento.IdLocalidad = int(localidad) if localidad else evento.IdLocalidad
-    
-
-    calendarioController.editarEvento(evento)
-    return jsonify({'mensaje': 'Evento actualizado correctamente'})
-
-@calendario_bp.route('/eliminarEvento/<int:evento_id>', methods=['DELETE'])
-def eliminar_evento(evento_id):
-    evento = Evento.query.get(evento_id)
-    if not evento:
-        return jsonify({'error': 'Evento no encontrado'}), 404
-    
-    return jsonify({'mensaje': 'Evento eliminado correctamente'})
-
-
 @calendario_bp.route("/partidosByCategoria")
 def partidosByCategoria(fecha, categoria):
 
@@ -229,4 +224,169 @@ def evento_detalle(evento_id):
             "tipoEvento": generalEnum.TipoEventoEnum(tipo).name
         })
 
+    data.update({
+            "IdCategoria": generalEnum.CategoriaEnum(evento.IdCategoria).value if evento.IdCategoria else None,
+            "IdContrincante": generalEnum.ContrincantesEnum(evento.IdContrincante).value if evento.IdContrincante else None,
+            "IdLocalidad": generalEnum.LocalidadEnum(evento.IdLocalidad).value if evento.IdLocalidad else None,
+            "IdRama": generalEnum.RamaEnum(evento.IdRama).value if evento.IdRama else None,
+            "IdDivision": generalEnum.DivisionEnum(evento.IdDivision).value if evento.IdDivision else None,
+            "fechaInicioFormat": evento.FechaInicio.isoformat(),
+            "fechaFinFormat": evento.FechaFin.isoformat() if evento.FechaFin else None,
+        })
+
     return jsonify(data)
+
+
+@calendario_bp.route('/nuevoEventoMasivo', methods=['POST'])
+def nuevoEventoMasivo():
+    fecha_inicio_str = request.form.get('fechaInicio')
+    fecha_fin_str = request.form.get('fechaFin')
+    hora_inicio_str = request.form.get('horaInicio') 
+
+    id_categoria = request.form.get('categoriaMasivo')
+    id_rama = request.form.get('ramaMasivo')
+    id_division = request.form.get('divisionMasivo')
+    dias_seleccionados = request.form.getlist('diasMasivo')
+
+    if fecha_inicio_str:
+        fecha_inicio_dt = datetime.strptime(fecha_inicio_str.strip(), "%Y-%m-%d")
+    else:
+        fecha_inicio_dt = None
+
+    if fecha_fin_str:
+        fecha_fin_dt = datetime.strptime(fecha_fin_str.strip(), "%Y-%m-%d")
+    else:
+        fecha_fin_dt = None
+
+    if not fecha_inicio_dt or not fecha_fin_dt or not dias_seleccionados or not hora_inicio_str:
+        flash("Debes seleccionar rango de fechas, hora de inicio y al menos un día", "danger")
+        return redirect(url_for('calendario.index'))
+
+    if fecha_fin_dt < fecha_inicio_dt:
+        flash("La fecha de fin debe ser mayor o igual a la fecha de inicio", "danger")
+        return redirect(url_for('calendario.index'))
+    
+    # Parsear hora de inicio (HH:mm)
+    hora, minuto = map(int, hora_inicio_str.split(":"))
+    
+    dias_int = [int(d) for d in dias_seleccionados]
+
+    IdCategoria = int(id_categoria) if id_categoria else None
+    Rama = int(id_rama) if id_rama else None
+    Division = int(id_division) if id_division else None
+
+    fecha_actual = fecha_inicio_dt.date()
+    eventos_creados = 0
+
+    while fecha_actual <= fecha_fin_dt.date():
+        if fecha_actual.weekday() in dias_int: 
+            fecha_inicio_evento = datetime.combine(fecha_actual, time(hora, minuto))
+            fecha_fin_evento = fecha_inicio_evento + timedelta(hours=1, minutes=30)
+
+            nuevo_evento = Evento(
+                Titulo=f"Entrenamiento {generalEnum.CategoriaEnum(IdCategoria).name} "
+                       f"{generalEnum.RamaEnum(Rama).name} "
+                       f"{generalEnum.DivisionEnum(Division).name}",
+                IdTipoEvento=generalEnum.TipoEventoEnum.Entrenamiento.value,
+                FechaInicio=fecha_inicio_evento,
+                FechaFin=fecha_fin_evento,
+                TodoElDia=False,
+                IdCategoria=IdCategoria,
+                IdDivision=Division,
+                IdRama=Rama,
+                Descripcion="Evento creado masivamente"
+            )
+            calendarioController.crearEvento(nuevo_evento)
+            eventos_creados += 1
+
+        fecha_actual += timedelta(days=1)
+
+    flash(f"Se crearon {eventos_creados} entrenamientos masivos", "success")
+    return redirect(url_for('calendario.index'))
+
+@calendario_bp.route("/updateEvento/<int:evento_id>", methods=["POST"])
+def update_evento(evento_id):
+    evento = calendarioController.getEventoById(evento_id)
+    if not evento:
+        flash("Evento no encontrado", "danger")
+        return redirect(url_for("calendario.index"))
+
+
+    nuevo_titulo = request.form.get("titulo")
+    fecha_inicio_str = request.form.get("fechaInicio")
+    fecha_fin_str = request.form.get("fechaFin")
+    descripcion = request.form.get("descripcion")
+    id_tipo_evento = int(request.form.get("tipoEvento")) if request.form.get("tipoEvento") else None
+    id_categoria = int(request.form.get("categoria")) if request.form.get("categoria") else None
+    id_contrincante = int(request.form.get("contrincante")) if request.form.get("contrincante") else None
+    id_localidad = int(request.form.get("localidad")) if request.form.get("localidad") else None
+    id_rama = int(request.form.get("rama")) if request.form.get("rama") else None
+    id_division = int(request.form.get("division")) if request.form.get("division") else None
+    todo_el_dia = request.form.get("todoElDia") == "on"
+
+    fecha_inicio_dt = datetime.fromisoformat(fecha_inicio_str) if fecha_inicio_str else None
+    fecha_fin_dt = datetime.fromisoformat(fecha_fin_str) if fecha_fin_str else None
+
+
+    if id_tipo_evento == generalEnum.TipoEventoEnum.Entrenamiento.value:
+        conflicto = Evento.query.filter(
+            Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value,
+            Evento.IdCategoria == id_categoria,
+            Evento.IdRama == id_rama,
+            Evento.IdDivision == id_division,
+            Evento.FechaInicio == fecha_inicio_dt,
+            Evento.Id != evento_id  # excluye el actual
+        ).first()
+
+        if conflicto:
+            flash("⚠️ Ya existe un entrenamiento para esa categoría en la misma fecha y horario.", "danger")
+            return redirect(url_for("calendario.index"))
+
+
+    if id_tipo_evento == generalEnum.TipoEventoEnum.Partido.value:
+        nuevo_titulo = f"Partido {generalEnum.CategoriaEnum(id_categoria).name} {generalEnum.RamaEnum(id_rama).name} {generalEnum.DivisionEnum(id_division).name} vs {generalEnum.ContrincantesEnum(id_contrincante).name}"
+        fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)
+
+    elif id_tipo_evento in (
+        generalEnum.TipoEventoEnum.Recaudacion.value,
+        generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value,
+        generalEnum.TipoEventoEnum.Entrenamiento.value,
+    ):
+        if id_tipo_evento == generalEnum.TipoEventoEnum.Entrenamiento.value:
+            nuevo_titulo = f"Entrenamiento {generalEnum.CategoriaEnum(id_categoria).name} {generalEnum.RamaEnum(id_rama).name} {generalEnum.DivisionEnum(id_division).name}"
+        fecha_fin_dt = fecha_inicio_dt + timedelta(minutes=1)
+
+    elif id_tipo_evento == generalEnum.TipoEventoEnum.Vacaciones.value:
+        nuevo_titulo = nuevo_titulo or "Vacaciones"
+        id_categoria = None
+        id_rama = None
+        id_division = None
+        id_contrincante = None
+
+    elif id_tipo_evento == generalEnum.TipoEventoEnum.Torneo.value:
+        nuevo_titulo = f"Torneo {generalEnum.CategoriaEnum(id_categoria).name} {generalEnum.RamaEnum(id_rama).name} {generalEnum.DivisionEnum(id_division).name}"
+
+
+    evento.Titulo = nuevo_titulo
+    evento.FechaInicio = fecha_inicio_dt
+    evento.FechaFin = fecha_fin_dt
+    evento.Descripcion = descripcion
+    evento.IdTipoEvento = id_tipo_evento
+    evento.IdCategoria = id_categoria
+    evento.IdContrincante = id_contrincante
+    evento.IdLocalidad = id_localidad
+    evento.IdRama = id_rama
+    evento.IdDivision = id_division
+    evento.TodoElDia = todo_el_dia
+
+    calendarioController.editarEvento(evento)
+    flash("✅ Evento actualizado correctamente", "success")
+    return redirect(url_for("calendario.index"))
+
+
+@calendario_bp.route("/eliminarEvento/<int:evento_id>", methods=["POST"])
+def eliminarEvento(evento_id):
+    evento = Evento.query.get(evento_id)
+    calendarioController.eliminarEvento(evento)
+    flash("Evento eliminado correctamente", "success")
+    return redirect(url_for("calendario.index"))

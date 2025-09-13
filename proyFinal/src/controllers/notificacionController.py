@@ -1,4 +1,4 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from flask import current_app, render_template, url_for, request
 from flask_login import current_user
 from flask_mail import Message
@@ -83,11 +83,21 @@ def obtener_notificaciones():
     # Arrancamos query base según rol
     if current_user.IdRol in (1, 3):  # Admin o Entrenador
         query = Notificacion.query
-    else:  # Deportista
+    else:  # Deportista → filtrar por su categoría, rama y división
         query = Notificacion.query.filter(
-            or_(
-                Notificacion.IdCategoria == current_user.IdCategoria,
-                Notificacion.IdCategoria == None
+            and_(
+                or_(
+                    Notificacion.IdCategoria == current_user.IdCategoria,
+                    Notificacion.IdCategoria == None
+                ),
+                or_(
+                    Notificacion.IdRama == current_user.IdRama,
+                    Notificacion.IdRama == None
+                ),
+                or_(
+                    Notificacion.IdDivision == current_user.IdDivision,
+                    Notificacion.IdDivision == None
+                )
             )
         )
 
@@ -115,7 +125,8 @@ def obtener_notificaciones():
     if rama and rama.isdigit():
         query = query.filter(Notificacion.IdRama == int(rama))
     
-    resultados = query.all()
+    # 👉 Ordenar y limitar a 6
+    resultados = query.order_by(Notificacion.Id.desc()).limit(6).all()
 
     notificaciones = []
     for e in resultados:
@@ -129,12 +140,10 @@ def obtener_notificaciones():
             'descripcion': e.Descripcion,
             'categoria': nombre_categoria,
             'division': nombre_division,
-            'rama': nombre_rama
+            'rama': nombre_rama,
         })
 
     return notificaciones
-
-
 
 def agregarNotificacion(nuevaNotif):
     db.session.add(nuevaNotif)
@@ -179,3 +188,4 @@ def enviar_mail(destinatario,titulo,descripcion):
     except Exception as e:
         print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
         return False
+    

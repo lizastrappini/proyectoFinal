@@ -6,7 +6,7 @@ from src.controllers import deportistaController, notificacionController
 from src.models.notificacion import Notificacion
 from src.models.usuario import Usuario
 from werkzeug.security import generate_password_hash
-
+from flask_login import current_user
 from src.utils.enums import generalEnum
 
 notificacion_bp = Blueprint('notificacion', __name__)
@@ -55,7 +55,14 @@ def index():
         for rama in generalEnum.RamaEnum
     ]
     notif = notificacionController.obtener_notificaciones()
-    return render_template('notificacion/index.html', notificaciones=notif, categorias=categorias, divisiones=divisiones, ramas=ramas)
+    
+    return render_template(
+    'notificacion/index.html',
+    notificaciones=notif,
+    categorias=categorias,
+    divisiones=divisiones,
+    ramas=ramas
+)
 
 @notificacion_bp.route('/obtener', methods=['GET'])
 def obtener():
@@ -176,3 +183,4 @@ def eliminar_notificacion(id):
         flash('Notificación eliminada exitosamente', 'success')
         return redirect(url_for('notificacion.index'))
     
+
