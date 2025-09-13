@@ -79,7 +79,7 @@ def subir_comprobante(id_pago):
     if file and allowed_file(file.filename):
         # Crear nombre seguro y carpeta de uploads si no existe
         filename = secure_filename(f"comprobante_{pago.Id}_{file.filename}")
-        upload_folder = os.path.join(current_app.root_path, 'uploads')
+        upload_folder = os.path.join(current_app.root_path, 'static','uploads')
         os.makedirs(upload_folder, exist_ok=True)
 
         # Guardar archivo
