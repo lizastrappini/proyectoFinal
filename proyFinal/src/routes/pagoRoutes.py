@@ -3,7 +3,8 @@ from decimal import Decimal
 import secrets
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
 import openpyxl
-from src.controllers import deportistaController, pagosController
+from src.controllers import deportistaController, pagosController, parametroController
+from src.models.parametro import Parametro
 from src.models.usuario import Usuario
 from src.models.pago import Pago
 from werkzeug.security import generate_password_hash
@@ -55,17 +56,32 @@ def filtrar():
 def agregar_pago():
     try:
         
-        fechaPago = request.form.get('fechaPago')
+        fechaPago_str = request.form.get('fechaPago')
         fechaVencimiento = request.form.get('fechaVencimiento')
-        importe = request.form.get('importe')
+        # importe = request.form.get('importe')
         estado_nombre = request.form.get('estado')
         usuario_id = request.form.get('deportista')
         
+        if fechaPago_str:
+            fechaPago = datetime.strptime(fechaPago_str, "%Y-%m-%d")
+        else:
+            fechaPago = None 
         if not usuario_id:
             raise ValueError("Debe seleccionar un deportista")
         
         if not estado_nombre or estado_nombre not in generalEnum.EstadoPagoEnum.__members__:
             raise ValueError("Estado inválido o no seleccionada")
+        
+        parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
+        if not parametro:
+            raise ValueError("No se encontró el parámetro ValorCuota")
+
+        try:
+            importe = float(parametro.Valor)
+        except ValueError:
+            raise ValueError("El valor de ValorCuota no es un número válido")
+  
+
 
         estado_id = generalEnum.EstadoPagoEnum[estado_nombre].value
         nuevo_pago = Pago(
@@ -107,7 +123,7 @@ def importar_pagos():
             raise ValueError("No se pudo abrir el archivo Excel")
 
         # ---------- VALIDAR ENCABEZADOS ----------
-        encabezados = ["Cuil Deportista", "Fecha Pago", "Fecha Vencimiento", "Importe", "IdEstado"]
+        encabezados = ["DNI Deportista", "Fecha Pago", "Fecha Vencimiento", "IdEstado"]
         for idx, esperado in enumerate(encabezados, start=1):
             valor = str(ws.cell(row=1, column=idx).value).strip() if ws.cell(row=1, column=idx).value else ""
             if valor != esperado:
@@ -128,20 +144,27 @@ def importar_pagos():
                 raise ValueError(f"Fila {fila}: No existe un usuario con DNI {dni}")
                 fila += 1
                 continue
+            parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
+            if not parametro:
+                raise ValueError("No se encontró el parámetro ValorCuota")
 
+            try:
+                importe = float(parametro.Valor)
+            except ValueError:
+                raise ValueError("El valor de ValorCuota no es un número válido")
             try:
                 fecha_pago_val = ws.cell(row=fila, column=2).value
                 fecha_venc_val = ws.cell(row=fila, column=3).value
-                importe_val = ws.cell(row=fila, column=4).value
-                id_estado = ws.cell(row=fila, column=5).value
+                # importe_val = ws.cell(row=fila, column=4).value
+                id_estado = ws.cell(row=fila, column=4).value
 
               
                 if not id_estado:
                     raise ValueError("Estado inválido o no seleccionado")
-                if not fecha_pago_val or not fecha_venc_val:
+                if not fecha_venc_val:
                     raise ValueError("Las fechas son obligatorias")
-                if not importe_val:
-                    raise ValueError("El importe es obligatorio")
+                # if not importe_val:
+                #     raise ValueError("El importe es obligatorio")
 
                 # Parseo fechas si vienen en string
                 fecha_pago = fecha_pago_val
@@ -152,7 +175,7 @@ def importar_pagos():
                     fecha_vencimiento = datetime.datetime.strptime(fecha_venc_val, "%d-%m-%Y")
 
                 # Importe
-                importe = Decimal(str(importe_val))
+                # importe = Decimal(str(importe_val))
 
                 nuevo_pago = Pago(
                     FechaPago=fecha_pago,
@@ -203,17 +226,20 @@ def editar_pago(id):
             flash('Pago no encontrado', 'danger')
             return redirect(url_for('pago.index'))
 
-    fechaPago = request.form.get('fechaPago')
+    fechaPago_str = request.form.get('fechaPago')
     fechaVencimiento = request.form.get('fechaVencimiento')
-    importe = request.form.get('importe')
+    # importe = request.form.get('importe')
     estado_nombre = request.form.get('estado')
     usuario_id = request.form.get('deportista')
     
-
+    if fechaPago_str:
+            fechaPago = datetime.strptime(fechaPago_str, "%Y-%m-%d")
+    else:
+            fechaPago = None 
     # Actualiza campos
     pago.FechaPago = fechaPago
     pago.FechaVencimiento = fechaVencimiento
-    pago.Importe = importe
+    # pago.Importe = importe
     pago.IdEstado = generalEnum.EstadoPagoEnum[estado_nombre].value
     pago.IdUsuario= usuario_id
     
@@ -259,9 +285,47 @@ def pagar_seleccionados():
         pagos = Pago.query.filter(Pago.Id.in_(ids)).all()
         for pago in pagos:
             pago.IdEstado = 1  # id de "Pago"
+            pago.FechaPago = datetime.datetime.today()
             pagosController.actualizar_pago(pago)
 
         return jsonify({'success': True, 'message': f'{len(pagos)} pagos actualizados a Pago'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
 
+
+@pago_bp.route('/actualizar_cuota', methods=['POST'])
+def actualizar_cuota():
+    try:
+        # Obtener el nuevo valor desde el formulario o JSON
+        nuevo_valor = request.form.get('importe')  # o request.json.get('nuevo_valor')
+        if not nuevo_valor:
+            raise ValueError("Debe indicar el nuevo valor de la cuota")
+
+        # Buscar el parámetro ValorCuota
+        parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
+        if not parametro:
+            raise ValueError("No se encontró el parámetro ValorCuota")
+
+        # Actualizar el valor
+        parametro.Valor = str(nuevo_valor)  # ⚠️ convertir a string si es Text
+       
+        parametroController.actualizar_parametro(parametro)
+       
+        deportistas = Usuario.query.filter_by(IdRol=2).all()  # rol 2 = deportista
+        enviados = parametroController.enviar_mail_actualizacion(deportistas, parametro)
+
+        mensaje = f'Cuota actualizada exitosamente. Correos enviados a {enviados} deportistas.'
+        
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': mensaje}), 200
+        else:
+            flash('Cuota actualizada exitosamente', 'success')
+            return redirect(url_for('pago.index'))
+    except Exception as e:
+        mensaje_error = str(e)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': mensaje_error}), 400
+        else:
+            flash(f'Error al actualizar cuota: {mensaje_error}', 'danger')
+            return redirect(url_for('pago.index'))

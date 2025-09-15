@@ -6,7 +6,7 @@ class Pago(db.Model):
     Id = db.Column(db.Integer, primary_key=True)
     IdEstado = db.Column(db.Integer, nullable=False)
     FechaVencimiento = db.Column(db.DateTime)
-    FechaPago = db.Column(db.DateTime)
+    FechaPago = db.Column(db.DateTime, nullable=True)
     Importe = db.Column(db.Numeric(16,2))
     Comprobante = db.Column(db.String(255), nullable=True)
 

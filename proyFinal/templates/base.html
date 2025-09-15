@@ -397,9 +397,15 @@
                           <a class="dropdown-item waves-effect" href="/miCuenta">
                             <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">Mi Perfil</span>
                           </a>
-                        </li><li>
+                        </li>
+                        <li>
                           <a class="dropdown-item waves-effect" href="/contacto">
                             <i class="ri-phone-fill ri-22px me-3"></i><span class="align-middle">Contacto</span>
+                          </a>
+                        </li>
+                         <li>
+                          <a class="dropdown-item waves-effect" href="/faq">
+                            <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">FAQ</span>
                           </a>
                         </li>
                         <li>
@@ -510,7 +516,7 @@
     </div>
     <div id="predefined-questions">
       <button class="faq-btn">¿Cómo me registro en Voley App?</button>
-      <button class="faq-btn">¿Cómo cambio mi contraseña?</button>
+      <button class="faq-btn">Olvidé mi contraseña, ¿qué hago?</button>
       <button class="faq-btn">¿Cómo puedo ver mis pagos deportivos?</button>
     </div>
   </div>
@@ -612,6 +618,10 @@ document.addEventListener('DOMContentLoaded', () => {
   chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') { sendQuestion(chatInput.value); chatInput.value = ''; } });
   document.querySelectorAll('.faq-btn').forEach(btn => btn.addEventListener('click', () => sendQuestion(btn.innerText)));
 });
+
+
+
+
 </script>
       {% block scripts %}{% endblock %}
 
