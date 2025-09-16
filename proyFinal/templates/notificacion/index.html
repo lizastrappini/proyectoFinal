@@ -1,17 +1,16 @@
-{% extends "base.html" %}
+  {% extends "base.html" %}
 
-{% block content %}
+  {% block content %}
 
-<div class="content-wrapper">
-  <!-- Content -->
-  <div class="container-xxl flex-grow-1 container-p-y">
-    <!-- Basic Bootstrap Table -->
-    <div class="card">
-      <h2 class="card-header">Bandeja de Notificaciones</h2>
-      <div class="card-body">
-      {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
-        
-        <div class="d-flex row mb-5 gx-5">
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <!-- Basic Bootstrap Table -->
+      <div class="card">
+        <h2 class="card-header">Bandeja de Notificaciones</h2>
+        <div class="card-body">
+        {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
+          <div class="d-flex row mb-5 gx-5">
           <div class="col d-flex justify-content-end">
             <button class="btn btn-outline-primary shadow-sm" onclick="limpiar()">
               Limpiar 
@@ -64,164 +63,345 @@
             Agregar
           </a>
         </div>
-      {% endif %}
+        {% endif %}
 
-      <div class="table-responsive text-nowrap">
-        <table id="tablaNotificaciones" class="table">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Título</th>
-              <th>Descripción</th>
-              <th>Categoría</th>
-              {% if current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
-                <th>División</th>
-                <th>Rama</th>
-                <th>Acciones</th>
-              {% endif %}
-            </tr>
-          </thead>
-        </table>
-      </div>
-
-      <!-- Modal Agregar Notificación -->
-      <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-simple modal-edit-user">
-          <div class="modal-content">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            <div class="modal-body p-0">
-              <div class="text-center mb-6">
-                <h4 class="mb-2" id="tituloAdd">Nueva Notificación</h4>
-              </div>
-              
-              <form id="addNotificacionForm" class="row g-5" method="POST" action="{{ url_for('notificacion.nueva_notificacion') }}">
-                <div class="col-12">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" id="titulo" name="titulo" class="form-control" required />
-                    <label for="titulo">Título</label>
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-floating form-floating-outline">
-                    <select id="categoria" name="categoria" class="form-select">
-                      <option value="" disabled selected>Seleccioná una categoría</option>
-                      {% for cat in categorias %}
-                        <option value="{{ cat.value }}">{{ cat.text }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="categoria">Categoría</label>
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-floating form-floating-outline">
-                    <select id="division" name="division" class="form-select">
-                      <option value="" disabled selected>Seleccioná una división</option>
-                      {% for div in divisiones %}
-                        <option value="{{ div.value }}">{{ div.text }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="division">División</label>
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-floating form-floating-outline">
-                    <select id="rama" name="rama" class="form-select">
-                      <option value="" disabled selected>Seleccioná una rama</option>
-                      {% for rama in ramas %}
-                        <option value="{{ rama.value }}">{{ rama.text }}</option>
-                      {% endfor %}
-                    </select>
-                    <label for="rama">Rama</label>
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-floating form-floating-outline">
-                    <textarea id="descripcion" name="descripcion" class="form-control" placeholder="Descripción detallada" style="height: 120px;" required></textarea>
-                    <label for="descripcion">Descripción</label>
-                  </div>
-                </div>
-
-                <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                  <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
-                  <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
-                </div>
-              </form>
-            </div>
+          <div class="table-responsive text-nowrap">
+            <table id="tablaNotificaciones" class="table">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Título</th>
+                  <th>Descripción</th>
+                  <th>Categoria</th>
+                  <th>Rama</th>
+                  <th>División</th>
+                  {% if current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
+                  <th>Acciones</th>
+                  {% endif %}
+                </tr>
+              </thead>
+            </table>
           </div>
+                <!-- Modal -->
+                <!-- Agregar User Modal -->
+                <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                    <div class="modal-content">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-body p-0">
+                        <div class="text-center mb-6">
+                          <h4 class="mb-2" id="tituloAdd">Nueva Notificación</h4>
+                        </div>
+
+                        <form id="addNotificacionForm" class="row g-5" method="POST" action="{{ url_for('notificacion.nueva_notificacion') }}">
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <input 
+                                type="text"
+                                id="titulo"
+                                name="titulo"
+                                class="form-control"
+                                value=""
+                                placeholder=""
+                                required />
+                              <label for="modalEditUserFirstName">Título</label>
+                            </div>
+                          </div>
+
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <select id="categoria" name="categoria" class="form-select">
+                                <option value="" disabled selected>Seleccioná una categoría</option>
+                                {% for cat in categorias %}
+                                  <option value="{{ cat.value }}">{{ cat.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="categoria">Categoría</label>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <select id="division" name="division" class="form-select">
+                                <option value="" disabled selected>Seleccioná una división</option>
+                                {% for div in divisiones %}
+                                  <option value="{{ div.value }}">{{ div.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="division">División</label>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <select id="rama" name="rama" class="form-select">
+                                <option value="" disabled selected>Seleccioná una rama</option>
+                                {% for rama in ramas %}
+                                  <option value="{{ rama.value }}">{{ rama.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="rama">Rama</label>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                              <textarea
+                                id="descripcion"
+                                name="descripcion"
+                                class="form-control"
+                                placeholder="Descripción detallada"
+                                style="height: 120px;"  
+                                required></textarea>
+                              <label for="modalEditUserLastName">Descripción</label>
+                            </div>
+                          </div>
+                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Crear</button>
+                            <button
+                              type="reset"
+                              class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              aria-label="Close">
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--/ Edit User Modal -->
+                <!-- /Modal -->
+
         </div>
       </div>
-      <!--/ Modal -->
-
     </div>
   </div>
-</div>
 
-{% endblock %}
+  {% endblock %}
 
-{% block scripts %}
+  {% block scripts %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
 
-  var tabla = $('#tablaNotificaciones').DataTable({
-    ajax: {
-      url: '/notificacion/obtener',
-      type: 'GET',
-      data: function(d) {
-        d.buscar = document.getElementById('filtroBuscar').value.trim();
-        d.categoria = document.getElementById('categoriaFiltro').value;
-        d.division = document.getElementById('divisionFiltro').value;
-        d.rama = document.getElementById('ramaFiltro').value;
-      },
-      dataSrc: 'data'
-    },
-    paging: false,
-    info: false,
-    searching: false,
-    ordering: true,
-    columns: [
-      { data: 'id' },
-      { data: 'titulo' },
-      { data: 'descripcion' },
-      { data: 'categoria' },
-      { data: 'division' },
-      { data: 'rama' }
-    ]
-  });
+  <script>
 
-  function recargarTabla() {
-    tabla.ajax.reload();
+    let tabla = null;
+
+function filtrar() {
+  const categoria = $('#categoriaFiltro').val();
+  const division = $('#divisionFiltro').val();
+  const rama = $('#ramaFiltro').val();
+  const buscar = $('#filtroBuscar').val();
+
+
+
+
+  const usuarioRol = parseInt(document.body.dataset.rol);
+
+
+  let url = '/notificacion/filtrar';
+  if (usuarioRol === 1 || usuarioRol === 3) { // Admin o entrenador
+    url = `/notificacion/filtrar?categoria=${categoria}&rama=${rama}&division=${division}&buscar=${buscar}`;
+  }
+  
+  
+
+  const columnas = [
+    { data: 'id' },
+    { data: 'titulo' },
+    { data: 'descripcion' },
+    { data: 'categoria' },
+    { data: 'division' },
+    { data: 'rama' },
+
+  ];
+
+  // Solo agregar columna Acciones si es admin (1) o entrenador (3)
+  if (usuarioRol === 1 || usuarioRol === 3) {
+    columnas.push({
+      data: null,
+      orderable: false,
+      searchable: false,
+      render: function (data, type, row, meta) {
+        return `
+          <div class="dropdown">
+            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="ri-more-2-line"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    });
   }
 
-  // Filtros: input + selects
-  ['filtroBuscar','categoriaFiltro','divisionFiltro','ramaFiltro'].forEach(function(id){
-    var elem = document.getElementById(id);
-    elem.addEventListener('change', recargarTabla);
-    elem.addEventListener('input', recargarTabla);
-  });
+  if (tabla) {
+    tabla.ajax.url(url).load();
+  } else {
+    tabla = $('#tablaNotificaciones').DataTable({
+      ajax: {
+        url: url,
+        dataSrc: 'data'
+      },
+      columns: columnas,
+      paging: false,
+      info: false,
+      searching: false,
+      ordering: true,
+      dom: 'frtip',
+      language: {
+        emptyTable: "No hay notificaciones disponibles"
+      },
+      initComplete: function () {
+        $('#tablaNotificaciones')
+          .removeClass('dataTable no-footer stripe hover')
+          .addClass('table');
+      }
+    });
+  }
+}
 
-  // Botón Limpiar
-  window.limpiar = function() {
-    // Limpiar input
-    document.getElementById('filtroBuscar').value = '';
 
-    // Limpiar selects y actualizar Select2 visualmente
-    ['categoriaFiltro','divisionFiltro','ramaFiltro'].forEach(function(id){
-      var select = $('#' + id);
-      select.val(''); // valor vacío
-      select.trigger('change'); // actualiza Select2
+
+  $(document).ready(function () {
+    filtrar(); // carga inicial
+    
+    $('#filtroBuscar').on('input', function () {
+      filtrar(); // se ejecuta mientras se escribe
     });
 
-    // Recarga tabla
-    recargarTabla();
+    $('#categoriaFiltro, #ramaFiltro, #divisionFiltro').on('change', function () {
+      filtrar(); // se ejecuta al cambiar selects
+    });
+    });
+    function limpiar() {
+          $('#categoriaFiltro').val('').trigger('change');
+          $('#ramaFiltro').val('').trigger('change');
+          $('#divisionFiltro').val('').trigger('change');
+          $('#filtroBuscar').val('').trigger('change');
+          filtrar(); // recargar la tabla sin filtros
+
+        
+        }
+    
+
+   $('#addUser').on('hidden.bs.modal', function () {
+  // Ocultar y limpiar el div de errores (si lo tenés en tu modal)
+  const errorDiv = document.getElementById('formError');
+  if (errorDiv) {
+    errorDiv.classList.add('d-none');
+    errorDiv.textContent = '';
   }
-});
-</script>
+
+  // Resetear selects de categoría, división y rama
+  $('#categoria').val(null).trigger('change');
+  $('#division').val(null).trigger('change');
+  $('#rama').val(null).trigger('change');
+
+  // Restaurar textos y botón a "alta"
+  $('#submitBtn').text('Crear');
+  $('#tituloAdd').text('Nueva Notificación');
+  });
+     
+   $('#addNotificacionForm').on('submit', function(e) {
+              e.preventDefault(); // Evita el envío tradicional
+
+              const form = this;
+              const actionUrl = $(form).attr('action');
+              const formData = new FormData(form);
+
+              fetch(actionUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+              .then(async response => {
+                if (!response.ok) {
+                  const error = await response.json();
+                  throw new Error(error.message || 'Error al crear');
+                }
+                return response.json();
+              })
+              .then(data => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Notificación creada',
+                  text: data.message,
+                  showConfirmButton: false,
+                  timer: 2000
+                });
+                $('#addUser').modal('hide');
+                $('#addNotificacionForm')[0].reset();
+                if (tabla) tabla.ajax.reload();
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message
+                });
+              });
+            });
 
 
+          function eliminarFila(rowIndex) {
+            const tabla = $('#tablaNotificaciones').DataTable();
+            const data = tabla.row(rowIndex).data();
 
-{% endblock %}
+            Swal.fire({
+              title: '¿Estás segura/o?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                fetch(`/notificacion/eliminar/${data.id}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                  }
+                })
+                .then(async response => {
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error desconocido');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Eliminado',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+                  tabla.ajax.reload();
+                })
+                .catch(error => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Hubo un error al intentar eliminar la notificación.'
+                  });
+                });
+              }
+            });
+          }
+
+  </script>
+  <!-- DataTables Buttons CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+  <!-- DataTables y Buttons JS -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  {% endblock %}

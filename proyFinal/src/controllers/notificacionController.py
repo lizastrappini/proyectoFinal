@@ -9,104 +9,32 @@ from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum
 from src import db
 from src.utils.Mail import mail
 
-"""
-def obtener_notificaciones():
-    if not current_user.is_authenticated:
-        return []
-    
-    # Parámetros de filtro NUEVO
-    palabra = request.args.get('buscar', '').lower()
-    categoria = request.args.get('categoria')
-    division = request.args.get('division')
-    rama = request.args.get('rama')
-
-    # Filtrar según el rol
-    if current_user.IdRol in (1, 3):  # Admin o Entrenador
-        resultados = Notificacion.query.all()
-    else:  # Deportista
-        resultados = Notificacion.query.filter(
-            or_(
-                Notificacion.IdCategoria == current_user.IdCategoria,
-                Notificacion.IdCategoria == None
-            )
-        )#.all()
-        
-    # Filtro por palabra (en título o descripción)
-    if palabra:
-        query = query.filter(
-            or_(
-                Notificacion.Titulo.ilike(f"%{palabra}%"),
-                Notificacion.Descripcion.ilike(f"%{palabra}%")
-            )
-        )
-
-    # Filtro por categoría
-    if categoria:
-        query = query.filter(Notificacion.IdCategoria == int(categoria))
-
-    # Filtro por división
-    if division:
-        query = query.filter(Notificacion.IdDivision == int(division))
-
-    # Filtro por rama
-    if rama:
-        query = query.filter(Notificacion.IdRama == int(rama))
-
-    resultados = query.all()
-
-    notificaciones = []
-    for e in resultados:
-        nombre_categoria = CategoriaEnum(int(e.IdCategoria)).name if e.IdCategoria is not None else "Todas"
-        nombre_division = DivisionEnum(int(e.IdDivision)).name if e.IdDivision is not None else "Todas"
-        nombre_rama = RamaEnum(int(e.IdRama)).name if e.IdRama is not None else "Todas"
-        notificaciones.append({
-            'id': e.Id,
-            'titulo': e.Titulo,
-            'descripcion': e.Descripcion,
-            'categoria': nombre_categoria,   
-            'division': nombre_division,
-            'rama': nombre_rama
-        })
-
-    return notificaciones
-
-# def getUsuarioById(id):
-#     return Usuario.query.filter_by(Id=id).first()
-"""
-
-
-
-def obtener_notificaciones():
+def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None):
     if not current_user.is_authenticated:
         return []
 
-    # Arrancamos query base según rol
-    if current_user.IdRol in (1, 3):  # Admin o Entrenador
-        query = Notificacion.query
-    else:  # Deportista → filtrar por su categoría, rama y división
-        query = Notificacion.query.filter(
-            and_(
-                or_(
-                    Notificacion.IdCategoria == current_user.IdCategoria,
-                    Notificacion.IdCategoria == None
-                ),
-                or_(
-                    Notificacion.IdRama == current_user.IdRama,
-                    Notificacion.IdRama == None
-                ),
-                or_(
-                    Notificacion.IdDivision == current_user.IdDivision,
-                    Notificacion.IdDivision == None
-                )
+    query = Notificacion.query
+
+    # --- Filtrado por rol ---
+    if current_user.IdRol == 2:  # Deportista
+        if current_user.IdCategoria is not None:
+            query = query.filter(
+                or_(Notificacion.IdCategoria == current_user.IdCategoria,
+                    Notificacion.IdCategoria == None)
             )
-        )
+        if current_user.IdRama is not None:
+            query = query.filter(
+                or_(Notificacion.IdRama == current_user.IdRama,
+                    Notificacion.IdRama == None)
+            )
+        if current_user.IdDivision is not None:
+            query = query.filter(
+                or_(Notificacion.IdDivision == current_user.IdDivision,
+                    Notificacion.IdDivision == None)
+            )
+    # Admin (1) y Entrenador (3) ven todas las notificaciones, no se filtra nada
 
-    # --- FILTROS DEL FRONT ---
-    buscar = request.args.get('buscar', '').strip()
-    categoria = request.args.get('categoria', '').strip()
-    division = request.args.get('division', '').strip()
-    rama = request.args.get('rama', '').strip()
-
+    # --- Filtros del front ---
     if buscar:
         like_pattern = f"%{buscar}%"
         query = query.filter(
@@ -115,18 +43,15 @@ def obtener_notificaciones():
                 Notificacion.Descripcion.ilike(like_pattern)
             )
         )
+    if categoria is not None:
+        query = query.filter(Notificacion.IdCategoria == categoria)
+    if rama is not None:
+        query = query.filter(Notificacion.IdRama == rama)
+    if division is not None:
+        query = query.filter(Notificacion.IdDivision == division)
 
-    if categoria and categoria.isdigit():
-        query = query.filter(Notificacion.IdCategoria == int(categoria))
-
-    if division and division.isdigit():
-        query = query.filter(Notificacion.IdDivision == int(division))
-
-    if rama and rama.isdigit():
-        query = query.filter(Notificacion.IdRama == int(rama))
-    
-    # 👉 Ordenar y limitar a 6
-    resultados = query.order_by(Notificacion.Id.desc()).limit(6).all()
+    # --- Ordenar y limitar ---
+    resultados = query.order_by(Notificacion.Id.desc()).all()
 
     notificaciones = []
     for e in resultados:
@@ -144,6 +69,7 @@ def obtener_notificaciones():
         })
 
     return notificaciones
+
 
 def agregarNotificacion(nuevaNotif):
     db.session.add(nuevaNotif)
