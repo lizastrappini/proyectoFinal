@@ -12,7 +12,7 @@ from flask_login import LoginManager, current_user
 from config import DevelopmentConfig, app_configs
 from src import db
 from src.controllers import deportistaController, notificacionController
-from src.models.contacto import Contacto
+from src.models.parametro import Parametro
 from src.models.usuario import Usuario
 from src.routes.usuarioRoutes import usuario_bp
 from src.routes.calendarioRoutes import calendario_bp
@@ -25,6 +25,7 @@ from src.routes.estadisticasRoutes import estadisticas_bp
 from src.routes.notificacionRoutes import notificacion_bp
 from src.routes.contactoRoutes import contacto_bp
 from src.routes.chatbotRoutes import chatbot_bp
+from src.routes.faqRoutes import faq_bp
 from src.utils.Mail import mail
 
 app = Flask(__name__)
@@ -44,6 +45,7 @@ app.register_blueprint(entrenador_bp, url_prefix='/entrenador')
 app.register_blueprint(deportista_bp, url_prefix='/deportista')
 app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
 app.register_blueprint(contacto_bp, url_prefix='/contacto')
+app.register_blueprint(faq_bp, url_prefix='/faq')
 app.register_blueprint(estadisticas_bp)  # monta en /estadisticas
 app.register_blueprint(chatbot_bp)
 
@@ -84,13 +86,13 @@ def inject_notificaciones():
 # Context processor para datos de contacto y fecha actual
 @app.context_processor
 def inject_contacto_and_now():
-    contacto = Contacto.query.first()
+    contacto = Parametro.query.first()
     return {'contacto': contacto, 'now': datetime.now()}
 
 scheduler = BackgroundScheduler()
 # Se ejecuta todos los días a la medianoche
 scheduler.add_job(deportistaController.actualizar_categorias_automaticas, 'cron', hour=0, minute=0)
 scheduler.start()
-
+        
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True, use_reloader=True)

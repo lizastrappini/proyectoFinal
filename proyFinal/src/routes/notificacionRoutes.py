@@ -11,34 +11,6 @@ from src.utils.enums import generalEnum
 
 notificacion_bp = Blueprint('notificacion', __name__)
 
-# @notificacion_bp.route('/')
-# def index():
-#     return render_template('notificacion/index.html')
-"""
-@notificacion_bp.route('/')
-def index():
-    categorias = [
-    {'value': cat.value, 'text': cat.name}
-    for cat in generalEnum.CategoriaEnum
-    ]
-    divisiones = [
-    {'value': div.value, 'text': div.name}
-    for div in generalEnum.DivisionEnum
-    ]
-    ramas = [
-    {'value': rama.value, 'text': rama.name}
-    for rama in generalEnum.RamaEnum
-    ]
-    notif = notificacionController.obtener_notificaciones()
-    return render_template('notificacion/index.html', notificaciones= notif, categorias= categorias, divisiones=divisiones, ramas=ramas)
-
-
-@notificacion_bp.route('/obtener', methods=['GET'])
-def obtener():
-    notif = notificacionController.obtener_notificaciones()
-    return jsonify(data=notif)  
-
-"""
 
 @notificacion_bp.route('/')
 def index():
@@ -61,14 +33,22 @@ def index():
     notificaciones=notif,
     categorias=categorias,
     divisiones=divisiones,
-    ramas=ramas
-)
+    ramas=ramas)
 
-@notificacion_bp.route('/obtener', methods=['GET'])
-def obtener():
-    notif = notificacionController.obtener_notificaciones()
-    print("DEBUG obtener ->", notif)  # 👈 chequeo en consola
-    return jsonify(data=notif)
+@notificacion_bp.route('/filtrar', methods=['GET'])
+def filtrar():
+    buscar = request.args.get('buscar', '').strip()
+    categoria = request.args.get('categoria')
+    rama = request.args.get('rama')
+    division = request.args.get('division')
+    
+    
+    categoria = int(categoria) if categoria and categoria.isdigit() else None
+    rama = int(rama) if rama and rama.isdigit() else None
+    division = int(division) if division and division.isdigit() else None
+    
+    data = notificacionController.obtener_notificaciones(buscar=buscar, categoria=categoria, rama=rama, division=division)
+    return jsonify({'data': data})
 
 
 
@@ -116,6 +96,8 @@ def nueva_notificacion():
             IdDivision=division_id,
             IdRama=rama_id
         )
+        notificacionController.agregarNotificacion(nueva_notif)    
+        
         
         usuarios_query = Usuario.query
 
@@ -128,29 +110,16 @@ def nueva_notificacion():
 
         usuarios_destino = usuarios_query.all()
 
-        """
-        if categoria_id:
-            usuarios_destino = Usuario.query.filter_by(IdCategoria=categoria_id).all()
+       
+        if usuarios_destino:
+            for usuario in usuarios_destino:
+                notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
         else:
-            usuarios_destino = Usuario.query.all()
-            
-        if division_id:
-            usuarios_destino = Usuario.query.filter_by(IdDivision=division_id).all()
-        else:
-            usuarios_destino = Usuario.query.all()
-            
-        if rama_id:
-            usuarios_destino = Usuario.query.filter_by(IdRama=rama_id).all()
-        else:
-            usuarios_destino = Usuario.query.all()
-           
-        """
-            
-        for user in usuarios_destino:
-            notificacionController.enviar_mail(user.Email, titulo, descripcion)
+            # Si no hay filtros o no se encontró nadie, se puede decidir
+            # enviar a todos (opcional)
+            pass
 
-        notificacionController.agregarNotificacion(nueva_notif)
-        # notificacionController.enviar_mail(nueva_notif)
+       
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Notificación creada exitosamente'}), 200
