@@ -232,11 +232,11 @@ INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`) VALUES
 (5, '¿Cómo puedo recibir notificaciones importantes?', 'Todas las notificaciones aparecen en el ícono de campana en la barra superior. También puedes verlas desde la sección “Notificaciones”.', 'notificacion'),
 (6, '¿Cómo puedo actualizar mis datos personales?', 'Ve a “Mi Cuenta” en el menú lateral. Allí puedes modificar tu nombre, apellido, correo y teléfono.', 'datos personales, mi cuenta '),
 (7, '¿Puedo contactar al club desde la app?', 'Sí, en la sección “Medios de Contacto” encontrarás teléfono, email, WhatsApp e Instagram para comunicarte con el club.', 'medios de contacto, telefono, email, whatsapp, instagram'),
-(8, '¿Quién puede ver los pagos de los deportistas?', 'Solo los administradores tienen acceso a la sección de “Pagos” para ver y gestionar pagos de los deportistas. Para ver tus pagos ve a \"Mi Cuenta\"', 'pagos '),
+(8, '¿Quién puede ver las cuotas de los deportistas?', 'Solo los administradores tienen acceso a la sección de “Pagos” para ver y gestionar pagos de los deportistas. Para ver tus pagos ve a \"Mi Cuenta\"', 'cuota '),
 (9, '¿Cómo agrego o elimino deportistas o entrenadores?', 'Solo los administradores pueden agregar o eliminar usuarios desde las secciones “Deportistas” o “Entrenadores”.', 'alta, deportistas, entrenadores, eliminar'),
 (10, '¿La app funciona en móvil y desktop?', 'Sí, Voley App está diseñada para ser responsiva y funcionar en cualquier dispositivo con navegador moderno.', 'celular, movil, computadora'),
 (11, '¿Cómo cambio mi contraseña?', 'Puede cambiar su contraseña desde la sección \'Mi Cuenta\' del menú.', 'contraseña'),
-(12, '¿Cómo puedo ver mis pagos deportivos?', 'Puede ver sus pagos y el estado de los mismos desde la sección \'Mi Cuenta\' del menú.', 'estado cuotas');
+(12, '¿Cómo puedo ver mis pagos deportivos?', 'Puede ver sus pagos y el estado de los mismos desde la sección \'Mi Cuenta\' del menú.', 'pagos');
 
 -- --------------------------------------------------------
 
