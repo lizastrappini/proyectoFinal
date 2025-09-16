@@ -44,6 +44,9 @@ def filtrar():
     fecha_desde = request.args.get('fechaDesde')
     fecha_hasta = request.args.get('fechaHasta')
     # dni = request.args.get('dni')
+
+    if(fecha_desde is None or fecha_hasta is None):
+        return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
     
     if estado and estado.isdigit():
         estado = int(estado)
@@ -257,11 +260,21 @@ def pagar_seleccionados():
             return jsonify({'success': False, 'message': 'No se seleccionaron pagos'}), 400
         
         pagos = Pago.query.filter(Pago.Id.in_(ids)).all()
-        for pago in pagos:
-            pago.IdEstado = 1  # id de "Pago"
-            pagosController.actualizar_pago(pago)
 
-        return jsonify({'success': True, 'message': f'{len(pagos)} pagos actualizados a Pago'})
+        actualizados = 0
+
+        for pago in pagos:
+            if pago.IdEstado == 1: #ya estaba pagado,para q no actualice fechapago
+                continue
+            pago.IdEstado = 1
+            pago.FechaPago = datetime.datetime.now()
+            pagosController.actualizar_pago(pago)
+            actualizados += 1
+
+        mensaje = f'{actualizados} pagos actualizados a Pago'
+    
+        return jsonify({'success': True,'updated': actualizados,'message': mensaje})
+
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
 

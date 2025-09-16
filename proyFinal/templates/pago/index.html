@@ -12,9 +12,7 @@
 
         <div class="d-flex row mb-5 gx-5">
           <div class="col d-flex justify-content-end">
-            <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
-              Limpiar 
-            </button>
+
           </div>
           <div class="col-12 col-md-2">
             <select id="estadoFiltro" class="select2 form-select" data-placeholder="Estado" >
@@ -25,18 +23,22 @@
             </select>
           </div>
           <div class="col-12 col-md-2">
-            <div class="form-floating mb-0">
-            <input type="date" class="form-control" id="fechaDesdeFiltro" placeholder="Fecha Desde">
-            <label for="fechaDesdeFiltro">Fecha Desde</label>
+
+            <div class="form-floating form-floating-outline" >
+              <input type="text" class="form-control" id="fechaDesdeFiltro" name="fechaDesdeFiltro" placeholder="Fecha Desde" required/>
+              <label for="fechaDesdeFiltro">Fecha Desde</label>
             </div>
             <!-- <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde"> -->
           </div>
           <div class="col-12 col-md-2">
-            <div class="form-floating mb-0">
-            <input type="date" class="form-control" id="fechaHastaFiltro" placeholder="Fecha Hasta">
-            <label for="fechaHastaFiltro">Fecha Hasta</label>
+            <div class="form-floating form-floating-outline" >
+              <input type="text" class="form-control" id="fechaHastaFiltro" name="fechaHastaFiltro" placeholder="Fecha Hasta" required/>
+              <label for="fechaHastaFiltro">Fecha Hasta</label>
             </div>
             <!-- <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta"> -->
+          </div>
+          <div class="col-auto d-flex justify-content-end">
+            <button id="btnFiltrar" class="btn btn-primary">Filtrar</button>
           </div>
         </div>
 
@@ -61,14 +63,17 @@
 
   
 
-          <div class="table-responsive text-nowrap">
-            <table id="tablaPagos" class="table">
+          <div class="table-responsive">
+            <table class="invoice-list-table table dataTable no-footer dtr-column" id="tablaPagos">
               <thead>
                 <tr>
                   <!-- {% if current_user.IdRol == RolEnum.Admin %} -->
-                  <th><input type="checkbox" id="selectAll"></th>
+                  <th>
+                    <div class="form-check pl-4 pt-3">
+                      <input class="form-check-input" type="checkbox" value="" id="selectAll">
+                    </div>
+                  </th>
                   <!-- {% endif %} -->
-                  <th>Id</th>
                   <!-- {% if current_user.IdRol == RolEnum.Admin %} -->
                   <th>Deportista</th>
                   <!-- {% endif %} -->
@@ -233,350 +238,435 @@
     </div>
   </div>
 
+<div id="uiMsg" class="mt-2"></div>
+
   {% endblock %}
 
   {% block scripts %}
   <script>
 
-    let tabla = null;
+let tabla = null;
+let fvFiltros;
 
-    function filtrar() {
-      const estado = $('#estadoFiltro').val();
-      const fechaDesde = $('#fechaDesdeFiltro').val();
-      const fechaHasta = $('#fechaHastaFiltro').val();
-      
-      const params = new URLSearchParams();
-      if (estado) params.append('estado', estado);
-      if (fechaDesde) params.append('fechaDesde', fechaDesde);
-      if (fechaHasta) params.append('fechaHasta', fechaHasta);
+$(function () {
+    $('#alerta-container').css({ bottom: '160px' }); // subir alertas sólo aquí
+  });
 
-      const url = `/pago/filtrar?${params.toString()}`;
+function showFlash(msg, type = 'danger', timeout = 4000) {
+  const $container = $('#alerta-container');
+  if (!$container.length) return;
 
+  const id = 'alert-' + Date.now();
 
-      if (tabla) {
-        tabla.ajax.url(url).load();
-      } else {
-        tabla = $('#tablaPagos').DataTable({
-          ajax: {
-            url: url,
-            dataSrc: 'data'
-          },
-          columns: [
-       
-          { 
-            data: null,
-            orderable: false,
-            searchable: false,
-            render: function(data, type, row) {
-              return `<input type="checkbox" class="check-pago" data-id="${row.id}">`;
-            }
-          },
-     
-          { data: 'id' },
-          { data: 'deportista' },
-          { data: 'fechaPago' },
-          { data: 'fechaVencimiento' },
-          {
-          data: 'importe',
-          render: function (data) {
-            return `$ ${parseFloat(data).toLocaleString('es-AR')}`;
-            }
-          },
-          {
-            data: 'estado',
-            render: function (data, type, row) {
-              let badgeClass = '';
+  const $alert = $(`
+    <div id="${id}" class="alert alert-${type} alert-dismissible fade" role="alert"
+         style="margin: 0.25rem auto; max-width: 400px;">
+      ${msg}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `);
 
-              if (data === 'Pago') {
-                badgeClass = 'bg-label-success';
-              } else if (data === 'Pendiente') {
-                badgeClass = 'bg-label-warning';
-              } else if (data === 'NoPago') {
-                badgeClass = 'bg-label-danger';
-              } else {
-                badgeClass = 'bg-label-secondary';
-              }
+  // Agregar y animar
+  $container.append($alert);
+  requestAnimationFrame(() => $alert.addClass('show'));
 
-              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
-            }
-          },
-          {
-            data: 'comprobanteFoto',
-            render: function(data, type, row) {
-              if (data) {
-                // Miniatura clickeable
-                return `<a href="/static/${data}" target="_blank">
-                  <img src="/static/${data}" style="height:40px; width:auto; object-fit:contain;" />
-                </a>`;
-
-              } else {
-                return 'No Cargado';
-              }
-            }
-          },
-        
-          
-          {
-            data: null,
-            orderable: false,
-            searchable: false,
-            render: function(data, type, row, meta) {
-           
-            return `
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="ri-more-2-line"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
-                    <i class="ri-pencil-line me-1"></i> Editar
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
-                    <i class="ri-delete-bin-7-line me-1"></i> Eliminar
-                  </a>
-                 
-                </div>
-              </div>
-            `;
-          }
-
-          }
-          ],
-          paging: false,
-          info: false,
-          searching: false,
-          ordering: true,
-          dom: 'frtip',  // <-- importante para mostrar botones
-          buttons: [
-            {
-              extend: 'excelHtml5',
-              text: 'Exportar a Excel',
-              title: 'Pagos',
-              className: 'buttons-excel',
-              exportOptions: {
-                columns: ':not(:last-child)' // Excluir columna acciones
-              }
-            }
-          ],
-          
-          initComplete: function () {
-            $('#tablaPagos')
-              .removeClass('dataTable no-footer stripe hover')
-              .addClass('table');
-          }
-        }); 
-      }
-    }
-   // Función para mostrar u ocultar el botón Pagar
-function actualizarBotonPagar() {
-    const anyChecked = $('.check-pago:checked').length > 0;
-    $('#btnPagarSeleccionados').prop('disabled', !anyChecked);
-
-    // Actualizar el checkbox de selectAll
-    const allChecked = $('.check-pago').length === $('.check-pago:checked').length;
-    $('#selectAll').prop('checked', allChecked);
+  // Auto-cerrar
+  if (timeout > 0) {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      bootstrap.Alert.getOrCreateInstance(el).close();
+    }, timeout);
+  }
 }
 
-// Delegación de eventos para checkboxes (incluso los que se crean después)
-$(document).on('change', '#selectAll', function() {
+function actualizarBotonPagar() {
+  const anyChecked = $('.check-pago:checked').length > 0;
+  $('#btnPagarSeleccionados').prop('disabled', !anyChecked);
+
+  // actualizar el selectAll
+  const allChecked = $('.check-pago').length > 0 &&
+                     $('.check-pago').length === $('.check-pago:checked').length;
+  $('#selectAll').prop('checked', allChecked);
+}
+
+function limpiar() {
+  // limpiar filtros
+  $('#estadoFiltro').val('').trigger('change');
+  $('#fechaDesdeFiltro').val('');
+  $('#fechaHastaFiltro').val('');
+
+  // reset min/max de flatpickr si existen
+  if (window.fpDesde && window.fpHasta) {
+    window.fpDesde.set('maxDate', null);
+    window.fpHasta.set('minDate', null);
+  }
+
+  // dejar tabla vacía y mostrar mensaje
+  if (tabla) {
+    tabla.clear().draw();
+    actualizarBotonPagar();
+  }
+}
+
+
+function filtrar() {
+  const estado     = $('#estadoFiltro').val();
+  const fechaDesde = $('#fechaDesdeFiltro').val();
+  const fechaHasta = $('#fechaHastaFiltro').val();
+
+  const params = new URLSearchParams();
+  if (estado)     params.append('estado', estado);
+  if (fechaDesde) params.append('fechaDesde', fechaDesde);
+  if (fechaHasta) params.append('fechaHasta', fechaHasta);
+
+  const url = `/pago/filtrar?${params.toString()}`;
+
+  $.getJSON(url)
+    .done(resp => {
+      if (resp && resp.message) {
+        // mostrás el mensaje del backend abajo-centro usando tu container
+        showFlash(resp.message, 'danger');
+      }
+
+      const rows = (resp && resp.data) ? resp.data : [];
+      tabla.clear().rows.add(rows).draw();
+      actualizarBotonPagar();
+    })
+    .fail(() => {
+      tabla.clear().draw();
+      actualizarBotonPagar();
+      showFlash('No se pudieron obtener los datos.', 'danger');
+    });
+}
+
+
+function editarFila(rowIndex) {
+  const dt  = $('#tablaPagos').DataTable();
+  const data = dt.row(rowIndex).data();
+  if (!data) return;
+
+  const $idInput = $('#id'); // por si existe un hidden id
+  if ($idInput.length) $idInput.val(data.id);
+
+  $('#fechaPago').val(data.fechaPagoISO || data.fechaPago || '');
+  $('#fechaVencimiento').val(data.fechaVencimientoISO || data.fechaVencimiento || '');
+  $('#importe').val(data.importe ?? '');
+
+  $('#estado').val(data.estado).trigger('change');
+  $('#deportista').val(data.deportista_id).trigger('change');
+
+  // Cambiar a modo edición
+  $('#editPagosForm').attr('action', `/pago/editar/${data.id}`);
+  $('#submitBtn').text('Actualizar');
+  $('#tituloAdd').text('Editar Pago');
+
+  // Mostrar modal
+  $('#addPago').modal('show');
+}
+
+function eliminarFila(rowIndex) {
+  const dt  = $('#tablaPagos').DataTable();
+  const data = dt.row(rowIndex).data();
+  if (!data) return;
+
+  Swal.fire({
+    title: '¿Estás segura/o?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    fetch(`/pago/eliminar/${data.id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(async response => {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error desconocido');
+      }
+      return response.json();
+    })
+    .then(data => {
+      Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 });
+      dt.ajax ? dt.ajax.reload() : filtrar(); // si no hay ajax, recargar con filtrar()
+    })
+    .catch(error => {
+      Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'Hubo un error al intentar eliminar el pago.' });
+    });
+  });
+}
+
+
+$(document).ready(function () {
+
+  if ($.fn.select2) {
+    $('#estadoFiltro').select2({ width: '100%', placeholder: 'Estado', allowClear: true });
+  }
+
+
+  window.fpDesde = $("#fechaDesdeFiltro").flatpickr({
+    locale: flatpickr.l10ns.es,
+    altInput: true,
+    altFormat: "d-m-Y",
+    dateFormat: "Y-m-d",
+    allowInput: true,
+    onChange: function (selectedDates, dateStr) {
+      if (window.fpHasta) window.fpHasta.set("minDate", dateStr);
+    }
+  });
+
+  window.fpHasta = $("#fechaHastaFiltro").flatpickr({
+    locale: flatpickr.l10ns.es,
+    altInput: true,
+    altFormat: "d-m-Y",
+    dateFormat: "Y-m-d",
+    allowInput: true,
+    onChange: function (selectedDates, dateStr) {
+      if (window.fpDesde) window.fpDesde.set("maxDate", dateStr);
+    }
+  });
+
+  tabla = $('#tablaPagos').DataTable({
+    data: [], // arranca vacía pero “pintada”
+    columns: [
+      { 
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function(data, type, row) {
+          return `<input type="checkbox" class="check-pago form-check-input ml-1" data-id="${row?.id ?? ''}">`;
+        }
+      },
+      { data: 'deportista' },
+      { data: 'fechaPago' },
+      { data: 'fechaVencimiento' },
+      { data: 'importe',
+        render: function (data) {
+          const n = parseFloat(data ?? 0);
+          return isNaN(n) ? '' : `$ ${n.toLocaleString('es-AR')}`;
+        }
+      },
+      { data: 'estado',
+        render: function (data) {
+          let badgeClass = '';
+          if (data === 'Pago') badgeClass = 'bg-label-success';
+          else if (data === 'Pendiente') badgeClass = 'bg-label-warning';
+          else if (data === 'NoPago') badgeClass = 'bg-label-danger';
+          else badgeClass = 'bg-label-secondary';
+          return `<span class="badge rounded-pill ${badgeClass}">${data ?? ''}</span>`;
+        }
+      },
+      { data: 'comprobanteFoto',
+        render: function(data) {
+          return data
+            ? `<a href="/static/${data}" target="_blank"><img src="/static/${data}" style="height:40px;width:auto;object-fit:contain" /></a>`
+            : 'No Cargado';
+        }
+      },
+      { data: null,
+        orderable: false,
+        searchable: false,
+        render: function(data, type, row, meta) {
+          return `
+            <div class="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="ri-more-2-line"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
+                  <i class="ri-pencil-line me-1"></i> Editar
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                  <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+                </a>
+              </div>
+            </div>`;
+        }
+      }
+    ],
+    paging: false,
+    info: false,
+    searching: false,
+    ordering: true,
+    dom: 'frtip',
+    autoWidth: false,  
+    buttons: [
+      {
+        extend: 'excelHtml5',
+        text: 'Exportar a Excel',
+        title: 'Pagos',
+        className: 'buttons-excel',
+        exportOptions: { columns: ':not(:last-child)' }
+      }
+    ],
+     paging: true,
+  pageLength: 10,                 // filas por página
+  lengthMenu: [10, 25, 50, 100],  // opciones del selector
+  info: true,
+  pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+  autoWidth: false,
+
+  // Footer al estilo «info a la izquierda, paginador a la derecha»
+  // (si tu tema ya lo arma así, podés dejar 'lfrtip')
+  dom: "frtip", // o "lfrtip" si querés también el selector de cantidad arriba
+
+  language: {
+    emptyTable:  "Ningún dato disponible. Intente filtrar",
+    zeroRecords: "Ningún dato disponible. Intente filtrar",
+    lengthMenu:  "Mostrar _MENU_",
+    info:        "Mostrando _START_ a _END_ de _TOTAL_",
+    infoEmpty:   "Mostrando 0 a 0 de 0",
+    infoFiltered:"(filtrado de _MAX_ en total)",
+    paginate: {
+      previous: '<i class="ri-arrow-left-s-line"></i>',
+      next:     '<i class="ri-arrow-right-s-line"></i>',
+      first:    'Primero',
+      last:     'Último'
+    }
+  },
+    initComplete: function () {
+      // limpiar clases extras si tu tema las agrega
+      $('#tablaPagos')
+        .removeClass('dataTable no-footer stripe hover')
+        .addClass('table');
+    }
+  });
+
+  $('#btnPagarSeleccionados').prop('disabled', true);
+
+  $(document).on('change', '#selectAll', function () {
     const checked = $(this).is(':checked');
     $('.check-pago').prop('checked', checked);
     actualizarBotonPagar();
-});
+  });
 
-$(document).on('change', '.check-pago', function() {
+  $(document).on('change', '.check-pago', function () {
     actualizarBotonPagar();
-});
+  });
 
-// Cuando la tabla se dibuja o redibuja
-$('#tablaPagos').on('draw.dt', function() {
+  $('#tablaPagos').on('draw.dt', function () {
     actualizarBotonPagar();
-});
-// Botón Pagar
-$('#btnPagarSeleccionados').on('click', function() {
-    const idsSeleccionados = $('.check-pago:checked').map(function() { return $(this).data('id'); }).get();
-    if(idsSeleccionados.length === 0) return;
+  });
+
+  $('#btnPagarSeleccionados').on('click', function () {
+    const idsSeleccionados = $('.check-pago:checked').map(function() {
+      return $(this).data('id');
+    }).get();
+
+    if (idsSeleccionados.length === 0) return;
 
     Swal.fire({
-        title: '¿Confirmar pago de los seleccionados?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, pagar',
-        cancelButtonText: 'Cancelar'
+      title: '¿Confirmar pago de los seleccionados?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, pagar',
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
-        if(result.isConfirmed) {
-            fetch('/pago/pagar_seleccionados', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: JSON.stringify({ ids: idsSeleccionados })
-            })
-            .then(async response => {
-                if(!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Error al pagar');
-                }
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({ icon: 'success', title: 'Pagos actualizados', text: data.message, showConfirmButton: false, timer: 2000 });
-                if(tabla) tabla.ajax.reload();
-            })
-            .catch(error => {
-                Swal.fire({ icon: 'error', title: 'Error', text: error.message });
-            });
+      if (!result.isConfirmed) return;
+
+      fetch('/pago/pagar_seleccionados', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ ids: idsSeleccionados })
+      })
+      .then(async response => {
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Error al pagar');
         }
-    });
-});
-
-    $(document).ready(function () {
-      $('#btnPagarSeleccionados').prop('disabled', true);
-      filtrar(); // carga inicial
-    
-      $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').on('change', function () {
-      filtrar(); // recarga con nuevos filtros
-    });
-
-   
-     $('.btn-export').on('click', function() {
-    tabla.button('.buttons-excel').trigger();
+        return response.json();
+      })
+      .then(data => {
+        Swal.fire({ icon: 'success', title: 'Pagos actualizados', text: data.message, showConfirmButton: false, timer: 2000 });
+        // recargar: si no usás ajax nativo, volvé a ejecutar filtrar()
+        filtrar();
+      })
+      .catch(error => {
+        Swal.fire({ icon: 'error', title: 'Error', text: error.message });
       });
     });
+  });
 
+  $('.btn-export').on('click', function () {
+    tabla.button('.buttons-excel').trigger();
+  });
 
-              function editarFila(rowIndex) {
-              const tabla = $('#tablaPagos').DataTable();
-              const data = tabla.row(rowIndex).data();
+  $('#addPago').on('hidden.bs.modal', function () {
+    const form = $('#editPagosForm')[0];
+    if (form) form.reset();
 
-              // Llenar inputs
-              $('#id').val(data.id);
-              $('#fechaPago').val(data.fechaPagoISO);
-              $('#fechaVencimiento').val(data.fechaVencimientoISO);
-              $('#importe').val(data.importe);
-              $('#estado').val(data.estado).trigger('change');
-              $('#deportista').val(data.deportista_id).trigger('change');
+    $('#estado').val(null).trigger('change');
+    $('#deportista').val(null).trigger('change');
 
+    $('#editPagosForm').attr('action', '/pago/agregar_pago');
+    $('#submitBtn').text('Crear');
+    $('#tituloAdd').text('Agregar Pago');
+  });
 
-              
-              // Cambiar modo y texto del botón
-              $('#editPagosForm').attr('action', `/pago/editar/${data.id}`);  // O data.id si tenés otro ID
-              $('#submitBtn').text('Actualizar');
-              $('#tituloAdd').text('Editar Pago');
+  $('#editPagosForm').on('submit', function (e) {
+    e.preventDefault();
 
-              // Mostrar el modal
-              $('#addPago').modal('show');
-              
+    const form = this;
+    const actionUrl = $(form).attr('action');
+    const formData = new FormData(form);
 
-            }
-              $('#addPago').on('hidden.bs.modal', function () {
-              $('#editPagosForm')[0].reset();
-              $('#estado').val(null).trigger('change');
-              $('#deportista').val(null).trigger('change');
-              $('#editPagosForm').attr('action', '{{ url_for("pago.agregar_pago") }}');
-              $('#submitBtn').text('Crear');
-              $('#tituloAdd').text('Agregar Pago');
-            });
+    fetch(actionUrl, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(async response => {
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al procesar');
+      }
+      return response.json();
+    })
+    .then(data => {
+      Swal.fire({
+        icon: 'success',
+        title: data.message?.includes('creado') ? 'Pago creado' : 'Pago actualizado',
+        text: data.message || 'Operación exitosa',
+        showConfirmButton: false,
+        timer: 2000
+      });
 
-            $('#editPagosForm').on('submit', function(e) {
-                e.preventDefault(); // Evita el envío tradicional
+      $('#addPago').modal('hide');
 
-                const form = this;
-                const actionUrl = $(form).attr('action');
-                const formData = new FormData(form);
+      // reset a modo crear
+      const f = $('#editPagosForm')[0];
+      if (f) f.reset();
+      $('#estado').val(null).trigger('change');
+      $('#deportista').val(null).trigger('change');
+      $('#editPagosForm').attr('action', '/pago/agregar_pago');
+      $('#submitBtn').text('Crear');
+      $('#tituloAdd').text('Agregar Pago');
 
-                fetch(actionUrl, {
-                  method: 'POST',
-                  body: formData,
-                  headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                  }
-                })
-                .then(async response => {
-                  if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Error al actualizar');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: data.message.includes('creado') ? 'Pago creado' : 'Pago actualizado',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  $('#addPago').modal('hide');
-                  $('#editPagosForm')[0].reset();
-                  $('#estado').val(null).trigger('change');
-                  $('#deportista').val(null).trigger('change');
-                  $('#editPagosForm').attr('action', '{{ url_for("pago.agregar_pago") }}');
-                  $('#submitBtn').text('Crear');
-                  $('#tituloAdd').text('Agregar Pago');
-                  if (tabla) tabla.ajax.reload();
-                })
-                .catch(error => {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-                  });
-                });
-              });
+      filtrar(); // refrescar datos
+    })
+    .catch(error => {
+      Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+    });
+  });
 
+  $('#btnFiltrar').on('click', function () {
+    const fechaDesde = $('#fechaDesdeFiltro').val();
+    const fechaHasta = $('#fechaHastaFiltro').val();
 
-
-
-          function eliminarFila(rowIndex) {
-            const tabla = $('#tablaPagos').DataTable();
-            const data = tabla.row(rowIndex).data();
-
-            Swal.fire({
-              title: '¿Estás segura/o?',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Sí, eliminar',
-              cancelButtonText: 'Cancelar'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                fetch(`/pago/eliminar/${data.id}`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                  }
-                })
-                .then(async response => {
-                  if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error desconocido');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Eliminado',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  tabla.ajax.reload();
-                })
-                .catch(error => {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Hubo un error al intentar eliminar el pago.'
-                  });
-                });
-              }
-            });
-          }
-          
-          function limpiar() {
-          $('#estadoFiltro, #fechaDesdeFiltro, #fechaHastaFiltro').val('').trigger('change');
-          filtrar(); // recargar la tabla sin filtros 
-          }
+    filtrar();
+  });
+});
+      
   </script>
   <!-- DataTables Buttons CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>

@@ -61,7 +61,7 @@ def obtener_pagos(estado= None,  fecha_desde=None, fecha_hasta=None):
             'fechaPagoISO': e.FechaPago.strftime('%Y-%m-%d') if e.FechaPago else None,
             'importe': e.Importe,
             'estado': estado_nombre,
-            'deportista': deportista_nombre,
+            'deportista': f"#{deportista.Id} {deportista_nombre}",
             'deportista_id': e.IdUsuario,
             'comprobante': 'Cargado' if e.Comprobante and e.Comprobante.strip() != '' else 'No Cargado',
             'comprobanteFoto': e.Comprobante

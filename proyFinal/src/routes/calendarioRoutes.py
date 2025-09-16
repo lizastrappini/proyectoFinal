@@ -17,18 +17,18 @@ def index():
     {'value': evento.value, 'text': evento.name}
     for evento in generalEnum.TipoEventoEnum
     ]
-    
-    tipoeventos.append({'value': 7, 'text': 'MiCategoria'})
-
     usuario = current_user
     user = usuarioController.getUsuarioById(usuario.Id)
+
+    if user and (user.IdRol == generalEnum.RolEnum.Deportista.value):
+        tipoeventos.append({'value': 7, 'text': 'MiCategoria'})
 
     if user and (user.IdRol == generalEnum.RolEnum.Entrenador.value or user.IdRol == generalEnum.RolEnum.Admin.value):
         categorias = [
         {'value': cat.value, 'text': cat.name}
         for cat in generalEnum.CategoriaEnum
-        ]
-
+        if cat.value != 0
+]
         contrincantes = [
         {'value': contrincante.value, 'text': contrincante.name}
         for contrincante in generalEnum.ContrincantesEnum

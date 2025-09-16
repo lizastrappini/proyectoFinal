@@ -152,7 +152,7 @@ if (horaInicioMasivo) {
     btnNuevoEventoMasivo.addEventListener('click', e => {
       // Limpiar valores del form
       resetValues();
-      bsAddEventSidebar.show();
+      //bsAddEventSidebar.show();
 
       // Personalizar modal
       if (offcanvasTitle) {
@@ -238,13 +238,15 @@ function mostrarCamposSegunTipo(forceTipo = null, ocultarTipo = false) {
 
 
     // Event listener
-    if (tipoEvento) {
-      // Escucha cambios de Select2
-      $(tipoEvento).on('change', mostrarCamposSegunTipo);
+   if (tipoEvento) {
+  $(tipoEvento).on('change select2:select', function () {
+    mostrarCamposSegunTipo();
+  });
 
-      // Llamada inicial
-      mostrarCamposSegunTipo();
-    }
+  // llamada inicial
+  mostrarCamposSegunTipo();
+}
+
 
     // Event click function
     function eventClick(info) {

@@ -45,20 +45,7 @@ window.isDarkStyle = window.Helpers.isDarkStyle();
   }
 
   // Navbar
-  window.addEventListener('scroll', e => {
-    if (window.scrollY > 10) {
-      nav.classList.add('navbar-active');
-    } else {
-      nav.classList.remove('navbar-active');
-    }
-  });
-  window.addEventListener('load', e => {
-    if (window.scrollY > 10) {
-      nav.classList.add('navbar-active');
-    } else {
-      nav.classList.remove('navbar-active');
-    }
-  });
+  
 
   // Function to close the mobile menu
   function closeMenu() {
