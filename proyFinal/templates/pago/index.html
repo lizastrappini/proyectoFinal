@@ -162,8 +162,8 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="estado" class="form-label">Estado</label>
-                            <select class="form-select" id="estado" name="estado" required>
-                              <option value="">Seleccione un estado</option>
+                            <select class="select2 form-select" id="estado" name="estado" required >
+                              <option value="0">Seleccione un estado</option>
                               {% for estado in estados %}
                                 <option value="{{ estado.text }}">{{ estado.text }}</option>
                               {% endfor %}
@@ -716,7 +716,33 @@ $(document).ready(function () {
     filtrar();
   });
 });
-      
+      $('#importarPagosForm').on('submit', function (e) {
+  e.preventDefault();
+  const form = this;
+  const formData = new FormData(form);
+
+  fetch($(form).attr('action'), {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(async response => {
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al procesar');
+    }
+    return response.json();
+  })
+  .then(data => {
+    Swal.fire({ icon: 'success', title: 'Importación exitosa', text: data.message, timer: 2000, showConfirmButton: false });
+    $('#importarPago').modal('hide');
+    filtrar(); // 🔑 refrescar la tabla con los filtros actuales
+  })
+  .catch(error => {
+    Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+  });
+});
+
   </script>
   <!-- DataTables Buttons CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>

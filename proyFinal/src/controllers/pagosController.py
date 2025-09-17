@@ -26,7 +26,7 @@ def obtener_pagos(estado= None,  fecha_desde=None, fecha_hasta=None):
     if fecha_desde:
         try:
             fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
-            query = query.filter(Pago.FechaPago >= fecha_desde_dt)
+            query = query.filter(Pago.FechaVencimiento >= fecha_desde_dt)
         except ValueError:
             pass
 
@@ -34,7 +34,7 @@ def obtener_pagos(estado= None,  fecha_desde=None, fecha_hasta=None):
     if fecha_hasta:
         try:
             fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
-            query = query.filter(Pago.FechaPago <= fecha_hasta_dt)
+            query = query.filter(Pago.FechaVencimiento <= fecha_hasta_dt)
         except ValueError:
             pass
     

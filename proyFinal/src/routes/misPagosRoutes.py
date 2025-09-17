@@ -88,6 +88,7 @@ def subir_comprobante(id_pago):
 
         # Guardar ruta en la DB
         pago.Comprobante = f"uploads/{filename}"
+        pago.IdEstado = generalEnum.EstadoPagoEnum.Pendiente.value
         pagosController.actualizar_pago(pago)
         return jsonify({"success": True, "message": "Comprobante subido correctamente", "ruta": pago.Comprobante})
 
