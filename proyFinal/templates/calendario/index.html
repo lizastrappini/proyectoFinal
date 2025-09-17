@@ -3,8 +3,10 @@
 {% block content %}
 
 <!-- Content -->
-<div class="container-xxl flex-grow-1 container-p-y">
-  <div class="card app-calendar-wrapper h-100" style="max-height:90vh;">
+<div class="d-flex flex-column min-vh-100">
+  <div class="flex-grow-1">
+    <div class="container-xxl container-p-y">
+      <div class="card app-calendar-wrapper h-100">
     <div class="row g-0">
       <!-- Calendar Sidebar -->
       <div class="col app-calendar-sidebar border-end" id="app-calendar-sidebar">
@@ -358,7 +360,8 @@
     </div>
   </div>
 </div>
-
+  </div>
+</div>
 
 <style>
 .fc-event-.form-check-recaudacion {

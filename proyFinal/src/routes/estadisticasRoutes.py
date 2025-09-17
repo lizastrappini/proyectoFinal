@@ -48,7 +48,7 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
     wb = openpyxl.load_workbook(ruta_archivo)
     ws = wb.active
 
-    partido = calendarioController.getPartidosById(int(idPartido))
+    partido = calendarioController.getEventoById(int(idPartido))
 
     if not partido:
         return jsonify({
@@ -65,7 +65,7 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
     ws.cell(row=3, column=4, value=f"Rosario Central - {categoria_texto} - {rama_texto} - {division_texto}")
 
     # O3
-    ws.cell(row=3, column=15, value="Contrincante")  # hardcode por ahora
+    ws.cell(row=3, column=15, value=generalEnum.ContrincantesEnum(int(partido.IdContrincante)).name)  # hardcode por ahora
 
     # P5
     fecha_str = partido.FechaInicio.strftime("%d-%m-%Y")
@@ -159,7 +159,7 @@ def subir_estadisticas():
     except ValueError:
         return jsonify({"estado": "error", "mensaje": "ID de partido inválido"}), 400
 
-    partido = calendarioController.getPartidosById(idPartido)
+    partido = calendarioController.getEventoById(idPartido)
     if not partido:
         return jsonify({"estado": "error", "mensaje": "No se encontró el partido seleccionado"}), 400
 

@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timezone
+import pytz
 from decimal import Decimal
 import secrets
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
@@ -293,7 +294,8 @@ def pagar_seleccionados():
             if pago.IdEstado == 1: #ya estaba pagado,para q no actualice fechapago
                 continue
             pago.IdEstado = 1
-            pago.FechaPago = datetime.datetime.now()
+            arg = pytz.timezone("America/Argentina/Buenos_Aires")
+            pago.FechaPago = datetime.now(arg)
             pagosController.actualizar_pago(pago)
             actualizados += 1
 

@@ -24,28 +24,38 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
     if idPartido:
         filtros_partidos.append(EstadisticaPorPartido.IdPartido == idPartido)
 
-    # --- Filtrar por fecha (puede ser un rango o un día único) ---
+    # --- Filtrar por fecha (rango o día único) ---
     if fechaHasta:
         fecha_desde = None
         fecha_hasta = None
-        # si es un rango tipo "13-07-2025 a 17-07-2025"
         if "a" in fechaHasta:
             partes = fechaHasta.split("a")
             fecha_desde = datetime.strptime(partes[0].strip(), "%d-%m-%Y").date()
             fecha_hasta = datetime.strptime(partes[1].strip(), "%d-%m-%Y").date()
         else:
-            # un solo día
             fecha_hasta = datetime.strptime(fechaHasta.strip(), "%d-%m-%Y").date()
             fecha_desde = fecha_hasta
 
         filtros_partidos.append(EstadisticaPorPartido.Fecha.between(fecha_desde, fecha_hasta))
 
     # --- Consulta de resumen de partidos ---
-    partidos_resumen = db.session.query(
-        func.count(EstadisticaPorPartido.Id).label("partidos_jugados"),
-        func.count(case((EstadisticaPorPartido.Resultado == 1, 1))).label("partidos_ganados"),
-        func.count(case((EstadisticaPorPartido.Resultado == 2, 1))).label("partidos_perdidos")
-    ).filter(*filtros_partidos).one()
+    if misEstadisticas and idUsuario:
+        partidos_resumen = db.session.query(
+            func.count(EstadisticaPorPartido.Id).label("partidos_jugados"),
+            func.count(case((EstadisticaPorPartido.Resultado == 1, 1))).label("partidos_ganados"),
+            func.count(case((EstadisticaPorPartido.Resultado == 2, 1))).label("partidos_perdidos")
+        ).join(
+            EstadisticaUsuarioPartido, EstadisticaUsuarioPartido.IdEstadisticaPorPartido == EstadisticaPorPartido.Id
+        ).filter(
+            *filtros_partidos,
+            EstadisticaUsuarioPartido.IdUsuario == idUsuario
+        ).one()
+    else:
+        partidos_resumen = db.session.query(
+            func.count(EstadisticaPorPartido.Id).label("partidos_jugados"),
+            func.count(case((EstadisticaPorPartido.Resultado == 1, 1))).label("partidos_ganados"),
+            func.count(case((EstadisticaPorPartido.Resultado == 2, 1))).label("partidos_perdidos")
+        ).filter(*filtros_partidos).one()
 
     # --- Filtros para usuario ---
     filtros_usuario = filtros_partidos.copy()
@@ -65,27 +75,34 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
         *filtros_usuario
     ).one()
 
-    partidos_por_categoria = db.session.query(
-        EstadisticaPorPartido.IdCategoria,
-        func.count(EstadisticaPorPartido.Id).label("cantidad")
-    ).filter(*filtros_partidos).group_by(EstadisticaPorPartido.IdCategoria).all()
+    # --- Partidos por categoría ---
+    if misEstadisticas and idUsuario:
+        partidos_por_categoria = db.session.query(
+            EstadisticaPorPartido.IdCategoria,
+            func.count(EstadisticaPorPartido.Id).label("cantidad")
+        ).join(
+            EstadisticaUsuarioPartido, EstadisticaUsuarioPartido.IdEstadisticaPorPartido == EstadisticaPorPartido.Id
+        ).filter(
+            *filtros_partidos,
+            EstadisticaUsuarioPartido.IdUsuario == idUsuario
+        ).group_by(EstadisticaPorPartido.IdCategoria).all()
+    else:
+        partidos_por_categoria = db.session.query(
+            EstadisticaPorPartido.IdCategoria,
+            func.count(EstadisticaPorPartido.Id).label("cantidad")
+        ).filter(*filtros_partidos).group_by(EstadisticaPorPartido.IdCategoria).all()
 
     partidos_dict = {p.IdCategoria: p.cantidad for p in partidos_por_categoria}
 
-    
     categorias = []
     cantidades = []
-
     for cat in generalEnum.CategoriaEnum:
-        if cat.value == 0:           # ignorar el enum con valor 0
+        if cat.value == 0:  # ignorar el enum con valor 0
             continue
-        categorias.append(cat.name)  
+        categorias.append(cat.name)
         cantidades.append(partidos_dict.get(cat.value, 0))
 
-    filtros_bloqueos = filtros_partidos.copy()
-    if misEstadisticas and idUsuario:
-        filtros_bloqueos.append(EstadisticaUsuarioPartido.IdUsuario == idUsuario)
-
+    # --- Bloqueos ---
     bloqueos_resumen = db.session.query(
         func.sum(EstadisticaUsuarioPartido.BLP).label("bl_positivos"),
         func.sum(EstadisticaUsuarioPartido.BLN).label("bl_neutros")
@@ -95,6 +112,7 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
         *filtros_usuario
     ).one()
 
+    # --- Recepciones ---
     recepciones_resumen = db.session.query(
         func.sum(EstadisticaUsuarioPartido.REE).label("REE"),
         func.sum(EstadisticaUsuarioPartido.REV).label("REV"),
@@ -129,3 +147,4 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
     }
 
     return resumen_dict
+

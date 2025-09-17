@@ -166,9 +166,17 @@ $('#formComprobante').on('submit', function(e) {
     processData: false,
     success: function(resp) {
       if (resp.success) {
-        Swal.fire('Éxito', 'Comprobante subido correctamente', 'success');
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Comprobante subido correctamente',
+          didOpen: function () {
+            document.querySelector('.swal2-container').style.zIndex = 20000;
+            document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+        });
         $('#modalComprobante').modal('hide');
-        tabla.ajax ? tabla.ajax.reload() : filtrar();
+        filtrar();
       } else {
         Swal.fire('Error', resp.error || 'No se pudo subir', 'error');
       }
