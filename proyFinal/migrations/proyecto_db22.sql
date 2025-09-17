@@ -44,34 +44,8 @@ CREATE TABLE `Calendario` (
 TRUNCATE TABLE `Calendario`;
 -- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `Contacto`
---
 
-DROP TABLE IF EXISTS `Contacto`;
-CREATE TABLE `Contacto` (
-  `Id` int NOT NULL,
-  `Titulo` varchar(50) NOT NULL,
-  `Valor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `prueba` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Truncar tablas antes de insertar `Contacto`
---
-
-TRUNCATE TABLE `Contacto`;
---
--- Volcado de datos para la tabla `Contacto`
---
-
-INSERT INTO `Contacto` (`Id`, `Titulo`, `Valor`, `prueba`) VALUES
-(1, 'Email', 'voley@rosariocentral.com', NULL),
-(2, 'WhatsApp', '+54 9 341 555-5678', NULL),
-(3, 'Instagram', 'https://www.instagram.com/voleycarc?igsh=MTZ0aHpiMDJmNTdnNg%3D%3D&utm_source=qr', NULL),
-(4, 'Teléfono', '+54 341 555-1234', NULL);
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `EstadisticaPorPartido`
@@ -251,18 +225,18 @@ TRUNCATE TABLE `faq`;
 --
 
 INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`) VALUES
-(1, '¿Cómo me registro en Voley App?', 'Solo los administradores pueden crear usuarios. Una vez creado, recibirás un mail con tus credenciales para iniciar sesión.', 'registro alta'),
-(2, 'Olvidé mi contraseña, ¿qué hago?', 'Haz clic en “Recuperar contraseña” en la pantalla de login. Te enviaremos un correo con las instrucciones para restablecerla.', 'recuperar'),
-(3, '¿Qué funciones tiene un entrenador en la app?', 'Los entrenadores pueden ver sus deportistas asignados, estadísticas, notificaciones importantes y actualizar información de contacto.', 'entrenador funcion'),
-(4, '¿Dónde puedo ver los eventos?', 'Ingresa al módulo “Calendario” en el menú lateral. Allí podrás ver todos los eventos asignados a tu equipo.', 'calendario evento entrenamiento partido'),
+(1, '¿Cómo me registro en Voley App?', 'Solo los administradores pueden crear usuarios. Una vez creado, recibirás un mail con tus credenciales para iniciar sesión.', 'registro, alta'),
+(2, 'Olvidé mi contraseña, ¿qué hago?', 'Haz clic en “Recuperar contraseña” en la pantalla de login. Te enviaremos un correo con las instrucciones para restablecerla.', 'recuperar, olvide'),
+(3, '¿Qué funciones tiene un entrenador en la app?', 'Los entrenadores pueden ver sus deportistas asignados, estadísticas, notificaciones importantes y actualizar información de contacto.', 'entrenador, funcion'),
+(4, '¿Dónde puedo ver los eventos?', 'Ingresa al módulo “Calendario” en el menú lateral. Allí podrás ver todos los eventos asignados a tu equipo.', 'calendario, evento, entrenamiento, partido'),
 (5, '¿Cómo puedo recibir notificaciones importantes?', 'Todas las notificaciones aparecen en el ícono de campana en la barra superior. También puedes verlas desde la sección “Notificaciones”.', 'notificacion'),
-(6, '¿Cómo puedo actualizar mis datos personales?', 'Ve a “Mi Cuenta” en el menú lateral. Allí puedes modificar tu nombre, apellido, correo y teléfono.', 'datos personales mi cuenta '),
-(7, '¿Puedo contactar al club desde la app?', 'Sí, en la sección “Medios de Contacto” encontrarás teléfono, email, WhatsApp e Instagram para comunicarte con el club.', 'medios de contacto telefono email whatsapp instagram'),
-(8, '¿Quién puede ver los pagos de los deportistas?', 'Solo los administradores tienen acceso a la sección de “Pagos” para ver y gestionar pagos de los deportistas. Para ver tus pagos ve a \"Mi Cuenta\"', 'pagos '),
-(9, '¿Cómo agrego o elimino deportistas o entrenadores?', 'Solo los administradores pueden agregar o eliminar usuarios desde las secciones “Deportistas” o “Entrenadores”.', 'alta deportistas entrenadores eliminar'),
-(10, '¿La app funciona en móvil y desktop?', 'Sí, Voley App está diseñada para ser responsiva y funcionar en cualquier dispositivo con navegador moderno.', 'celular movil computadora'),
+(6, '¿Cómo puedo actualizar mis datos personales?', 'Ve a “Mi Cuenta” en el menú lateral. Allí puedes modificar tu nombre, apellido, correo y teléfono.', 'datos personales, mi cuenta '),
+(7, '¿Puedo contactar al club desde la app?', 'Sí, en la sección “Medios de Contacto” encontrarás teléfono, email, WhatsApp e Instagram para comunicarte con el club.', 'medios de contacto, telefono, email, whatsapp, instagram'),
+(8, '¿Quién puede ver las cuotas de los deportistas?', 'Solo los administradores tienen acceso a la sección de “Pagos” para ver y gestionar pagos de los deportistas. Para ver tus pagos ve a \"Mi Cuenta\"', 'cuota '),
+(9, '¿Cómo agrego o elimino deportistas o entrenadores?', 'Solo los administradores pueden agregar o eliminar usuarios desde las secciones “Deportistas” o “Entrenadores”.', 'alta, deportistas, entrenadores, eliminar'),
+(10, '¿La app funciona en móvil y desktop?', 'Sí, Voley App está diseñada para ser responsiva y funcionar en cualquier dispositivo con navegador moderno.', 'celular, movil, computadora'),
 (11, '¿Cómo cambio mi contraseña?', 'Puede cambiar su contraseña desde la sección \'Mi Cuenta\' del menú.', 'contraseña'),
-(12, '¿Cómo puedo ver mis pagos deportivos?', 'Puede ver sus pagos y el estado de los mismos desde la sección \'Mi Cuenta\' del menú.', 'estado cuotas');
+(12, '¿Cómo puedo ver mis pagos deportivos?', 'Puede ver sus pagos y el estado de los mismos desde la sección \'Mi Cuenta\' del menú.', 'pagos');
 
 -- --------------------------------------------------------
 
@@ -504,9 +478,9 @@ ALTER TABLE `Calendario`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indices de la tabla `Contacto`
+-- Indexes for table `Parametro`
 --
-ALTER TABLE `Contacto`
+ALTER TABLE `Parametro`
   ADD PRIMARY KEY (`Id`);
 
 --
@@ -561,10 +535,10 @@ ALTER TABLE `Calendario`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `Contacto`
+-- AUTO_INCREMENT for table `Parametro`
 --
-ALTER TABLE `Contacto`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `Parametro`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `EstadisticaPorPartido`
