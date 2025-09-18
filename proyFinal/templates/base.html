@@ -248,12 +248,23 @@
                   </li>
                 {% endif %}
                  
+                {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
                   <li class="menu-item">
                     <a href="/notificacion" class="menu-link ">
                       <i class="menu-icon tf-icons ri-notification-3-line"></i>
                       <div data-i18n="Notificaciones">Notificaciones</div>
                     </a>
                   </li>
+                {% endif %}
+
+                {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Deportista ) %}
+                  <li class="menu-item">
+                    <a href="/notificacion/misNotificaciones" class="menu-link ">
+                      <i class="menu-icon tf-icons ri-notification-3-line"></i>
+                      <div data-i18n="Notificaciones">Notificaciones</div>
+                    </a>
+                  </li>
+                {% endif %}
                 
     
                 <!-- Seccion entrenadores -->

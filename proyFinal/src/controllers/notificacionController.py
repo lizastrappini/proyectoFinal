@@ -66,6 +66,7 @@ def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None
             'categoria': nombre_categoria,
             'division': nombre_division,
             'rama': nombre_rama,
+            'fechaEnvio': e.FechaEnvio.strftime("%d/%m/%Y %H:%M")
         })
 
     return notificaciones

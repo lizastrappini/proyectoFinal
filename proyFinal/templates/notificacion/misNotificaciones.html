@@ -9,53 +9,7 @@
       <div class="card">
         <h2 class="card-header">Bandeja de Notificaciones</h2>
         <div class="card-body">
-        {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
-          <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
-
-            <div class="form-floating form-floating-outline" style="min-width: 200px;">
-              <input type="text" id="filtroBuscar" class="form-control" placeholder="Buscar...">
-              <label for="filtroBuscar">Buscar</label>
-            </div>
-
-            <div class="form-floating form-floating-outline" style="min-width: 180px;">
-              <select id="categoriaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Categoría">
-                <option value="">Todas</option>
-                {% for cat in categorias %}
-                  <option value="{{ cat.value }}">{{ cat.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="form-floating form-floating-outline" style="min-width: 180px;">
-              <select id="divisionFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="División">
-                <option value="">Todas</option>
-                {% for div in divisiones %}
-                  <option value="{{ div.value }}">{{ div.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="form-floating form-floating-outline" style="min-width: 180px;">
-              <select id="ramaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Rama">
-                <option value="">Todas</option>
-                {% for rama in ramas %}
-                  <option value="{{ rama.value }}">{{ rama.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <button id="btnFiltrarNotificacion" class="btn btn-primary waves-effect waves-light">
-              Filtrar
-            </button>
-          </div>
-
-        <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-          <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
-            Agregar
-          </a>
-        </div>
-        {% endif %}
-
+  
           <div class="table-responsive text-nowrap overflow-visible">
             <table id="tablaNotificaciones" class="table">
               <thead>
@@ -66,9 +20,7 @@
                   <th>Categoria</th>
                   <th>Rama</th>
                   <th>División</th>
-                  {% if current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
                   <th>Fecha Envio</th>
-                  {% endif %}
                 </tr>
               </thead>
             </table>
@@ -80,9 +32,6 @@
                     <div class="modal-content">
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       <div class="modal-body p-0">
-                        <div class="text-center mb-6">
-                          <h4 class="mb-2" id="tituloAdd">Nueva Notificación</h4>
-                        </div>
 
                         <form id="addNotificacionForm" class="row g-5" method="POST" action="{{ url_for('notificacion.nueva_notificacion') }}">
                           <div class="col-12">
@@ -171,24 +120,17 @@
 
   {% block scripts %}
 
-
- <script>
+<script>
   let tabla = null;
-  let firstLoad = true; 
-  // Inicializar la tabla de Notificaciones
+
+  // Inicializar vacía (sin firstLoad)
   tabla = $('#tablaNotificaciones').DataTable({
     ajax: {
-      url: '/notificacion/filtrar?init=1',
-      dataSrc: function (json) {
-        if (firstLoad) { 
-          firstLoad = false; 
-          return []; // ✅ arranca vacía
-        }
-        return json && json.data ? json.data : [];
-      }
+      url: '/notificacion/filtrar', // se sobreescribe en filtrar()
+      dataSrc: 'data'
     },
     language: {
-      emptyTable: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>'
+      emptyTable: '<div class="text-center">No hay notificaciones disponibles</div>'
     },
     columns: [
       { data: 'id' },
@@ -211,11 +153,6 @@
     }
   });
 
-  // Botón Filtrar
-  $('#btnFiltrarNotificacion').on('click', function () {
-    filtrar();
-  });
-
   // Función de filtrado
   function filtrar() {
     const categoria = $('#categoriaFiltro').val();
@@ -225,8 +162,13 @@
 
     const url = `/notificacion/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&buscar=${encodeURIComponent(buscar || '')}`;
 
-    tabla.ajax.url(url).load(); // ✅ actualiza la tabla existente
+    tabla.ajax.url(url).load(); // ✅ carga la tabla
   }
+
+  // Botón Filtrar
+  $('#btnFiltrarNotificacion').on('click', function () {
+    filtrar();
+  });
 
   // Limpiar filtros
   function limpiar() {
@@ -234,9 +176,7 @@
     $('#divisionFiltro').val('').trigger('change');
     $('#ramaFiltro').val('').trigger('change');
     $('#filtroBuscar').val('');
-    if (tabla) {
-      tabla.clear().draw();
-    }
+    filtrar(); // 👈 recarga todas las notificaciones
   }
 
   // Eliminar fila
@@ -287,7 +227,13 @@
       }
     });
   }
+
+  // 👇 carga inicial con todas las notificaciones
+  $(document).ready(function () {
+    filtrar();
+  });
 </script>
+
 
 
   <!-- DataTables Buttons CSS -->

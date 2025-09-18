@@ -12,44 +12,52 @@
       <div class="row g-2 align-items-center">
         <div class="col-12 col-md-2">
           <div class="form-floating mb-0">
-            <input type="text" class="form-control" id="fechaDescargar" placeholder="Fecha de partido">
+            <input type="text" class="form-control" id="fechaDescargar" placeholder="Fecha de partido" autocomplete="off">
             <label for="fechaDescargar">Fecha</label>
           </div>
         </div>
         <div class="col-12 col-md-2">
-          <select id="categoriaDescargar" class="select2 form-select" data-placeholder="Categoría">
-            <option value=""></option>
-            {% for cat in categorias %}
-              <option value="{{ cat.value }}">{{ cat.text }}</option>
-            {% endfor %}
-          </select>
+          <div class="form-floating form-floating-outline">
+            <select id="categoriaDescargar" class="select2 form-select" data-allow-clear="true" data-placeholder="Categoría">
+              <option value=""></option>
+              {% for cat in categorias %}
+                <option value="{{ cat.value }}">{{ cat.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+         </div>
+        <div class="col-12 col-md-2">
+          <div class="form-floating form-floating-outline">
+            <select id="ramaDescargar"  class="select2 form-select" data-allow-clear="true" data-placeholder="Rama">
+              <option value=""></option>
+              {% for r in ramas %}
+                <option value="{{ r.value }}">{{ r.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
         <div class="col-12 col-md-2">
-          <select id="ramaDescargar" class="select2 form-select" data-placeholder="Rama">
-            <option value=""></option>
-            {% for r in ramas %}
-              <option value="{{ r.value }}">{{ r.text }}</option>
-            {% endfor %}
-          </select>
+          <div class="form-floating form-floating-outline">
+            <select id="divisionDescargar" class="select2 form-select" data-allow-clear="true" data-placeholder="Division">
+              <option value=""></option>
+              {% for d in division %}
+                <option value="{{ d.value }}">{{ d.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
         <div class="col-12 col-md-2">
-          <select id="divisionDescargar" class="select2 form-select" data-placeholder="Division">
-            <option value=""></option>
-            {% for d in division %}
-              <option value="{{ d.value }}">{{ d.text }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-12 col-md-2">
-          <select id="partidoDescargar" class="select2 form-select" data-placeholder="Partido">
-            <option value=""></option>
-            {% for p in partidosDescarga %}
-              <option value="{{ p.value }}">{{ p.text }}</option>
-            {% endfor %}
-          </select>
+          <div class="form-floating form-floating-outline">
+            <select id="partidoDescargar" class="select2 form-select" data-allow-clear="true" data-placeholder="Partido">
+              <option value=""></option>
+              {% for p in partidosDescarga %}
+                <option value="{{ p.value }}">{{ p.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
         <div class="col-12 col-md-auto">
-          <button type="button" class="btn btn-success" id="btnDescargar" disabled>Buscar</button>
+          <button type="button" class="btn btn-success" id="btnDescargar" style="min-height: 45px !important" disabled>Buscar</button>
         </div>
         <br>
         <div class="mt-3">
@@ -69,7 +77,7 @@
   
 <br>
 <br>
-<div class="divestadisticas row g-3">
+<div class="divestadisticas row g-3 d-none">
 
   <!-- Donut chart (1/3 ancho) -->
   <div class="col-xxl-4 col-md-6 col-sm-12">
@@ -141,9 +149,31 @@ $(document).ready(function() {
   const $misEstadisticas = $('#misEstadisticas');
 
   // --- INICIALIZAR SELECT2 ---
-  $('#categoriaDescargar, #ramaDescargar, #divisionDescargar, #partidoDescargar')
-    .select2({ allowClear:true, width:'100%' });
+  $('#categoriaDescargar').select2({
+  dropdownParent: $('#categoriaDescargar').parent(),
+  width: '160px',               // 👈 mismo ancho fijo que estadoFiltro
+  placeholder: 'Categoría',
+  allowClear: true,
+  minimumResultsForSearch: Infinity
+});
 
+$('#ramaDescargar').select2({
+  allowClear: true,
+  width: '100%',
+  placeholder: 'Rama'
+});
+
+$('#divisionDescargar').select2({
+  allowClear: true,
+  width: '100%',
+  placeholder: 'División'
+});
+
+$('#partidoDescargar').select2({
+  allowClear: true,
+  width: '100%',
+  placeholder: 'Partido'
+});
   // --- INICIALIZAR DATEPICKER ---
   flatpickr("#fechaDescargar", { 
     locale: "es", 
@@ -202,7 +232,7 @@ $(document).ready(function() {
       partido: $partidoDescargar.val() || '',
       misEstadisticas: $misEstadisticas.is(':checked')
     };
-
+    $(".divestadisticas").removeClass('d-none');
     $.getJSON('/estadisticas/datos_graficos', data, function(res) {
       if(res.estado !== 'ok') {
         Swal.fire("Error", res.mensaje, "error");
@@ -268,7 +298,7 @@ function resultadoPartidos(estadisticas) {
             show: true,
             value: {
               fontSize: '1rem',
-              fontFamily: 'Helvetica Neue',
+              fontFamily: 'var(--bs-body-font-family)',
               color: config.colors.headingColor,
               fontWeight: 500,
               offsetY: 4,
@@ -281,9 +311,8 @@ function resultadoPartidos(estadisticas) {
             },
             total: {
               label: 'Total',
+              fontFamily: 'var(--bs-body-font-family)',
               show: true,
-              fontSize: '1.2rem',
-              color: config.colors.headingColor,
               fontWeight: 600,
               formatter: function(w) {
                 return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
@@ -317,8 +346,8 @@ function partidosPorCategoria(estadisticas){
     series: [{ name: 'Partidos', data: seriesData }],
     plotOptions: {
       bar: {
-        borderRadius: 10,
-        barHeight: '30%',
+        borderRadius: 6,
+        barHeight: '40%',
         horizontal: true,
         distributed: true,
         startingShape: 'rounded'
@@ -342,13 +371,13 @@ function partidosPorCategoria(estadisticas){
       tickAmount: Math.max(...seriesData), // <--- fuerza ticks hasta el máximo valor
       labels: {
         formatter: function(val) { return Math.round(val); }, // <--- solo enteros
-        style: { fontSize: '13px', colors: config.colors.labelColor, fontFamily: 'Helvetica Neue' }
+        style: { fontSize: '13px', colors: config.colors.labelColor, fontFamily: 'var(--bs-body-font-family)' }
       },
       axisBorder: { show: false },
       axisTicks: { show: false }
     },
     yaxis: {
-      labels: { style: { fontWeight: 500, fontSize: '0.9375rem', colors: config.colors.headingColor, fontFamily: 'Helvetica Neue' } }
+      labels: { style: { fontWeight: 500, fontSize: '0.9375rem', colors: config.colors.headingColor, fontFamily: 'var(--bs-body-font-family)' } }
     },
     states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } }
   };
@@ -386,11 +415,17 @@ function bloqueoPartidos(estadisticas) {
             labels: {
               show: true,
               value: {
+                fontWeight: 600,
+                fontFamily: 'var(--bs-body-font-family)',
                 formatter: function(val) { return parseInt(val); }
               },
               total: {
                 show: true,
+                fontSize: '1.2rem',
+                color: config.colors.headingColor,
+                fontWeight: 600,
                 label: 'Total',
+                fontFamily: 'var(--bs-body-font-family)',
                 formatter: function(w) { return w.globals.seriesTotals.reduce((a, b) => a + b, 0); }
               }
             }

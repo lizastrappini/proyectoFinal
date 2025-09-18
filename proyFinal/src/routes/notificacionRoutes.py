@@ -8,6 +8,8 @@ from src.models.usuario import Usuario
 from werkzeug.security import generate_password_hash
 from flask_login import current_user
 from src.utils.enums import generalEnum
+from datetime import datetime, timezone, date, timedelta
+import pytz
 
 notificacion_bp = Blueprint('notificacion', __name__)
 
@@ -34,6 +36,17 @@ def index():
     categorias=categorias,
     divisiones=divisiones,
     ramas=ramas)
+
+
+@notificacion_bp.route('/misNotificaciones')
+def misNotificaciones():
+    
+    notif = notificacionController.obtener_notificaciones()
+    
+    return render_template(
+    'notificacion/misNotificaciones.html',
+    notificaciones=notif)
+
 
 @notificacion_bp.route('/filtrar', methods=['GET'])
 def filtrar():
@@ -88,13 +101,16 @@ def nueva_notificacion():
             except ValueError:
                 raise ValueError("Rama inválida")
         
-       
+        arg = pytz.timezone("America/Argentina/Buenos_Aires")
+        fecha = datetime.now(arg)
+
         nueva_notif = Notificacion(
             Titulo = titulo,
             Descripcion= descripcion,
             IdCategoria=categoria_id,
             IdDivision=division_id,
-            IdRama=rama_id
+            IdRama=rama_id,
+            FechaEnvio=fecha
         )
         notificacionController.agregarNotificacion(nueva_notif)    
         
@@ -110,22 +126,21 @@ def nueva_notificacion():
 
         usuarios_destino = usuarios_query.all()
 
-       
-        if usuarios_destino:
-            for usuario in usuarios_destino:
-                notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
-        else:
+       #
+       # if usuarios_destino:
+       #     for usuario in usuarios_destino:
+       #         notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
+       # else:
             # Si no hay filtros o no se encontró nadie, se puede decidir
             # enviar a todos (opcional)
-            pass
-
-       
+        #    pass
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Notificación creada exitosamente'}), 200
         else:
             flash('Notificación creada exitosamente', 'success')
             return redirect(url_for('notificacion.index'))
+        
     except Exception as e:
         mensaje_error = str(e)
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

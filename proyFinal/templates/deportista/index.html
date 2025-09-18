@@ -11,49 +11,49 @@
         <div class="card-body">
 
           
-          <div class="d-flex row mb-5 gx-5">
-            <div class="col d-flex justify-content-end">
-              <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
-                Limpiar 
-              </button>
-            </div>
+          <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+              <div class="form-floating form-floating-outline" style="min-width: 180px;">
+                <select id="deportistaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Deportista">
+                  <option value=""></option>
+                  {% for deportista in deportistas %}
+                      <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-floating form-floating-outline" style="min-width: 180px;">
+                <select id="categoriaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Categoría" >
+                  <option value=""></option>
+                  {% for cat in categorias %}
+                      <option value="{{ cat.value }}">{{ cat.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <div class="col-12 col-md-2">
-              <select id="deportistaFiltro" class="select2 form-select" data-placeholder="Deportista">
-                <option value=""></option>
-                {% for deportista in deportistas %}
-                    <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
-                {% endfor %}
-              </select>
-            </div>
 
-            <div class="col-12 col-md-2">
-              <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoría" >
-                <option value=""></option>
-                {% for cat in categorias %}
-                    <option value="{{ cat.value }}">{{ cat.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
+              <div class="form-floating form-floating-outline" style="min-width: 180px;">
+                <select id="divisionFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="División" >
+                  <option value=""></option>
+                  {% for div in divisiones %}
+                      <option value="{{ div.value }}">{{ div.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <div class="col-12 col-md-2">
-              <select id="divisionFiltro" class="select2 form-select" data-placeholder="División" >
-                <option value=""></option>
-                {% for div in divisiones %}
-                    <option value="{{ div.value }}">{{ div.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
 
-            <div class="col-12 col-md-2">
-              <select id="ramaFiltro" class="select2 form-select" data-placeholder="Rama" >
-                <option value=""></option>
-                {% for rama in ramas %}
-                    <option value="{{ rama.value }}">{{ rama.text }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            
+
+              <div class="form-floating form-floating-outline" style="min-width: 180px;">
+                <select id="ramaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Rama" >
+                  <option value=""></option>
+                  {% for rama in ramas %}
+                      <option value="{{ rama.value }}">{{ rama.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+
+            <button id="btnFiltrarDeportista" class="btn btn-primary waves-effect waves-light">
+            Filtrar
+          </button>
           </div>
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
@@ -66,7 +66,7 @@
               Agregar
             </a>
           </div>
-          <div class="table-responsive text-nowrap">
+          <div class="table-responsive text-nowrap overflow-visible">
             <table id="tablaDeportista" class="table">
               <thead>
                 <tr>
@@ -165,21 +165,14 @@
                           
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
-                              <input 
-                                type="date"
-                                id="fechaNacimiento"
-                                name="fechaNacimiento"
-                                class="form-control"
-                                value=""
-                                placeholder=""
-                                required />
-                              <label for="modalEditUserFirstName">Fecha Nacimiento</label>
+                              <input type="text" class="form-control" id="fechaNacimiento" name="fechaNacimiento" placeholder="Fecha Nacimiento" autocomplete="off" required>
+                              <label for="fechaNacimiento">Fecha Nacimiento</label>
                             </div>
                           </div>
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="categoria" class="form-label">Categoría</label>
-                            <select class="form-select" id="categoria" name="categoria"  required>
+                            <select class="select2 form-select" id="categoria" name="categoria" data-placeholder="Categoria" required>
                               <option value="">Seleccione una categoria</option>
                               {% for categoria in categorias %}
                                 <option value="{{ categoria.text }}">{{ categoria.text }}</option>
@@ -190,7 +183,7 @@
                            <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="4">
                             <label for="categoriaExtra" class="form-label">Categoría Extra</label>
-                            <select class="form-select" id="categoriaExtra" name="categoriaExtra">
+                            <select class="select2 form-select" id="categoriaExtra" name="categoriaExtra" data-placeholder="Categoria Extra" multiple="multiple">
                               <option value="">Seleccione una categoria</option>
                               {% for cat in categorias %}
                                 <option value="{{ cat.text }}">{{ cat.text }}</option>
@@ -202,7 +195,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="division" class="form-label">Division</label>
-                            <select class="form-select" id="division" name="division" required>
+                            <select class="select2 form-select" id="division" name="division" data-placeholder="Division" required>
                               <option value="">Seleccione una division</option>
                               {% for div in divisiones %}
                                 <option value="{{ div.text }}">{{ div.text }}</option>
@@ -214,7 +207,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
                             <label for="rama" class="form-label">Rama</label>
-                            <select class="form-select" id="rama" name="rama" required>
+                            <select class="select2 form-select" id="rama" name="rama" data-placeholder="Rama" required>
                               <option value="">Seleccione una rama</option>
                               {% for rama in ramas %}
                                 <option value="{{ rama.text}}">{{ rama.text }}</option>
@@ -227,8 +220,8 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
                             <label for="federado" class="form-label">Federado</label>
-                            <select class="form-select" id="federado" name="federado" required>
-                              <option value="">Seleccione si es federado o no</option>
+                            <select class="select2 form-select" id="federado" name="federado" data-placeholder="Federado" required>
+                              <option value="">Federado</option>
                               {% for federado in federados %}
                                 <option value="{{ federado.text}}">{{ federado.text }}</option>
                               {% endfor %}
@@ -264,293 +257,298 @@
   {% endblock %}
 
   {% block scripts %}
-  <script>
-    let tabla = null;
+<script>
+  flatpickr("#fechaNacimiento", { 
+    locale: "es", 
+    dateFormat: "d-m-Y",
+    maxDate: "today"
+  });
 
-    function filtrar() {
-      const categoria = $('#categoriaFiltro').val();
-      const division = $('#divisionFiltro').val();
-      const rama = $('#ramaFiltro').val();
-      const dni = $('#deportistaFiltro').val(); 
-      console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
-      
-      const url = `/deportista/filtrar?categoria=${categoria}&dni=${dni}&rama=${rama}&division=${division}`;
+  let tabla = null;
+  let firstLoad = true;
 
-      if (tabla) {
-        tabla.ajax.url(url).load();
-      } else {
-        tabla = $('#tablaDeportista').DataTable({
-          ajax: {
-            url: url,
-            dataSrc: 'data'
-          },
-          columns: [
-          { data: 'dni' },
-          { data: 'nombre' },
-          { data: 'apellido' },
-          { data: 'email' },
-          { data: 'telefono' },
-          { data: 'categoria' },
-          { data: 'division' },
-          { data: 'rama'},
-          {
-            data: 'estado',
-            render: function (data, type, row) {
-              let badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
-              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
-            }
-          },
-      
-          {
-            data: null,
-            orderable: false,
-            searchable: false,
-            render: function(data, type, row, meta) {
-            const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
-            return `
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="ri-more-2-line"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
-                    <i class="ri-pencil-line me-1"></i> Editar
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
-                    <i class="ri-delete-bin-7-line me-1"></i> Eliminar
-                  </a>
-                  <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
-                    <i class="ri-refresh-line me-1"></i> ${accion}
-                  </a>
-                </div>
-              </div>
-            `;
-          }
-
-          }
-          ],
-          paging: false,
-          info: false,
-          searching: false,
-          ordering: true,
-          dom: 'frtip',  // <-- importante para mostrar botones
-          buttons: [
-            {
-              extend: 'excelHtml5',
-              text: 'Exportar a Excel',
-              title: 'Deportista',
-              className: 'buttons-excel',
-              exportOptions: {
-                columns: ':not(:last-child)' // Excluir columna acciones
-              }
-            }
-          ],
-          
-          initComplete: function () {
-            $('#tablaDeportista')
-              .removeClass('dataTable no-footer stripe hover')
-              .addClass('table');
-          }
-        }); 
+  // Inicializar la tabla vacía
+  tabla = $('#tablaDeportista').DataTable({
+    ajax: {
+      url: '/deportista/filtrar?init=1',
+      dataSrc: function (json) {
+        if (firstLoad) {
+          firstLoad = false;
+          return []; // ✅ vacío en la primera carga
+        }
+        return json && json.data ? json.data : [];
       }
+    },
+    language: {
+      emptyTable: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>'
+    },
+    columns: [
+      { data: 'dni' },
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: 'email' },
+      { data: 'telefono' },
+      { data: 'categoria' },
+      { data: 'division' },
+      { data: 'rama' },
+      {
+        data: 'estado',
+        render: function (data) {
+          const badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
+          return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
+        }
+      },
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row, meta) {
+          const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
+          return `
+            <div class="dropdown" data-bs-boundary="viewport">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="ri-more-2-line"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
+                  <i class="ri-pencil-line me-1"></i> Editar
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                  <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+                </a>
+                <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
+                  <i class="ri-refresh-line me-1"></i> ${accion}
+                </a>
+              </div>
+            </div>`;
+        }
+      }
+    ],
+    paging: false,
+    info: false,
+    searching: false,
+    ordering: true,
+    dom: 'frtip',
+    buttons: [
+      {
+        extend: 'excelHtml5',
+        text: 'Exportar a Excel',
+        title: 'Deportistas',
+        className: 'buttons-excel',
+        exportOptions: { columns: ':not(:last-child)' }
+      }
+    ],
+    initComplete: function () {
+      $('#tablaDeportista').removeClass('dataTable no-footer stripe hover').addClass('table');
     }
-      
-  $(document).ready(function () {
-    filtrar(); // carga inicial
+  });
 
-    $('#categoriaFiltro,#ramaFiltro, #deportistaFiltro,#divisionFiltro').on('change', function () {
-      filtrar(); // recarga con nuevos filtros
+  // Botón Exportar
+  $('.btn-export').on('click', function () {
+    if (tabla) tabla.button('.buttons-excel').trigger();
+  });
+
+  // ✅ Botón Filtrar
+  $('#btnFiltrarDeportista').on('click', function () {
+    filtrar();
+  });
+
+  // Función filtrar
+  function filtrar() {
+    const categoria = $('#categoriaFiltro').val();
+    const division = $('#divisionFiltro').val();
+    const rama = $('#ramaFiltro').val();
+    const dni = $('#deportistaFiltro').val();
+
+    const url = `/deportista/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&dni=${encodeURIComponent(dni || '')}`;
+    tabla.ajax.url(url).load();
+  }
+
+  // ✅ Botón Limpiar
+  function limpiar() {
+    $('#categoriaFiltro').val('').trigger('change');
+    $('#ramaFiltro').val('').trigger('change');
+    $('#divisionFiltro').val('').trigger('change');
+    $('#deportistaFiltro').val('').trigger('change');
+    filtrar();
+  }
+
+  // Editar fila
+  function editarFila(rowIndex) {
+    const data = tabla.row(rowIndex).data();
+    const dni = data.dni;
+
+    fetch(`/deportista/getDeportista/${dni}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(async r => {
+        if (!r.ok) {
+          const e = await r.json();
+          throw new Error(e.message || 'Error al cargar datos del deportista');
+        }
+        return r.json();
+      })
+      .then(detalle => {
+        $('#dni').val(detalle.dni);
+        $('#nombre').val(detalle.nombre);
+        $('#apellido').val(detalle.apellido);
+        $('#email').val(detalle.email);
+        $('#telefono').val(detalle.telefono);
+
+        $('#categoria').val(detalle.categoria).trigger('change');
+        $('#rama').val(detalle.rama).trigger('change');
+        $('#division').val(detalle.division).trigger('change');
+        $('#federado').val(detalle.federado).trigger('change');
+
+        if (detalle.categoriaExtra) {
+          const extras = Array.isArray(detalle.categoriaExtra)
+            ? detalle.categoriaExtra
+            : detalle.categoriaExtra.split(',');
+          $('#categoriaExtra').val(extras).trigger('change');
+        } else {
+          $('#categoriaExtra').val(null).trigger('change');
+        }
+
+        if (detalle.fechaNacimiento) {
+          $('#fechaNacimiento').val(detalle.fechaNacimiento);
+        }
+
+        $('#editDeportistaForm').attr('action', `/deportista/editar/${detalle.dni}`);
+        $('#submitBtn').text('Actualizar');
+        $('#tituloAdd').text('Editar Deportista');
+        $('#addUser').modal('show');
+      })
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'No se pudo cargar el deportista' });
       });
-      $('.btn-export').on('click', function() {
-        tabla.button('.buttons-excel').trigger();
-          });
-        });
-              function editarFila(rowIndex) {
-              const tabla = $('#tablaDeportista').DataTable();
-              const data = tabla.row(rowIndex).data();
+  }
 
-              // Llenar inputs
-              $('#dni').val(data.dni);
-              $('#nombre').val(data.nombre);
-              $('#apellido').val(data.apellido);
-              $('#email').val(data.email);
-              $('#fechaNacimiento').val(data.fechaNacimientoISO);
-              $('#federado').val(data.federado).trigger('change');
-              $('#telefono').val(data.telefono);
-              $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
-              $('#categoriaExtra').val(data.categoriaExtra).trigger('change');
-              $('#division').val(data.division).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
-              $('#rama').val(data.rama).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+  // Eliminar fila
+  function eliminarFila(rowIndex) {
+    const data = tabla.row(rowIndex).data();
 
-              // Cambiar modo y texto del botón
-              $('#editDeportistaForm').attr('action', `/deportista/editar/${data.dni}`);  // O data.id si tenés otro ID
-              $('#submitBtn').text('Actualizar');
-              $('#tituloAdd').text('Editar Deportista');
-
-              // Mostrar el modal
-              $('#addUser').modal('show');
+    Swal.fire({
+      title: '¿Estás segura/o?',
+      text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/deportista/eliminar/${data.dni}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(async r => {
+            if (!r.ok) {
+              const e = await r.json();
+              throw new Error(e.message || 'Error desconocido');
             }
-              $('#addUser').on('hidden.bs.modal', function () {
-              const errorDiv = document.getElementById('formError');
-              errorDiv.classList.add('d-none');
-              errorDiv.textContent = '';
-              $('#editDeportistaForm')[0].reset();
-              $('#categoria').val(null).trigger('change');
-              $('#division').val(null).trigger('change');
-              $('#rama').val(null).trigger('change');
-              $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
-              $('#submitBtn').text('Crear');
-              $('#tituloAdd').text('Agregar Deportista');
-            });
+            return r.json();
+          })
+          .then(data => {
+            Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 });
+            tabla.ajax.reload();
+          })
+          .catch(err => {
+            Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Hubo un error al intentar eliminar el deportista.' });
+          });
+      }
+    });
+  }
 
-            $('#editDeportistaForm').on('submit', function(e) {
-                e.preventDefault(); // Evita el envío tradicional
+  // Cambiar estado
+  $('#tablaDeportista').on('click', '.cambiar-estado', function () {
+    const dni = $(this).data('dni');
 
-                const form = this;
-                const actionUrl = $(form).attr('action');
-                const formData = new FormData(form);
+    fetch(`/deportista/cambiarEstado/${dni}`, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(async r => {
+        if (!r.ok) {
+          const e = await r.json();
+          throw new Error(e.message || 'Error desconocido');
+        }
+        return r.json();
+      })
+      .then(data => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Estado actualizado',
+          text: `Nuevo estado: ${data.nuevo_estado}`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+        tabla.ajax.reload(null, false);
+      })
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'Error al cambiar estado', text: err.message || 'Ocurrió un error inesperado' });
+      });
+  });
 
-                fetch(actionUrl, {
-                  method: 'POST',
-                  body: formData,
-                  headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                  }
-                })
-                .then(async response => {
-                  if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Error al actualizar');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: data.message.includes('creado') ? 'Deportista creado' : 'Deportista actualizado',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  $('#addUser').modal('hide');
-                  $('#editDeportistaForm')[0].reset();
-                  $('#categoria').val(null).trigger('change');
-                  $('#rama').val(null).trigger('change');
-                  $('#division').val(null).trigger('change');
-                  $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
-                  $('#submitBtn').text('Crear');
-                  $('#tituloAdd').text('Agregar Deportista');
-                  if (tabla) tabla.ajax.reload();
-                })
-                .catch(error => {
-                  const errorDiv = document.getElementById('formError');
-                  errorDiv.textContent = error.message;
-                  errorDiv.classList.remove('d-none');
-                  
-                });
-              });
+  // ✅ Submit del formulario (crear/editar deportista)
+  $('#editDeportistaForm').on('submit', function (e) {
+    e.preventDefault();
 
+    const form = this;
+    const actionUrl = $(form).attr('action');
+    const formData = new FormData(form);
 
+    fetch(actionUrl, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(async r => {
+        if (!r.ok) {
+          const e = await r.json();
+          throw new Error(e.message || 'Error al guardar el deportista');
+        }
+        return r.json();
+      })
+      .then(data => {
+        Swal.fire({
+          icon: 'success',
+          title: data.message.includes('creado') ? 'Deportista creado' : 'Deportista actualizado',
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false
+        });
+        $('#addUser').modal('hide');
+        $('#editDeportistaForm')[0].reset();
+        $('#categoria, #rama, #division, #federado, #categoriaExtra').val(null).trigger('change');
+        $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+        $('#submitBtn').text('Crear');
+        $('#tituloAdd').text('Agregar Deportista');
+        if (tabla) tabla.ajax.reload();
+      })
+      .catch(err => {
+        const errorDiv = document.getElementById('formError');
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('d-none');
+        // ❌ No cierro el modal, lo dejo abierto para corregir
+      });
+  });
 
-
-          function eliminarFila(rowIndex) {
-            const tabla = $('#tablaDeportista').DataTable();
-            const data = tabla.row(rowIndex).data();
-
-            Swal.fire({
-              title: '¿Estás segura/o?',
-              text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Sí, eliminar',
-              cancelButtonText: 'Cancelar'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                fetch(`/deportista/eliminar/${data.dni}`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                  }
-                })
-                .then(async response => {
-                  if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error desconocido');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Eliminado',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  tabla.ajax.reload();
-                })
-                .catch(error => {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Hubo un error al intentar eliminar el deportista.'
-                  });
-                });
-              }
-            });
-          }
-          function limpiar() {
-            $('#categoriaFiltro').val('').trigger('change');
-            $('#ramaFiltro').val('').trigger('change');
-            $('#divisionFiltro').val('').trigger('change');
-            $('#deportistaFiltro').val('').trigger('change');
-            filtrar(); // recargar la tabla sin filtros
-
-          
-          }
-          $('#tablaDeportista').on('click', '.cambiar-estado', function () {
-            const dni = $(this).data('dni');
-            const boton = $(this);
-            
-            fetch(`/deportista/cambiarEstado/${dni}`, {
-                method: 'POST',
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest'
-                }
-              })
-                .then(async response => {
-                  if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Error desconocido');
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Estado actualizado',
-                    text: `Nuevo estado: ${data.nuevo_estado}`,
-                    timer: 2000,
-                    showConfirmButton: false
-                  });
-                  tabla.ajax.reload(null, false);
-                })
-                .catch(err => {
-                  console.error('Error:', err);
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error al cambiar estado',
-                    text: err.message || 'Ocurrió un error inesperado'
-                  });
-                });    
-                      });
+  // ✅ Reset modal al cerrarse (para limpiar siempre)
+  $('#addUser').on('hidden.bs.modal', function () {
+    const form = $('#editDeportistaForm')[0];
+    form.reset();
+    $('#categoria, #rama, #division, #federado, #categoriaExtra').val(null).trigger('change');
+    $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
+    $('#submitBtn').text('Crear');
+    $('#tituloAdd').text('Agregar Deportista');
+    const errorDiv = document.getElementById('formError');
+    if (errorDiv) {
+      errorDiv.classList.add('d-none');
+      errorDiv.textContent = '';
+    }
+  });
+</script>
 
 
-
-
-
-  </script>
   <!-- DataTables Buttons CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
 

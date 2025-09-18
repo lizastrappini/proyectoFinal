@@ -8,6 +8,7 @@ class Notificacion(db.Model):
     IdCategoria = db.Column(db.Integer, nullable=True)
     IdDivision = db.Column(db.Integer, nullable=True)
     IdRama = db.Column(db.Integer, nullable=True)
-
+    FechaEnvio = db.Column(db.DateTime, nullable=False)
+    
     def __repr__(self):
         return f"<Notificacion {self.Titulo}>"

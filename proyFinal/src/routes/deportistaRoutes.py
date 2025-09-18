@@ -82,15 +82,21 @@ def agregar_deportista():
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
-        categoriaExtra = request.form.get('categoriaExtra')
+        categoriaExtra = request.form.getlist('categoriaExtra')
         
-        
-
+        categoriaExtraIds = []
+        if categoriaExtra:
+            try:
+                categoriaExtraIds = [
+                    generalEnum.CategoriaEnum[nombre].value
+                    for nombre in categoriaExtra
+                    if nombre in generalEnum.CategoriaEnum.__members__
+                ]
+            except Exception:
+                raise ValueError("Categoría Extra inválida")
+            
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
-            raise ValueError("Categoría inválida o no seleccionada")
-        
-        if not categoriaExtra or categoriaExtra not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
         
         if not rama_nombre or rama_nombre not in generalEnum.RamaEnum.__members__:
@@ -100,11 +106,10 @@ def agregar_deportista():
             raise ValueError("División inválida o no seleccionada")
 
         fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  # Convertir string a datetime
-        categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
-        # categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
+        #categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
-        categoriaExtraId = generalEnum.CategoriaEnum[categoriaExtra].value
         federado_id = generalEnum.FederadoEnum[federado_nombre].value
         caracteres = string.ascii_letters + string.digits  # letras + números
         password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
@@ -126,7 +131,8 @@ def agregar_deportista():
             IdCategoria = categoria_id,
             IdRama = rama_id,
             IdDivision = division_id,
-            Password =  generate_password_hash(password_plana),
+            Password = generate_password_hash(dni),
+            #Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"{nombre}_{dni}",
             Localidad= 1,
@@ -138,7 +144,7 @@ def agregar_deportista():
             TokenEnviado=False,
             FechaVencimientoToken=None,
             Federado = federado_id,
-            CategoriaExtra = categoriaExtraId
+            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
         )
         deportistaController.agregarDeportista(nuevo_deportista)
         deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
@@ -163,7 +169,19 @@ def editar_deportista(dni):
     try:
         nuevo_dni = request.form.get('dni')
         nuevo_email = request.form.get('email')
-        
+        categoria_extra = request.form.getlist('categoriaExtra')
+
+        categoriaExtraIds = []
+        if categoria_extra:
+            try:
+                categoriaExtraIds = [
+                    generalEnum.CategoriaEnum[nombre].value
+                    for nombre in categoria_extra
+                    if nombre in generalEnum.CategoriaEnum.__members__
+                ]
+            except Exception:
+                raise ValueError("Categoría Extra inválida")
+
         if nuevo_dni and int(nuevo_dni) != dni:
             usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
             if usuario_existente:
@@ -196,7 +214,7 @@ def editar_deportista(dni):
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
         categoria_extra = request.form.get('categoriaExtra')
-        
+        categoria = request.form.get('categoria')
 
         # Actualiza campos
         deportista.Dni = nuevo_dni
@@ -205,14 +223,14 @@ def editar_deportista(dni):
         deportista.Email = nuevo_email
         deportista.FechaNacimiento = fechaNacimiento
         deportista.Telefono = telefono
-        # deportista.IdCategoria = generalEnum.CategoriaEnum[categoria_nombre].value
+        deportista.IdCategoria = generalEnum.CategoriaEnum[categoria].value
         fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
-        deportista.IdCategoria = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        #deportista.IdCategoria = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
         deportista.IdRama = generalEnum.RamaEnum[rama_nombre].value
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
         deportista.Federado = generalEnum.FederadoEnum[federado_nombre].value
         # deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
-        deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
+        deportista.CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
         
         
         if deportista.IdCategoria != categoria_vieja:
@@ -221,6 +239,7 @@ def editar_deportista(dni):
                 deportista.Nombre,
                 generalEnum.CategoriaEnum(deportista.IdCategoria).name
             )
+
         deportistaController.actualizar_deportista(deportista)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -286,6 +305,32 @@ def cambiar_estado(dni):
    
     })
 
+
+@deportista_bp.route('/getDeportista/<int:dni>', methods=['GET'])
+def getDeportista(dni):
+    deportista = deportistaController.obtener_deportista_por_dni(dni)
+
+    if not deportista:
+        return jsonify({'error': 'Deportista no encontrado'}), 404
+
+    return jsonify({
+        "dni": deportista.Dni,
+        "nombre": deportista.Nombre,
+        "apellido": deportista.Apellido,
+        "email": deportista.Email,
+        "telefono": deportista.Telefono,
+        # devolvemos los nombres porque tus selects usan .text
+        "categoria": generalEnum.CategoriaEnum(deportista.IdCategoria).name if deportista.IdCategoria else None,
+        "division": generalEnum.DivisionEnum(deportista.IdDivision).name if deportista.IdDivision else None,
+        "rama": generalEnum.RamaEnum(deportista.IdRama).name if deportista.IdRama else None,
+        "fechaNacimiento": deportista.FechaNacimiento.strftime("%Y-%m-%d") if deportista.FechaNacimiento else None,
+        "federado": generalEnum.FederadoEnum(deportista.Federado).name if deportista.Federado else None,
+        # categorías extra como lista de nombres
+        "categoriaExtra": [
+            generalEnum.CategoriaEnum(int(x)).name for x in deportista.CategoriaExtra.split(",")
+        ] if deportista.CategoriaExtra else []
+    })
+    
 
 # @deportista_bp.route('/subir_comprobante', methods=['POST'])
 # def subir_comrpobante():

@@ -11,28 +11,34 @@
       <div class="card-body">
 
         
-        <div class="d-flex row mb-5 gx-5">
-          <div class="col d-flex justify-content-end">
-            <button class="btn btn-outline-primary  shadow-sm" onclick="limpiar()">
-              Limpiar 
-            </button>
-          </div>
-          <div class="col-12 col-md-2">
-            <select id="categoriaFiltro" class="select2 form-select" data-placeholder="Categoria" >
+        <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+          <div class="form-floating form-floating-outline" style="min-width: 180px;"> 
+            <select id="categoriaFiltro"
+                    class="select2 form-select" 
+                    data-allow-clear="true"
+                    data-placeholder="Categoría">
               <option value=""></option>
               {% for cat in categorias %}
-                  <option value="{{ cat.value }}">{{ cat.text }}</option>
+                <option value="{{ cat.value }}">{{ cat.text }}</option>
               {% endfor %}
             </select>
           </div>
-          <div class="col-12 col-md-2">
-            <select id="entrenadorFiltro" class="select2 form-select" data-placeholder="Entrenador">
+
+          <div class="form-floating form-floating-outline" style="min-width: 180px;">
+            <select id="entrenadorFiltro"
+                    class="select2 form-select form-select-sm" 
+                    data-allow-clear="true"
+                    data-placeholder="Entrenador">
               <option value=""></option>
               {% for entrenador in entrenadores %}
-                  <option value="{{ entrenador.dni }}">{{ entrenador.nombre }} {{ entrenador.apellido }}</option>
+                <option value="{{ entrenador.dni }}">{{ entrenador.nombre }} {{ entrenador.apellido }}</option>
               {% endfor %}
             </select>
           </div>
+
+          <button id="btnFiltrarEntrenador" class="btn btn-primary waves-effect waves-light">
+            Filtrar
+          </button>
         </div>
       
         <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
@@ -45,7 +51,7 @@
             Agregar
           </a>
         </div>
-        <div class="table-responsive text-nowrap">
+        <div class="table-responsive text-nowrap overflow-visible">
           <table id="tablaEntrenador" class="table">
             <thead>
               <tr>
@@ -182,46 +188,43 @@
 {% block scripts %}
 <script>
   let tabla = null;
+  let firstLoad = true; // fuerza la primera carga vacía
 
-  function filtrar() {
-    const categoria = $('#categoriaFiltro').val();
-    const dni = $('#entrenadorFiltro').val(); 
-    console.log("Categoría seleccionada:", categoria, "Dni Seleccionado", dni);
-    
-    const url = `/entrenador/filtrar?categoria=${categoria}&dni=${dni}`;
-
-    if (tabla) {
-      tabla.ajax.url(url).load();
-    } else {
-      tabla = $('#tablaEntrenador').DataTable({
-        ajax: {
-          url: url,
-          dataSrc: 'data'
-        },
-        columns: [
-        { data: 'dni' },
-        { data: 'nombre' },
-        { data: 'apellido' },
-        { data: 'email' },
-        { data: 'telefono' },
-        { data: 'categoria' },
-        {
-            data: 'estado',
-            render: function (data, type, row) {
-              let badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
-              return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
-            }
-          },
-    
-        {
-          data: null,
-          orderable: false,
-          searchable: false,
-          render: function(data, type, row, meta) {
+  // Inicializar la tabla una sola vez (vacía en el primer draw)
+  tabla = $('#tablaEntrenador').DataTable({
+    ajax: {
+      url: '/entrenador/filtrar?init=1', // tu endpoint inicial
+      dataSrc: function (json) {
+        if (firstLoad) { firstLoad = false; return []; } // ✅ vacía en el arranque
+        return json && json.data ? json.data : [];
+      }
+    },
+    language: {
+      emptyTable: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>'
+    },
+    columns: [
+      { data: 'dni' },
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: 'email' },
+      { data: 'telefono' },
+      { data: 'categoria' },
+      {
+        data: 'estado',
+        render: function (data) {
+          const badgeClass = data === 'Activo' ? 'bg-label-success' : 'bg-label-danger';
+          return `<span class="badge rounded-pill ${badgeClass}">${data}</span>`;
+        }
+      },
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row, meta) {
           const accion = row.estado === 'Activo' ? 'Deshabilitar' : 'Habilitar';
           return `
-            <div class="dropdown">
-              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="dropdown" data-bs-boundary="viewport">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                 <i class="ri-more-2-line"></i>
               </button>
               <div class="dropdown-menu">
@@ -238,221 +241,164 @@
             </div>
           `;
         }
-
-        }
-        ],
-        paging: false,
-        info: false,
-        searching: false,
-        ordering: true,
-        dom: 'frtip',  // <-- importante para mostrar botones
-        buttons: [
-          {
-            extend: 'excelHtml5',
-            text: 'Exportar a Excel',
-            title: 'Entrenadores',
-            className: 'buttons-excel',
-            exportOptions: {
-              columns: ':not(:last-child)' // Excluir columna acciones
-            }
-          }
-        ],
-        
-        initComplete: function () {
-          $('#tablaEntrenador')
-            .removeClass('dataTable no-footer stripe hover')
-            .addClass('table');
-        }
-      }); 
+      }
+    ],
+    paging: false,
+    info: false,
+    searching: false,
+    ordering: true,
+    dom: 'frtip',
+    buttons: [
+      {
+        extend: 'excelHtml5',
+        text: 'Exportar a Excel',
+        title: 'Entrenadores',
+        className: 'buttons-excel',
+        exportOptions: { columns: ':not(:last-child)' }
+      }
+    ],
+    initComplete: function () {
+      $('#tablaEntrenador').removeClass('dataTable no-footer stripe hover').addClass('table');
     }
-  }
-    
- $(document).ready(function () {
-  filtrar(); // carga inicial
+  });
 
-  $('#categoriaFiltro, #entrenadorFiltro').on('change', function () {
-    filtrar(); // recarga con nuevos filtros
-    });
-    $('.btn-export').on('click', function() {
-   tabla.button('.buttons-excel').trigger();
+  // Botón Exportar
+  $('.btn-export').on('click', function() {
+    if (tabla) tabla.button('.buttons-excel').trigger();
+  });
+
+  // Botón Filtrar (ID correcto del botón en tu HTML)
+  $('#btnFiltrarEntrenador').on('click', function () {
+    filtrar();
+  });
+
+  // Función de filtrado
+  function filtrar() {
+    const categoria = $('#categoriaFiltro').val();
+    const dni = $('#entrenadorFiltro').val();
+
+    const url = `/entrenador/filtrar?categoria=${encodeURIComponent(categoria || '')}&dni=${encodeURIComponent(dni || '')}`;
+    tabla.ajax.url(url).load(); // ✅ recarga sobre la tabla ya creada
+  }
+
+  // Editar fila
+  function editarFila(rowIndex) {
+    const tabla = $('#tablaEntrenador').DataTable();
+    const data = tabla.row(rowIndex).data();
+
+    $('#dni').val(data.dni);
+    $('#nombre').val(data.nombre);
+    $('#apellido').val(data.apellido);
+    $('#email').val(data.email);
+    $('#telefono').val(data.telefono);
+    $('#categoria').val(data.categoria).trigger('change');
+
+    $('#editEntrenadorForm').attr('action', `/entrenador/editar/${data.dni}`);
+    $('#submitBtn').text('Actualizar');
+    $('#tituloAdd').text('Editar Entrenador');
+    $('#addUser').modal('show');
+  }
+
+  // Reset modal
+  $('#addUser').on('hidden.bs.modal', function () {
+    const errorDiv = document.getElementById('formError');
+    errorDiv.classList.add('d-none');
+    errorDiv.textContent = '';
+    $('#editEntrenadorForm')[0].reset();
+    $('#categoria').val(null).trigger('change');
+    $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
+    $('#submitBtn').text('Crear');
+    $('#tituloAdd').text('Agregar Entrenador');
+  });
+
+  // Guardar (crear/editar)
+  $('#editEntrenadorForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const actionUrl = $(form).attr('action');
+    const formData = new FormData(form);
+
+    fetch(actionUrl, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(async r => { if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Error al actualizar'); } return r.json(); })
+    .then(data => {
+      Swal.fire({ icon: 'success', title: data.message.includes('creado') ? 'Entrenador creado' : 'Entrenador actualizado', text: data.message, showConfirmButton: false, timer: 2000 });
+      $('#addUser').modal('hide');
+      $('#editEntrenadorForm')[0].reset();
+      $('#categoria').val(null).trigger('change');
+      $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
+      $('#submitBtn').text('Crear');
+      $('#tituloAdd').text('Agregar Entrenador');
+      if (tabla) tabla.ajax.reload();
+    })
+    .catch(err => {
+      const errorDiv = document.getElementById('formError');
+      errorDiv.textContent = err.message;
+      errorDiv.classList.remove('d-none');
     });
   });
 
+  // Eliminar fila
+  function eliminarFila(rowIndex) {
+    const tabla = $('#tablaEntrenador').DataTable();
+    const data = tabla.row(rowIndex).data();
 
-            function editarFila(rowIndex) {
-            const tabla = $('#tablaEntrenador').DataTable();
-            const data = tabla.row(rowIndex).data();
+    Swal.fire({
+      title: '¿Estás segura/o?',
+      text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/entrenador/eliminar/${data.dni}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(async r => { if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Error desconocido'); } return r.json(); })
+        .then(data => {
+          Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 });
+          tabla.ajax.reload();
+        })
+        .catch(err => {
+          Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Hubo un error al intentar eliminar el entrenador.' });
+        });
+      }
+    });
+  }
 
-            // Llenar inputs
-            $('#dni').val(data.dni);
-            $('#nombre').val(data.nombre);
-            $('#apellido').val(data.apellido);
-            $('#email').val(data.email);
-            $('#telefono').val(data.telefono);
-            $('#categoria').val(data.categoria).trigger('change'); // Asegurate que en el backend mandás una lista de IDs para editar
+  // Limpiar filtros
+  function limpiar() {
+    $('#categoriaFiltro').val('').trigger('change');
+    $('#entrenadorFiltro').val('').trigger('change');
+    filtrar(); // recarga sin filtros
+  }
 
-            // Cambiar modo y texto del botón
-            $('#editEntrenadorForm').attr('action', `/entrenador/editar/${data.dni}`);  // O data.id si tenés otro ID
-            $('#submitBtn').text('Actualizar');
-            $('#tituloAdd').text('Editar Entrenador');
+  // Cambiar estado
+  $('#tablaEntrenador').on('click', '.cambiar-estado', function () {
+    const dni = $(this).data('dni');
 
-            // Mostrar el modal
-            $('#addUser').modal('show');
-          }
-            $('#addUser').on('hidden.bs.modal', function () {
-            const errorDiv = document.getElementById('formError');
-            errorDiv.classList.add('d-none');
-            errorDiv.textContent = '';
-            $('#editEntrenadorForm')[0].reset();
-            $('#categoria').val(null).trigger('change');
-            $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
-            $('#submitBtn').text('Crear');
-            $('#tituloAdd').text('Agregar Entrenador');
-          });
-
-          $('#editEntrenadorForm').on('submit', function(e) {
-              e.preventDefault(); // Evita el envío tradicional
-
-              const form = this;
-              const actionUrl = $(form).attr('action');
-              const formData = new FormData(form);
-
-              fetch(actionUrl, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest'
-                }
-              })
-              .then(async response => {
-                if (!response.ok) {
-                  const error = await response.json();
-                  throw new Error(error.message || 'Error al actualizar');
-                }
-                return response.json();
-              })
-              .then(data => {
-                Swal.fire({
-                  icon: 'success',
-                  title: data.message.includes('creado') ? 'Entrenador creado' : 'Entrenador actualizado',
-                  text: data.message,
-                  showConfirmButton: false,
-                  timer: 2000
-                });
-                $('#addUser').modal('hide');
-                $('#editEntrenadorForm')[0].reset();
-                $('#categoria').val(null).trigger('change');
-                $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
-                $('#submitBtn').text('Crear');
-                $('#tituloAdd').text('Agregar Entrenador');
-                if (tabla) tabla.ajax.reload();
-              })
-              .catch(error => {
-                const errorDiv = document.getElementById('formError');
-                  errorDiv.textContent = error.message;
-                  errorDiv.classList.remove('d-none');
-              });
-            });
-
-
-
-
-         function eliminarFila(rowIndex) {
-          const tabla = $('#tablaEntrenador').DataTable();
-          const data = tabla.row(rowIndex).data();
-
-          Swal.fire({
-            title: '¿Estás segura/o?',
-            text: `Vas a eliminar a ${data.nombre} ${data.apellido}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              fetch(`/entrenador/eliminar/${data.dni}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Requested-With': 'XMLHttpRequest'
-                }
-              })
-              .then(async response => {
-                if (!response.ok) {
-                  const errorData = await response.json();
-                  throw new Error(errorData.message || 'Error desconocido');
-                }
-                return response.json();
-              })
-              .then(data => {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Eliminado',
-                  text: data.message,
-                  showConfirmButton: false,
-                  timer: 2000
-                });
-                tabla.ajax.reload();
-              })
-              .catch(error => {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: error.message || 'Hubo un error al intentar eliminar el entrenador.'
-                });
-              });
-            }
-          });
-        }
-        function limpiar() {
-          $('#categoriaFiltro').val('').trigger('change');
-          $('#entrenadorFiltro').val('').trigger('change');
-          filtrar(); // recargar la tabla sin filtros
-
-        
-        }
-        $('#tablaEntrenador').on('click', '.cambiar-estado', function () {
-          const dni = $(this).data('dni');
-          const boton = $(this);
-           
-          fetch(`/entrenador/cambiarEstado/${dni}`, {
-              method: 'POST',
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
-            })
-              .then(async response => {
-                if (!response.ok) {
-                  const error = await response.json();
-                  throw new Error(error.message || 'Error desconocido');
-                }
-                return response.json();
-              })
-              .then(data => {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Estado actualizado',
-                  text: `Nuevo estado: ${data.nuevo_estado}`,
-                  timer: 2000,
-                  showConfirmButton: false
-                });
-                tabla.ajax.reload(null, false);
-              })
-              .catch(err => {
-                console.error('Error:', err);
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error al cambiar estado',
-                  text: err.message || 'Ocurrió un error inesperado'
-                });
-              });    
-                    });
-
-
-
-
-
+    fetch(`/entrenador/cambiarEstado/${dni}`, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(async r => { if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Error desconocido'); } return r.json(); })
+    .then(data => {
+      Swal.fire({ icon: 'success', title: 'Estado actualizado', text: `Nuevo estado: ${data.nuevo_estado}`, timer: 2000, showConfirmButton: false });
+      tabla.ajax.reload(null, false);
+    })
+    .catch(err => {
+      Swal.fire({ icon: 'error', title: 'Error al cambiar estado', text: err.message || 'Ocurrió un error inesperado' });
+    });
+  });
 </script>
+
+
 <!-- DataTables Buttons CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
 
