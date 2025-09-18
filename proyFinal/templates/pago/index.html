@@ -8,63 +8,101 @@
       <!-- Basic Bootstrap Table -->
       <div class="card">
         <h2 class="card-header">Cuotas Deportivas</h2>
-        <div class="card-body">
 
-        <div class="d-flex row mb-5 gx-5">
-          <div class="col d-flex justify-content-end">
-
+        <div id="estadisticasWrapper" class="row mb-6 g-6 d-none">
+  <!-- Tarjeta de Reviews -->
+  <div class="col-md-6">
+    <div class="card h-80">
+      <div class="card-body p-4 row">
+        <div class="col-sm-5 border-end">
+          <div class="d-flex align-items-center mb-2">
+            <span class="text-primary fs-5 fw-medium">0 Cuotas Pagas</span>
           </div>
-          <div class="col-12 col-md-2">
-            <select id="estadoFiltro" class="select2 form-select" data-placeholder="Estado" >
-              <option value=""></option>
-              {% for estado in estados %}
-                  <option value="{{ estado.value }}">{{ estado.text }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-12 col-md-2">
-
-            <div class="form-floating form-floating-outline" >
-              <input type="text" class="form-control" id="fechaDesdeFiltro" name="fechaDesdeFiltro" placeholder="Fecha Desde" required/>
-              <label for="fechaDesdeFiltro">Fecha Desde</label>
-            </div>
-            <!-- <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde"> -->
-          </div>
-          <div class="col-12 col-md-2">
-            <div class="form-floating form-floating-outline" >
-              <input type="text" class="form-control" id="fechaHastaFiltro" name="fechaHastaFiltro" placeholder="Fecha Hasta" required/>
-              <label for="fechaHastaFiltro">Fecha Hasta</label>
-            </div>
-            <!-- <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta"> -->
-          </div>
-          <div class="col-auto d-flex justify-content-end">
-            <button id="btnFiltrar" class="btn btn-primary">Filtrar</button>
-          </div>
+          <h6 class="mb-2">Distribuidas por categoría</h6>
+          <p class="mb-2 text-muted">Resumen de los pagos registrados dentro de las fechas seleccionadas</p>
         </div>
 
-        {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
-          <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-            <button id="btnPagarSeleccionados" class="btn btn-outline-primary" disabled>Pagar</button>
-            <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light"
-             data-bs-target="#actualizarCuota" data-bs-toggle="modal">
-             
-              Actualizar Cuota
-            </a>
-            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
-              <span><i class="ri-upload-line me-sm-1"></i> 
-                <span class="d-none d-sm-inline-block">Exportar</span>
-              </span>
-            </button>
-            <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light"
-             data-bs-target="#importarPago" data-bs-toggle="modal">
-              <i class="ri-download-line me-sm-1"></i> 
-              Importar
-            </a>
-            <a href="javascript:;" class="btn btn-primary" data-bs-target="#addPago" data-bs-toggle="modal">
-              Agregar Pago
-            </a>
-          </div>
-          {% endif %}
+        <!-- 🔹 Este div lo va a llenar renderEstadisticas -->
+        <div class="col-sm-7 d-flex flex-column ps-4 gap-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Estadísticas -->
+  <div class="col-md-6">
+    <div class="card h-80">
+      <div class="card-body row">
+        <div class="col-sm-5">
+          <h5 class="mb-2 text-nowrap">Mes con más pagos registrados</h5>
+          <p class="mb-2">
+            <span class="me-2">-</span>
+          </p>
+          <h6 class="mb-2 fw-normal">
+            <span class="me-1">0%</span> frente a -
+          </h6>
+          <small class="text-muted">Informe Mensual</small>
+        </div>
+
+        <div class="col-sm-7 d-flex justify-content-end align-items-end">
+          <!-- 🔹 Este div lo llena ApexCharts -->
+          <div id="reviewsChart" style="min-height: 120px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+
+        <div class="card-body">
+
+        <!-- Filtros y acciones en UNA sola fila -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+  <!-- Botones (izquierda) -->
+  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
+  <div class="d-flex flex-wrap gap-2">
+    <button id="btnPagarSeleccionados" class="btn btn-outline-primary btn-sm" disabled>Pagar</button>
+    <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#actualizarCuota" data-bs-toggle="modal">
+      Actualizar Cuota
+    </a>
+    <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
+      <i class="ri-upload-line me-sm-1"></i> Exportar
+    </button>
+    <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#importarPago" data-bs-toggle="modal">
+      <i class="ri-download-line me-sm-1"></i> Importar
+    </a>
+    <a href="javascript:;" class="btn btn-primary btn-sm waves-effect waves-light" style="padding:10px;font-size:small;" data-bs-target="#addPago" data-bs-toggle="modal">
+      Agregar Pago
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Filtros (derecha) -->
+  <div class="d-flex align-items-center gap-2">
+    <div style="min-width: 140px !important;">
+    <select id="estadoFiltro"
+            class="select2 form-select form-select-sm"
+            data-placeholder="Estado"
+            style="width:140px; min-height:32px;">
+      <option value=""></option>
+      {% for estado in estados %}
+        <option value="{{ estado.value }}">{{ estado.text }}</option>
+      {% endfor %}
+    </select>
+</div>
+    <input type="text" class="form-control form-control-sm" id="fechaDesdeFiltro"
+           name="fechaDesdeFiltro" placeholder="Fecha Desde" style="width:150px;" autocomplete="off">
+
+    <input type="text" class="form-control form-control-sm" id="fechaHastaFiltro"
+           name="fechaHastaFiltro" placeholder="Fecha Hasta" style="width:150px;" autocomplete="off">
+
+    <button id="btnFiltrar" class="btn btn-primary btn-sm waves-effect waves-light" style="height: 38px;">Filtrar</button>
+  </div>
+</div>
+
+
+
+
+        
 
   
 
@@ -108,43 +146,51 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="usuario_id" class="form-label">Deportista</label>
-                            <select class="form-select" id="deportista" name="deportista" required>
-                              <option value="">Seleccione un deportista</option>
+                            <select class="select2 form-select" id="deportista" name="deportista" required>
+                              <option value="0" disabled selected hidden >Seleccione un deportista</option>
                               {% for deportista in deportistas %}
                                 <option value="{{ deportista.id }}">{{ deportista.nombre }}{{ deportista.apellido }}</option>
                               {% endfor %}
                             </select>
                           </div>
                           </div>
-                          
-
+                        
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
-                              <input 
-                                type="date"
-                                id="fechaPago"
-                                name="fechaPago"
-                                class="form-control"
-                                value=""
-                                placeholder=""
-                                 />
-                              <label for="modalEditUserFirstName">Fecha Pago</label>
+                              <!-- visible -->
+                              <input type="text"
+                                    class="form-control"
+                                    id="fechaPagoDisplay"
+                                    name="fechaPago_display"
+                                    placeholder="Fecha Pago"
+                                    autocomplete="off"
+                                    required />
+
+                              <!-- hidden -->
+                              <input type="hidden" id="fechaPagoIso" name="fechaPago" value="{{ fecha_pago or '' }}" />
+
+                              <label for="fechaPagoDisplay">Fecha Pago</label>
                             </div>
                           </div>
 
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
-                              <input
-                                type="date"
-                                id="fechaVencimiento"
-                                name="fechaVencimiento"
-                                class="form-control"
-                                value=""
-                                placeholder=""
-                                required />
-                              <label for="modalEditUserLastName">Fecha Vencimiento</label>
+                              <!-- visible -->
+                              <input type="text"
+                                    class="form-control"
+                                    id="fechaVencimientoDisplay"
+                                    name="fechaVencimiento_display"
+                                    placeholder="Fecha Vencimiento"
+                                    autocomplete="off"
+                                    required />
+
+                              <!-- hidden -->
+                              <input type="hidden" id="fechaVencimientoIso" name="fechaVencimiento" value="{{ fecha_vencimiento or '' }}"/>
+
+                              <label for="fechaVencimientoDisplay">Fecha Vencimiento</label>
                             </div>
                           </div>
+
                           <!-- <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                               <input
@@ -163,7 +209,7 @@
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="estado" class="form-label">Estado</label>
                             <select class="select2 form-select" id="estado" name="estado" required >
-                              <option value="0">Seleccione un estado</option>
+                              <option value="0" disabled selected hidden>Seleccione un estado</option>
                               {% for estado in estados %}
                                 <option value="{{ estado.text }}">{{ estado.text }}</option>
                               {% endfor %}
@@ -254,7 +300,7 @@
                                 type="number"
                                 id="importe"
                                 name="importe"
-                                step="0.01" 
+                                step="1000" 
                                 class="form-control"
                                 value=""
                                 placeholder=""
@@ -291,6 +337,15 @@
 <div id="uiMsg" class="mt-2"></div>
 
   {% endblock %}
+
+<style>
+
+  #reviewsChart,
+#reviewsChart .apexcharts-canvas {
+  min-height: 100px !important;
+  height: 100px !important;
+}
+</style>
 
   {% block scripts %}
   <script>
@@ -382,6 +437,10 @@ function filtrar() {
       const rows = (resp && resp.data) ? resp.data : [];
       tabla.clear().rows.add(rows).draw();
       actualizarBotonPagar();
+      if (resp.estadisticas) {
+        renderEstadisticas(resp.estadisticas);
+      }
+
     })
     .fail(() => {
       tabla.clear().draw();
@@ -392,26 +451,52 @@ function filtrar() {
 
 
 function editarFila(rowIndex) {
-  const dt  = $('#tablaPagos').DataTable();
+  const dt = $('#tablaPagos').DataTable();
   const data = dt.row(rowIndex).data();
   if (!data) return;
 
   const $idInput = $('#id'); // por si existe un hidden id
   if ($idInput.length) $idInput.val(data.id);
 
-  $('#fechaPago').val(data.fechaPagoISO || data.fechaPago || '');
-  $('#fechaVencimiento').val(data.fechaVencimientoISO || data.fechaVencimiento || '');
+  // ---- FECHA PAGO ----
+  if (data.fechaPagoISO) {
+    $('#fechaPagoIso').val(data.fechaPagoISO);
+    if (window.fpPago) {
+      window.fpPago.setDate(data.fechaPagoISO, true, "Y-m-d");
+    }
+  } else {
+    $('#fechaPagoIso').val("");
+    if (window.fpPago) {
+      window.fpPago.clear();
+    }
+  }
+
+  // ---- FECHA VENCIMIENTO ----
+  if (data.fechaVencimientoISO) {
+    $('#fechaVencimientoIso').val(data.fechaVencimientoISO);
+    if (window.fpVencimiento) {
+      window.fpVencimiento.setDate(data.fechaVencimientoISO, true, "Y-m-d");
+    }
+  } else {
+    $('#fechaVencimientoIso').val("");
+    if (window.fpVencimiento) {
+      window.fpVencimiento.clear();
+    }
+  }
+
+  // ---- IMPORTE (si volvés a mostrarlo en el modal) ----
   $('#importe').val(data.importe ?? '');
 
+  // ---- SELECTS ----
   $('#estado').val(data.estado).trigger('change');
   $('#deportista').val(data.deportista_id).trigger('change');
 
-  // Cambiar a modo edición
+  // ---- Cambiar a modo edición ----
   $('#editPagosForm').attr('action', `/pago/editar/${data.id}`);
   $('#submitBtn').text('Actualizar');
   $('#tituloAdd').text('Editar Pago');
 
-  // Mostrar modal
+  // ---- Mostrar modal ----
   $('#addPago').modal('show');
 }
 
@@ -425,7 +510,11 @@ function eliminarFila(rowIndex) {
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar'
+    cancelButtonText: 'Cancelar',
+    didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
   }).then((result) => {
     if (!result.isConfirmed) return;
 
@@ -444,11 +533,27 @@ function eliminarFila(rowIndex) {
       return response.json();
     })
     .then(data => {
-      Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 });
+      Swal.fire({ icon: 'success', 
+      title: 'Eliminado', 
+      text: data.message, 
+      showConfirmButton: false, 
+      timer: 2000,
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+        });
       dt.ajax ? dt.ajax.reload() : filtrar(); // si no hay ajax, recargar con filtrar()
     })
     .catch(error => {
-      Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'Hubo un error al intentar eliminar el pago.' });
+      Swal.fire({ icon: 'error', 
+      title: 'Error', 
+      text: error.message || 'Hubo un error al intentar eliminar el pago.',
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+     });
     });
   });
 }
@@ -457,10 +562,65 @@ function eliminarFila(rowIndex) {
 $(document).ready(function () {
 
   if ($.fn.select2) {
-    $('#estadoFiltro').select2({ width: '100%', placeholder: 'Estado', allowClear: true });
+  $('#estadoFiltro').select2({
+    dropdownParent: $('#estadoFiltro').parent(),
+    width: '160px',                 // ancho fijo
+    placeholder: 'Estado',
+    allowClear: true,
+    minimumResultsForSearch: Infinity
+  });
+
+  // Ajustar altura de la caja
+  $('.select2-selection').css({
+    'height': '38px',
+    'display': 'flex',
+    'align-items': 'center'
+  });
+
+  // Ajustar el texto dentro (placeholder o seleccionado)
+  $('.select2-selection__rendered').css({
+    'padding-left': '8px',   // un poco de aire
+    'line-height': '38px',   // mismo alto que el contenedor
+    'font-size': '0.875rem'
+  });
+
+}
+
+  window.fpPago = flatpickr("#fechaPagoDisplay", {
+  locale: flatpickr.l10ns.es,
+  dateFormat: "d-m-Y",
+  allowInput: true,
+  onChange(selectedDates, dateStr, instance) {
+    const hidden = document.getElementById("fechaPagoIso");
+    hidden.value = selectedDates.length
+      ? instance.formatDate(selectedDates[0], "Y-m-d")
+      : "";
+  },
+  onReady(selectedDates, dateStr, instance) {
+    const hiddenVal = document.getElementById("fechaPagoIso").value;
+    if (hiddenVal) {
+      instance.setDate(hiddenVal, true, "Y-m-d");
+    }
   }
+});
 
-
+window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
+  locale: flatpickr.l10ns.es,
+  dateFormat: "d-m-Y",
+  allowInput: true,
+  onChange(selectedDates, dateStr, instance) {
+    const hidden = document.getElementById("fechaVencimientoIso");
+    hidden.value = selectedDates.length
+      ? instance.formatDate(selectedDates[0], "Y-m-d")
+      : "";
+  },
+  onReady(selectedDates, dateStr, instance) {
+    const hiddenVal = document.getElementById("fechaVencimientoIso").value;
+    if (hiddenVal) {
+      instance.setDate(hiddenVal, true, "Y-m-d");
+    }
+  }
+});
   window.fpDesde = $("#fechaDesdeFiltro").flatpickr({
     locale: flatpickr.l10ns.es,
     altInput: true,
@@ -617,7 +777,11 @@ $(document).ready(function () {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, pagar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
     }).then((result) => {
       if (!result.isConfirmed) return;
 
@@ -637,12 +801,22 @@ $(document).ready(function () {
         return response.json();
       })
       .then(data => {
-        Swal.fire({ icon: 'success', title: 'Pagos actualizados', text: data.message, showConfirmButton: false, timer: 2000 });
+        Swal.fire({ icon: 'success', title: 'Pagos actualizados', text: data.message, showConfirmButton: false, timer: 2000,
+          didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+         });
         // recargar: si no usás ajax nativo, volvé a ejecutar filtrar()
         filtrar();
       })
       .catch(error => {
-        Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+        Swal.fire({ icon: 'error', title: 'Error', text: error.message,
+          didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+         });
       });
     });
   });
@@ -688,7 +862,11 @@ $(document).ready(function () {
         title: data.message?.includes('creado') ? 'Pago creado' : 'Pago actualizado',
         text: data.message || 'Operación exitosa',
         showConfirmButton: false,
-        timer: 2000
+        timer: 2000,
+        didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
       });
 
       $('#addPago').modal('hide');
@@ -705,7 +883,12 @@ $(document).ready(function () {
       filtrar(); // refrescar datos
     })
     .catch(error => {
-      Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+      Swal.fire({ icon: 'error', title: 'Error', text: error.message,
+        didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+       });
     });
   });
 
@@ -714,6 +897,7 @@ $(document).ready(function () {
     const fechaHasta = $('#fechaHastaFiltro').val();
 
     filtrar();
+     $('#estadisticasWrapper').removeClass('d-none');
   });
 });
       $('#importarPagosForm').on('submit', function (e) {
@@ -734,14 +918,93 @@ $(document).ready(function () {
     return response.json();
   })
   .then(data => {
-    Swal.fire({ icon: 'success', title: 'Importación exitosa', text: data.message, timer: 2000, showConfirmButton: false });
+    Swal.fire({ icon: 'success', title: 'Importación exitosa', text: data.message, timer: 2000, showConfirmButton: false,
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+     });
     $('#importarPago').modal('hide');
     filtrar(); // 🔑 refrescar la tabla con los filtros actuales
   })
   .catch(error => {
-    Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+    Swal.fire({ icon: 'error', title: 'Error', text: error.message,
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+     });
   });
 });
+const labelColor = "#a8aab4"; // gris para labels const colors = ["#72e12829","#72e12829","#72e12829","#72e12829","#72e128","#72e12829","#72e12829"];
+function renderEstadisticas(est) {
+  // mostrar wrapper si está oculto
+  $('#estadisticasWrapper').removeClass('d-none');
+
+  // === GRAFICO 1: CATEGORÍAS ===
+  const card1 = $('#estadisticasWrapper .col-md-6').first();
+  card1.find('.fs-5').text(`${est.totalPagas} Cuotas Pagas`);
+  card1.find('h6').text('Distribuidas por categoría');
+  card1.find('p.text-muted').text('Resumen de los pagos registrados dentro de las fechas seleccionadas');
+
+  const categoriasDiv = card1.find('.col-sm-7');
+  categoriasDiv.empty();
+  const total = est.totalPagas || 1;
+
+  est.porCategoria.forEach(c => {
+    const porcentaje = ((c.cantidad / total) * 100).toFixed(1);
+    categoriasDiv.append(`
+      <div class="d-flex align-items-center mb-0">
+        <span class="small me-2">${c.nombre}</span>
+        <div class="progress flex-grow-1 rounded-pill" style="height: 4px">
+          <div class="progress-bar bg-primary" style="width: ${porcentaje}%"></div>
+        </div>
+        <span class="small ms-2">${c.cantidad}</span>
+      </div>
+    `);
+  });
+
+  // === GRAFICO 2: POR MES ===
+  const card2 = $('#estadisticasWrapper .col-md-6').last();
+  card2.find('h5').text('Mes con más pagos registrados');
+  card2.find('p span').text(est.mesMax.nombre);
+  card2.find('h6').html(
+    `<span class="${est.mesMax.positivo ? 'text-success' : 'text-danger'} me-1">
+       ${est.mesMax.comparacion}
+     </span> frente a ${est.mesMax.comparadoCon}`
+  );
+  card2.find('small.text-muted').text('Informe Mensual');
+
+  // Chart con cuotas por mes
+  const visitorBarChartEl = document.querySelector('#reviewsChart');
+  if (visitorBarChartEl) {
+    visitorBarChartEl.innerHTML = ''; // resetear
+    const visitorBarChart = new ApexCharts(visitorBarChartEl, {
+      chart: { height: 125, type: 'bar', toolbar: { show: false } },
+      plotOptions: {
+        bar: { barHeight: '75%', columnWidth: '40%', borderRadius: 5, distributed: true }
+      },
+      grid: { show: false, padding: { top: 0, bottom: 0, left: 0, right: 0 } },
+      colors: ["#72e12829","#72e12829","#72e12829","#72e12829","#72e128",
+               "#72e12829","#72e12829","#72e12829","#72e12829","#72e12829",
+               "#72e12829","#72e12829"],
+      dataLabels: { enabled: false },
+      series: [{ data: est.porMes }],   // <- acá va lo que viene del backend
+      legend: { show: false },
+      xaxis: {
+        categories: ['E','F','M','A','M','J','J','A','S','O','N','D'],
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        labels: { style: { colors: "#a8aab4", fontSize: '13px' } }
+      },
+      yaxis: { labels: { show: false } }
+    });
+    visitorBarChart.render().then(() => {
+  document.querySelector("#reviewsChart .apexcharts-canvas").style.height = "100px";
+  document.querySelector("#reviewsChart .apexcharts-canvas").style.minHeight = "100px";
+});
+  }
+}
 
   </script>
   <!-- DataTables Buttons CSS -->
