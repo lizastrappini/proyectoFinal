@@ -9,34 +9,39 @@ from src.utils.enums import generalEnum
 from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, EstadoPagoEnum, RamaEnum, RolEnum
 from src import db
 from src.utils.Mail import mail
+from sqlalchemy import or_, and_
 
 def obtener_pagos(estado= None,  fecha_desde=None, fecha_hasta=None):
     query = Pago.query
-    # 🔒 Filtrar por usuario si es deportista
+
     if current_user.IdRol == RolEnum.Deportista:
         query = query.filter(Pago.IdUsuario == current_user.Id)
-    if estado:
+    if estado is not None and estado != "":
         try:
             estado_valor = int(estado)
-            query = query.filter_by(IdEstado=str(estado_valor))
-        except KeyError:
+            query = query.filter(Pago.IdEstado == estado_valor)
+        except ValueError:
             return []
         
     # Filtrar por fecha desde
     if fecha_desde:
-        try:
-            fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
-            query = query.filter(Pago.FechaVencimiento >= fecha_desde_dt)
-        except ValueError:
-            pass
+        fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
+        query = query.filter(
+            or_(
+                and_(Pago.FechaPago != None, Pago.FechaPago >= fecha_desde_dt),
+                and_(Pago.FechaPago == None, Pago.FechaVencimiento >= fecha_desde_dt)
+            )
+        )
 
     # Filtrar por fecha hasta
     if fecha_hasta:
-        try:
-            fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
-            query = query.filter(Pago.FechaVencimiento <= fecha_hasta_dt)
-        except ValueError:
-            pass
+        fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
+        query = query.filter(
+            or_(
+                and_(Pago.FechaPago != None, Pago.FechaPago <= fecha_hasta_dt),
+                and_(Pago.FechaPago == None, Pago.FechaVencimiento <= fecha_hasta_dt)
+            )
+        )
     
     resultados = query.all()
     pagos = []

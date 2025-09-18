@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
 import pytz
 from decimal import Decimal
 import secrets
@@ -11,7 +11,8 @@ from src.models.pago import Pago
 from werkzeug.security import generate_password_hash
 import os
 from werkzeug.utils import secure_filename
-
+from collections import Counter
+import locale, calendar
 
 from src.utils.enums import generalEnum
 
@@ -45,16 +46,100 @@ def filtrar():
     estado = request.args.get('estado')
     fecha_desde = request.args.get('fechaDesde')
     fecha_hasta = request.args.get('fechaHasta')
-    # dni = request.args.get('dni')
 
-    if(fecha_desde is None or fecha_hasta is None):
+    if not fecha_desde or not fecha_hasta:
         return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
-    
+
     if estado and estado.isdigit():
         estado = int(estado)
+
+    # --- 1) Data para la tabla ---
+    data = pagosController.obtener_pagos(
+        estado=estado,
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta
+    )
+
+    # --- 2) Data para estadísticas ---
+    fecha_desde_dt = datetime.strptime(fecha_desde, "%Y-%m-%d")
+    fecha_hasta_dt = datetime.strptime(fecha_hasta, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+
+    pagos_filtrados = Pago.query.filter(
+        Pago.FechaPago >= fecha_desde_dt.date(),
+        Pago.FechaPago <= fecha_hasta_dt.date(),
+        Pago.IdEstado == generalEnum.EstadoPagoEnum.Pago.value  # ✅ solo pagados
+    ).all()
+
+    # ✅ Cantidad de cuotas pagas por categoría (mostrar todas aunque tengan 0)
+    cuotas_por_categoria = []
+    for cat in generalEnum.CategoriaEnum:
+        if cat.value == 0:  # 🚫 saltar NoEspecificada
+            continue
+        cantidad = sum(
+            1 for p in pagos_filtrados
+            if p.usuario and p.usuario.IdCategoria == cat.value
+        )
+        cuotas_por_categoria.append({"nombre": cat.name, "cantidad": cantidad})
+
+    # ✅ Cuotas pagas por mes (año actual completo)
+    ahora = datetime.now()
+    year = ahora.year
+    cuotas_por_mes = [0] * 12
+
+    pagos_ano = Pago.query.filter(
+        Pago.FechaPago >= date(year, 1, 1),
+        Pago.FechaPago <= date(year, 12, 31),
+        Pago.IdEstado == generalEnum.EstadoPagoEnum.Pago.value
+    ).all()
+
+    for p in pagos_ano:
+        if p.FechaPago:
+            cuotas_por_mes[p.FechaPago.month - 1] += 1
+
+    # ✅ Comparativa mes actual vs anterior
+    max_mes_index = max(range(12), key=lambda i: cuotas_por_mes[i])
+    max_mes_total = cuotas_por_mes[max_mes_index]
     
-    data = pagosController.obtener_pagos(estado=estado, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta)
-    return jsonify({'data': data})
+
+    # mes anterior al de máximo
+    mes_anterior_index = max_mes_index - 1 if max_mes_index > 0 else 11
+    total_mes_anterior = cuotas_por_mes[mes_anterior_index]
+
+    if total_mes_anterior > 0:
+        variacion = ((max_mes_total - total_mes_anterior) / total_mes_anterior) * 100
+    elif max_mes_total > 0:
+        variacion = 100.0  # antes era 0, ahora hay pagos
+    else:
+        variacion = 0.0
+    
+    MESES_ES = {
+            1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril",
+            5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto",
+            9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+        }
+
+    comparativa = {
+        "mes_actual": MESES_ES[max_mes_index + 1],
+        "total_actual": max_mes_total,
+        "mes_anterior": MESES_ES[mes_anterior_index + 1],
+        "total_anterior": total_mes_anterior,
+        "variacion_pct": variacion
+    }
+
+    return jsonify({
+        "data": data,
+        "estadisticas": {
+            "totalPagas": sum(c["cantidad"] for c in cuotas_por_categoria),
+            "porCategoria": cuotas_por_categoria,   # 🔹 siempre todas las categorías
+            "porMes": cuotas_por_mes,               # 🔹 12 números
+            "mesMax": {
+                "nombre": comparativa["mes_actual"],
+                "comparacion": f'{comparativa["variacion_pct"]:.1f}%',
+                "positivo": comparativa["variacion_pct"] >= 0,
+                "comparadoCon": comparativa["mes_anterior"]
+            }
+        }
+    })
 
 @pago_bp.route('/nuevoPago', methods=['POST'])
 def agregar_pago():
