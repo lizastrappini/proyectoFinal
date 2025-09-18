@@ -91,7 +91,7 @@ def inject_contacto_and_now():
 
 scheduler = BackgroundScheduler()
 # Se ejecuta todos los días a la medianoche
-scheduler.add_job(deportistaController.actualizar_categorias_automaticas, 'cron', hour=0, minute=0)
+scheduler.add_job(deportistaController.actualizar_categorias_automaticas, 'cron',month=1,day=1, hour=0, minute=0)
 scheduler.start()
         
 if __name__ == "__main__":
