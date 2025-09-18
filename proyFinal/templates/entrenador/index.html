@@ -199,7 +199,7 @@
 <script>
   let tabla = null;
   let firstLoad = true; // fuerza la primera carga vacía
-
+$(document).ready(function () {
   // Inicializar la tabla una sola vez (vacía en el primer draw)
   tabla = $('#tablaEntrenador').DataTable({
     ajax: {
@@ -290,11 +290,11 @@
     initComplete: function () {
       $('#tablaEntrenador').removeClass('dataTable no-footer stripe hover').addClass('table');
     }
-  });
+  });});
 
   // Botón Exportar
 $('.btn-export').on('click', function () {
-    if (tabla) tabla.button('.buttons-excel').trigger();
+    tabla.button('.buttons-excel').trigger();
   });
 
   // Botón Filtrar (ID correcto del botón en tu HTML)

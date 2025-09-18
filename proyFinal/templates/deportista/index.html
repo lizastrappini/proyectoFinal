@@ -276,7 +276,7 @@
 
   let tabla = null;
   let firstLoad = true;
-
+$(document).ready(function () {
   // Inicializar la tabla vacía
   tabla = $('#tablaDeportista').DataTable({
     ajax: {
@@ -375,7 +375,7 @@
       $('#tablaDeportista').removeClass('dataTable no-footer stripe hover').addClass('table');
     }
   });
-
+  });
   // Botón Exportar
   $('.btn-export').on('click', function () {
     if (tabla) tabla.button('.buttons-excel').trigger();
