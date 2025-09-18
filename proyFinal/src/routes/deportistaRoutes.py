@@ -71,7 +71,7 @@ def filtrar():
 
 
 
-@deportista_bp.route('/nuevoDeportista', methods=['POST'])
+@@deportista_bp.route('/nuevoDeportista', methods=['POST'])
 def agregar_deportista():
     try:
         dni = request.form.get('dni')
@@ -86,9 +86,8 @@ def agregar_deportista():
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
-        categoriaExtra = request.form.get('categoriaExtra')
+        categoriaExtra = request.form.getlist('categoriaExtra')
         localidad_nombre = request.form.get('localidad')
-
         categoriaExtraIds = []
         if categoriaExtra:
             try:
@@ -103,9 +102,9 @@ def agregar_deportista():
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
-        if not localidad_nombre or localidad_nombre not in generalEnum.LocalidadEnum.__members__:
-            raise ValueError("Localidad inválida o no seleccionada")
         
+        if not localidad_nombre or localidad_nombre not in generalEnum.LocalidadEnum.__members__:
+            raise ValueError("Localidad inválida o no seleccionada")        
         if not rama_nombre or rama_nombre not in generalEnum.RamaEnum.__members__:
             raise ValueError("Rama inválida o no seleccionada")
         
@@ -145,7 +144,7 @@ def agregar_deportista():
             NombreUsuario=f"{nombre}_{dni}",
             Localidad= localidad_id,
             IdEstado=1,
-            # Direccion="N/A",
+            #Direccion="N/A",
             Telefono=telefono,
             IdRol=2,
             Token=None,
@@ -169,6 +168,7 @@ def agregar_deportista():
         else:
             flash(f'Error al crear deportista: {mensaje_error}', 'danger')
             return redirect(url_for('deportista.index'))
+
 
 
 
@@ -239,10 +239,9 @@ def editar_deportista(dni):
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
         deportista.Federado = generalEnum.FederadoEnum[federado_nombre].value
         # deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
-        deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
+        deportista.CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
         deportista.Localidad = generalEnum.LocalidadEnum[localidad_nombre].value
-        
-        
+         
         if deportista.IdCategoria != categoria_vieja:
             enviar_mail_categoria(
                 deportista.Email,
@@ -271,6 +270,8 @@ def editar_deportista(dni):
         else:
             flash('Ocurrió un error inesperado', 'danger')
             return redirect(url_for('deportista.index'))
+
+
 
 
 
@@ -340,6 +341,8 @@ def getDeportista(dni):
             generalEnum.CategoriaEnum(int(x)).name for x in deportista.CategoriaExtra.split(",")
         ] if deportista.CategoriaExtra else []
     })
+    
+
     
 
 # @deportista_bp.route('/subir_comprobante', methods=['POST'])
