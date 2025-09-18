@@ -42,11 +42,9 @@
         </div>
       
         <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
-            <span><i class="ri-external-link-line me-sm-1"></i> 
-              <span class="d-none d-sm-inline-block">Exportar</span>
-            </span>
-          </button> 
+          <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
+              <i class="ri-upload-line me-sm-1"></i> Exportar
+            </button>
           <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
             Agregar
           </a>
@@ -158,6 +156,18 @@
                             </select>
                           </div>
                           </div>
+
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="4">
+                            <label for="categoriaExtra" class="form-label">Categoría Extra</label>
+                            <select class="select2 form-select" id="categoriaExtra" name="categoriaExtra" data-placeholder="Categoria Extra" multiple="multiple">
+                              <option value="">Seleccione una categoria</option>
+                              {% for cat in categorias %}
+                                <option value="{{ cat.text }}">{{ cat.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
                         
                         
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
@@ -198,9 +208,6 @@
         if (firstLoad) { firstLoad = false; return []; } // ✅ vacía en el arranque
         return json && json.data ? json.data : [];
       }
-    },
-    language: {
-      emptyTable: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>'
     },
     columns: [
       { data: 'dni' },
@@ -248,6 +255,7 @@
     searching: false,
     ordering: true,
     dom: 'frtip',
+    autoWidth: false,  
     buttons: [
       {
         extend: 'excelHtml5',
@@ -257,13 +265,35 @@
         exportOptions: { columns: ':not(:last-child)' }
       }
     ],
+     paging: true,
+  pageLength: 10,                 // filas por página
+  lengthMenu: [10, 25, 50, 100],  // opciones del selector
+  info: true,
+  pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+  autoWidth: false,
+  dom: "frtip",
+
+  language: {
+    emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    lengthMenu:  "Mostrar _MENU_",
+    info:        "Mostrando _START_ a _END_ de _TOTAL_",
+    infoEmpty:   "Mostrando 0 a 0 de 0",
+    infoFiltered:"(filtrado de _MAX_ en total)",
+    paginate: {
+      previous: '<i class="ri-arrow-left-s-line"></i>',
+      next:     '<i class="ri-arrow-right-s-line"></i>',
+      first:    'Primero',
+      last:     'Último'
+    }
+  },
     initComplete: function () {
       $('#tablaEntrenador').removeClass('dataTable no-footer stripe hover').addClass('table');
     }
   });
 
   // Botón Exportar
-  $('.btn-export').on('click', function() {
+$('.btn-export').on('click', function () {
     if (tabla) tabla.button('.buttons-excel').trigger();
   });
 
@@ -283,21 +313,47 @@
 
   // Editar fila
   function editarFila(rowIndex) {
-    const tabla = $('#tablaEntrenador').DataTable();
-    const data = tabla.row(rowIndex).data();
+  const tabla = $('#tablaEntrenador').DataTable();
+  const data = tabla.row(rowIndex).data();
+  const dni = data.dni;
 
-    $('#dni').val(data.dni);
-    $('#nombre').val(data.nombre);
-    $('#apellido').val(data.apellido);
-    $('#email').val(data.email);
-    $('#telefono').val(data.telefono);
-    $('#categoria').val(data.categoria).trigger('change');
+  fetch(`/entrenador/getEntrenador/${dni}`, {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+    .then(async r => {
+      if (!r.ok) {
+        const e = await r.json();
+        throw new Error(e.message || 'Error al cargar datos del entrenador');
+      }
+      return r.json();
+    })
+    .then(detalle => {
+      $('#dni').val(detalle.dni);
+      $('#nombre').val(detalle.nombre);
+      $('#apellido').val(detalle.apellido);
+      $('#email').val(detalle.email);
+      $('#telefono').val(detalle.telefono);
+      $('#categoria').val(detalle.categoria).trigger('change');
 
-    $('#editEntrenadorForm').attr('action', `/entrenador/editar/${data.dni}`);
-    $('#submitBtn').text('Actualizar');
-    $('#tituloAdd').text('Editar Entrenador');
-    $('#addUser').modal('show');
-  }
+      if (detalle.categoriaExtra) {
+        const extras = Array.isArray(detalle.categoriaExtra)
+          ? detalle.categoriaExtra
+          : detalle.categoriaExtra.split(',');
+        $('#categoriaExtra').val(extras).trigger('change');
+      } else {
+        $('#categoriaExtra').val(null).trigger('change');
+      }
+
+      $('#editEntrenadorForm').attr('action', `/entrenador/editar/${detalle.dni}`);
+      $('#submitBtn').text('Actualizar');
+      $('#tituloAdd').text('Editar Entrenador');
+      $('#addUser').modal('show');
+    })
+    .catch(err => {
+      Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'No se pudo cargar el entrenador' });
+    });
+}
+
 
   // Reset modal
   $('#addUser').on('hidden.bs.modal', function () {
@@ -305,7 +361,7 @@
     errorDiv.classList.add('d-none');
     errorDiv.textContent = '';
     $('#editEntrenadorForm')[0].reset();
-    $('#categoria').val(null).trigger('change');
+    $('#categoria, #categoriaExtra').val(null).trigger('change');
     $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
     $('#submitBtn').text('Crear');
     $('#tituloAdd').text('Agregar Entrenador');
@@ -329,7 +385,7 @@
       Swal.fire({ icon: 'success', title: data.message.includes('creado') ? 'Entrenador creado' : 'Entrenador actualizado', text: data.message, showConfirmButton: false, timer: 2000 });
       $('#addUser').modal('hide');
       $('#editEntrenadorForm')[0].reset();
-      $('#categoria').val(null).trigger('change');
+      $('#categoria,#categoriaExtra').val(null).trigger('change');
       $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
       $('#submitBtn').text('Crear');
       $('#tituloAdd').text('Agregar Entrenador');

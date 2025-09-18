@@ -57,11 +57,9 @@
           </div>
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" type="button">
-              <span><i class="ri-external-link-line me-sm-1"></i> 
-                <span class="d-none d-sm-inline-block">Exportar</span>
-              </span>
-            </button> 
+            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
+              <i class="ri-upload-line me-sm-1"></i> Exportar
+            </button>
             <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
               Agregar
             </a>
@@ -350,6 +348,29 @@
         exportOptions: { columns: ':not(:last-child)' }
       }
     ],
+     paging: true,
+  pageLength: 10,                 // filas por página
+  lengthMenu: [10, 25, 50, 100],  // opciones del selector
+  info: true,
+  pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+  autoWidth: false,
+
+ 
+
+  language: {
+    emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    lengthMenu:  "Mostrar _MENU_",
+    info:        "Mostrando _START_ a _END_ de _TOTAL_",
+    infoEmpty:   "Mostrando 0 a 0 de 0",
+    infoFiltered:"(filtrado de _MAX_ en total)",
+    paginate: {
+      previous: '<i class="ri-arrow-left-s-line"></i>',
+      next:     '<i class="ri-arrow-right-s-line"></i>',
+      first:    'Primero',
+      last:     'Último'
+    }
+  },
     initComplete: function () {
       $('#tablaDeportista').removeClass('dataTable no-footer stripe hover').addClass('table');
     }

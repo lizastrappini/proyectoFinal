@@ -54,10 +54,22 @@ def agregar_entrenador():
         email = request.form.get('email')
         telefono = request.form.get('telefono')
         categoria_nombre = request.form.get('categoria')
+        categoriaExtra = request.form.getlist('categoriaExtra')
 
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
+    
+        categoriaExtraIds = []
+        if categoriaExtra:
+            try:
+                categoriaExtraIds = [
+                    generalEnum.CategoriaEnum[nombre].value
+                    for nombre in categoriaExtra
+                    if nombre in generalEnum.CategoriaEnum.__members__
+                ]
+            except Exception:
+                raise ValueError("Categoría Extra inválida")
 
         categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         # password_plana = '12345678' # despues hay que generar una contraseña aleatoria y hasheada
@@ -91,7 +103,9 @@ def agregar_entrenador():
             Token=None,
             TokenEnviado=False,
             FechaVencimientoToken=None,
-            Federado = 3
+            Federado = 3,
+            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
+            
         )
         entrenadorController.agregarEntrenador(nuevo_entrenador)
         entrenadorController.enviar_mail_alta_entrenador(nuevo_entrenador, password_plana)
@@ -116,6 +130,18 @@ def editar_entrenador(dni):
     try:
         nuevo_dni = request.form.get('dni')
         nuevo_email = request.form.get('email')
+        categoria_extra = request.form.getlist('categoriaExtra')
+        
+        categoriaExtraIds = []
+        if categoria_extra:
+            try:
+                categoriaExtraIds = [
+                    generalEnum.CategoriaEnum[nombre].value
+                    for nombre in categoria_extra
+                    if nombre in generalEnum.CategoriaEnum.__members__
+                ]
+            except Exception:
+                raise ValueError("Categoría Extra inválida")
         
         if nuevo_dni and int(nuevo_dni) != dni:
             usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
@@ -143,6 +169,8 @@ def editar_entrenador(dni):
         apellido = request.form.get('apellido')
         telefono = request.form.get('telefono')
         categoria_nombre = request.form.get('categoria')
+        categoria_extra = request.form.get('categoriaExtra')
+        
 
         # Actualiza campos
         entrenador.Dni = nuevo_dni
@@ -151,6 +179,8 @@ def editar_entrenador(dni):
         entrenador.Email = nuevo_email
         entrenador.Telefono = telefono
         entrenador.IdCategoria = generalEnum.CategoriaEnum[categoria_nombre].value
+        entrenador.CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
+        
 
         entrenadorController.actualizar_entrenador(entrenador)
     
@@ -217,3 +247,24 @@ def cambiar_estado(dni):
     })
 
 
+@entrenador_bp.route('/getEntrenador/<int:dni>', methods=['GET'])
+def getEntrenador(dni):
+    entrenador = entrenadorController.obtener_entrenador_por_dni(dni)
+
+    if not entrenador:
+        return jsonify({'error': 'Entrenador no encontrado'}), 404
+
+    return jsonify({
+        "dni": entrenador.Dni,
+        "nombre": entrenador.Nombre,
+        "apellido": entrenador.Apellido,
+        "email": entrenador.Email,
+        "telefono": entrenador.Telefono,
+        # si los entrenadores también usan categorías:
+        "categoria": generalEnum.CategoriaEnum(entrenador.IdCategoria).name if entrenador.IdCategoria else None,
+        # categorías extra como lista de nombres
+        "categoriaExtra": [
+            generalEnum.CategoriaEnum(int(x)).name for x in entrenador.CategoriaExtra.split(",")
+        ] if entrenador.CategoriaExtra else [],
+        
+    })

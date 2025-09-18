@@ -187,9 +187,6 @@
         return json && json.data ? json.data : [];
       }
     },
-    language: {
-      emptyTable: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>'
-    },
     columns: [
       { data: 'id' },
       { data: 'titulo' },
@@ -199,11 +196,31 @@
       { data: 'division' },
       { data: 'fechaEnvio'}
     ],
-    paging: false,
-    info: false,
     searching: false,
     ordering: true,
-    dom: 'frtip',
+    paging: true,
+    pageLength: 10,                 // filas por página
+    lengthMenu: [10, 25, 50, 100],  // opciones del selector
+    info: true,
+    pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+    autoWidth: false,
+    dom: "frtip",
+
+    language: {
+      emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+      zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+      lengthMenu:  "Mostrar _MENU_",
+      info:        "Mostrando _START_ a _END_ de _TOTAL_",
+      infoEmpty:   "Mostrando 0 a 0 de 0",
+      infoFiltered:"(filtrado de _MAX_ en total)",
+      paginate: {
+        previous: '<i class="ri-arrow-left-s-line"></i>',
+        next:     '<i class="ri-arrow-right-s-line"></i>',
+        first:    'Primero',
+        last:     'Último'
+      }
+    },
+
     initComplete: function () {
       $('#tablaNotificaciones')
         .removeClass('dataTable no-footer stripe hover')
