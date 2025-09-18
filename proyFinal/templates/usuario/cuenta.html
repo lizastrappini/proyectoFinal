@@ -8,160 +8,142 @@
             <!-- Content -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
-              <div class="row gy-6 gy-md-0">
-                <!-- User Sidebar -->
-                <div class="col-xl-4 col-lg-5 col-md-5">
-                  <!-- User Card -->
-
-
-                  
-                  <div class="card mb-4">
-
-
+              <div class="row">
+               
+                <div class="col-md-12">
+                 
+                  <div class="card mb-6">
+                    <!-- Sección Avatar -->
+                <div class="card-body">
+                  <div class="d-flex align-items-start align-items-sm-center gap-6">
+                    <!-- Foto o iniciales -->
+                
+                      <div
+                        class="d-flex align-items-center justify-content-center rounded-4 bg-label-primary text-white fw-bold"
+                        style="width: 100px; height: 100px; font-size: 2rem;">
+                        {{ current_user.Nombre[0] }}{{ current_user.Apellido[0] }}
+                      </div>
+                      <div class="d-flex flex-column">
+                        <div>
+                            <h5 class="fw-semibold fs-3">{{ usuario.nombre }} {{ usuario.apellido }}</h5>
+                            </div>
+                        <div>
+                            <span class="badge bg-label-hover-info rounded-pill">
+                              {{usuario.rol}}</span>
+                        </div>
+                        </div>
 
                     
-                    <div class="card-body pt-12">
-                      <div class="user-avatar-section">
-                        <div class="d-flex align-items-center flex-column">
-                         <div class="avatar rounded-circle d-flex  align-items-center justify-content-center text-white bg-label-primary mb-4"
-                                  style="width: 120px; height: 120px; font-size: 2rem; color: white;">
-                                {{ current_user.Nombre[0] }}{{ current_user.Apellido[0] }}
-                              </div>
+                    
 
-                          <div class="user-info text-center">
-                            <h5>{{ usuario.nombre }} {{ usuario.apellido }}</h5>
-                            <span class="badge bg-label-hover-info rounded-pill">{{usuario.rol}}</span>
-                          </div>
+                  </div>
+                </div>
+
+                <!-- Sección Formulario -->
+                <div class="card-body pt-0">
+                  <form id="formAccountSettings" method="POST" action="/editUsuario">
+                    <div class="row mt-1 g-5">
+                      <!-- <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" />
+                          <label for="nombre">Nombre</label>
                         </div>
                       </div>
-                     
-                      <h5 class="pb-4 border-bottom mb-4">Datos</h5>
-                      <div class="info-container">
-                        <ul class="list-unstyled mb-6">
-                             <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Nombre:</span>
-                            <span>{{ usuario.nombre }}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Apellido:</span>
-                            <span>{{ usuario.apellido }}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Usuario:</span>
-                            <span>{{usuario.usuario}}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Email:</span>
-                            <span>{{ usuario.email }}</span>
-                          </li>
-                          {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-                           <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Fecha Nacimiento:</span>
-                            <span>{{ usuario.fechaNacimientoISO }}</span>
-                          </li>
-                          {% endif %}
-                           {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-                           <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Tipo Deportista:</span>
-                            <span>{{ usuario.federado }}</span>
-                          </li>
-                          {% endif %}
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Estado:</span>
-                            <span class="badge rounded-pill {{ 'bg-label-success' if usuario.IdEstado == Activo else 'bg-label-danger' }}">
-                              {{ usuario.estado }}
-                            </span>
-                          </li>
-                         {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-                           <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Categoria:</span>
-                            <span>{{usuario.idCategoria}}</span>
-                          </li>
-                          {% endif %}
-                          
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Rol:</span>
-                            <span>{{usuario.rol}}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Dirección:</span>
-                            <span>{{usuario.direccion}}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Localidad:</span>
-                            <span>{{usuario.localidad}}</span>
-                          </li>
-                          <li class="mb-2">
-                            <span class="fw-medium text-heading me-2">Telefono:</span>
-                            <span>{{usuario.telefono}}</span>
-                          </li>
-                          
-                        </ul>
-                        <div class="d-flex justify-content-center">
-                          <a
-                            href="javascript;;"
-                            class="btn btn-primary me-4"
-                            data-bs-target="#editUser"
-                            data-bs-toggle="modal"
-                            >Editar</a>
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="apellido" name="apellido" value="{{ usuario.apellido }}" />
+                          <label for="apellido">Apellido</label>
+                        </div>
+                      </div> -->
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="email" id="email" name="email" value="{{ usuario.email }}" />
+                          <label for="email">Email</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="telefono" name="telefono" value="{{ usuario.telefono }}" />
+                          <label for="telefono">Teléfono</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="direccion" name="direccion" value="{{ usuario.direccion }}" />
+                          <label for="direccion">Dirección</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                      <div class="form-floating form-floating-outline">
+                              <select id="localidad" name="localidad" class="form-select">
+                                <option value="" disabled >Seleccioná una localidad</option>
+                                {% for localidad in localidades %}
+                                  <option value="{{ localidad.value }}">{{ localidad.text }}</option>
+                                {% endfor %}
+                              </select>
+                              <label for="localidad">Localidad</label>
+                            </div>
+                        </div>
+
+
+                      {% if current_user.IdRol == RolEnum.Deportista %}
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="date" id="fechaNacimiento" name="fechaNacimiento" value="{{ usuario.fechaNacimientoISO }}" readonly disabled />
+                          <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="federado" name="federado" value="{{ usuario.federado }}" readonly disabled  />
+                          <label for="federado">Tipo Deportista</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="categoria" name="categoria" value="{{ usuario.idCategoria }}" readonly disabled />
+                          <label for="categoria">Categoría</label>
+                        </div>
+                      </div>
+                      {% endif %}
+
+                      <!-- <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="rol" name="rol" value="{{ usuario.rol }}" readonly disabled  />
+                          <label for="rol">Rol</label>
+                        </div>
+                      </div> -->
+
+                      <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input
+                            class="form-control {{ 'is-valid' if usuario.IdEstado == Activo else 'is-invalid' }}"
+                            type="text"
+                            id="estado"
+                            name="estado"
+                            value="{{ usuario.estado }}"
+                            readonly disabled  />
+                          <label for="estado">Estado</label>
                         </div>
                       </div>
                     </div>
+
+                    <div class="mt-6">
+                      <button type="submit" class="btn btn-primary me-3">Guardar cambios</button>
+                     
+                    </div>
+                  </form>
+                </div>
+                   
                   </div>
                   <!-- /User Card -->
-                  
-                </div>
-                <!--/ User Sidebar -->
-
-                <!-- User Content -->
-                <div class="col-xl-8 col-lg-7 col-md-7">
-                 
-                  <!-- Tabla que muestra los pagos filtrados para ese usuario -->
-                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
-                  <div class="card mb-4">
-                    <h5 class="card-header">Estado de Cuotas</h5>
-                    <div class="table-responsive text-nowrap">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Mes</th>                        
-                            <th>Estado</th>
-                            <th>Fecha pago</th>
-                          </tr>
-                        </thead>
-                        <tbody class="table-border-bottom-0">
-                          {% if pagos %}
-                          {% for pago in pagos %}
-                            <tr>
-                              <td>{{ pago.periodo if pago.periodo else '-' }}</td>
-                              <td>
-                                {% if pago.estado == 'Pago' %}
-                                  <span class="badge rounded-pill bg-label-success me-1">Pago</span>
-                                {% elif pago.estado == 'NoPago' %}
-                                  <span class="badge rounded-pill bg-label-danger me-1">No Pago</span>
-                                {% elif pago.estado == 'Pendiente' %}
-                                  <span class="badge rounded-pill bg-label-warning me-1">Pendiente</span>
-                                {% else %}
-                                  <span class="badge rounded-pill bg-label-secondary me-1">Desconocido</span>
-                                {% endif %}
-                              </td>
-                              <td>{{ pago.fecha_pago.strftime('%d/%m/%Y') if pago.fecha_pago else '-' }}</td>
-                            </tr>
-                          {% endfor %}
-                          {% else %}
-                            <tr>
-                              <td colspan="3" class="text-center text-muted">No hay pagos registrados</td>
-                            </tr>
-                          {% endif %}
-
-
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                   {% endif %}
-
-                  <div class="card">
+                    <div class="card">
                     <!-- Cambiar contraseña -->
                     <h5 class="card-header">Cambiar Contraseña</h5>
                     <div class="card-body">
@@ -232,7 +214,14 @@
 
                     </div>
                   </div>
+                  
                 </div>
+                <!--/ User Sidebar -->
+
+                <!-- User Content -->
+                
+             
+                
                 
                   
 
@@ -241,141 +230,7 @@
                 <!--/ User Content -->
               </div>
 
-              <!-- Modal -->
-              <!-- Edit User Modal -->
-              <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-simple modal-edit-user">
-                  <div class="modal-content">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="modal-body p-0">
-                      <div class="text-center mb-6">
-                        <h4 class="mb-2">Editar Información</h4>
-                        
-                      </div>
-                      <form id="editUserForm" class="row g-5" action="/editUsuario" method="post">
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input 
-                              type="text"
-                              id="Nombre"
-                              name="Nombre"
-                              class="form-control"
-                              value="{{ usuario.nombre }}"
-                              placeholder="Nombre" required />
-                            <label for="modalEditUserFirstName">Nombre</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="Apellido"
-                              name="Apellido"
-                              class="form-control"
-                              value="{{ usuario.apellido }}"
-                              placeholder="Apellido" 
-                              required/>
-                            <label for="modalEditUserLastName">Apellido</label>
-                          </div>
-                        </div>
-                        <div class="col-12  col-md-6">
-                          <div class="form-floating form-floating-outline" readonly>
-                            <input
-                              type="text"
-                              id="Usuario"
-                              name="Usuario"
-                              class="form-control"
-                              value="{{ usuario.usuario }}"
-                              placeholder="laradelcoro"
-                              required readonly disabled />
-                            <label for="modalEditUserName">Usuario</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="Email"
-                              name="Email"
-                              class="form-control"
-                              value="{{ usuario.email }}"
-                              placeholder="laradelcoro@gmail.com" 
-                              required/>
-                            <label for="modalEditUserEmail">Email</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="date"
-                              id="FechaNacimiento"
-                              name="FechaNacimiento"
-                              class="form-control"
-                              value="{{ usuario.fechaNacimientoISO }}"
-                              placeholder="" 
-                              required readonly disabled/>
-                            <label for="modalEditUserFechaNac">Fecha Nacimiento</label>
-                          </div>
-                        </div>
-                       <div class="col-12 col-md-6">
-                          <div class="form-floating form-floating-outline">
-                            <input
-                              type="text"
-                              id="Direccion"
-                              name="Direccion"
-                              class="form-control"
-                              value="{{ usuario.direccion }}"
-                              placeholder="Maipu 1837"
-                              required />
-                            <label for="modalEditUserDireccion">Dirección</label>
-                          </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
-                            <label for="localidad" class="form-label">Localidad</label>
-                            <select class="form-select" id="Localidad" name="Localidad" required>
-                              <option value="">Seleccione una localidad</option>
-                              {% for loc in localidades %}
-                                <option value="{{ loc.value }}" {% if usuario.localidad_valor == loc.value %}selected{% endif %}>
-                                  {{ loc.text }}
-                                </option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                          </div>
-                        <div class="col-12 col-md-6">
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text">ARG (+54)</span>
-                            <div class="form-floating form-floating-outline">
-                              <input
-                                type="text"
-                                id="Telefono"
-                                name="Telefono"
-                                class="form-control phone-number-mask"
-                                value="{{ usuario.telefono }}"
-                                placeholder="3471-607768"
-                                required />
-                              <label for="modalEditUserPhone">Telefono</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                          <button type="submit" class="btn btn-primary">Guardar</button>
-                          <button
-                            type="reset"
-                            class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                            Cancelar
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!--/ Edit User Modal -->
-              <!-- /Modal -->
+              
             </div>
             <!-- / Content -->
 

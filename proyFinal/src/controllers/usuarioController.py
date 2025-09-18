@@ -26,8 +26,12 @@ def loginUser(username, password):
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
     if(usuario is not None):
-        localidad_valor = int(usuario.Localidad or 0)
-        localidad_nombre = generalEnum.LocalidadEnum(localidad_valor).name
+        localidad_valor = usuario.Localidad or 0
+        try:
+            localidad_nombre = generalEnum.LocalidadEnum(int(localidad_valor)).name
+        except (ValueError, TypeError):
+            localidad_nombre = 'No completado'
+        # localidad_nombre = generalEnum.LocalidadEnum(localidad_valor).name
         categoria_valor = int(usuario.IdCategoria or 0)
         categoria_nombre = generalEnum.CategoriaEnum(categoria_valor).name
         return {
@@ -73,19 +77,13 @@ def update(id, datos):
             usuario.NombreUsuario = datos['NombreUsuario']
         if 'Direccion' in datos:
             usuario.Direccion = datos['Direccion']
-        if 'Localidad' in datos:
-            usuario.Localidad = datos['Localidad']
+        if 'Localidad' in datos and datos['Localidad']:
+            usuario.Localidad = int(datos['Localidad'])
         if 'Telefono' in datos:
             usuario.Telefono = datos['Telefono']
     
 
         db.session.commit()
-        # if usuario.IdCategoria != categoria_vieja:
-        #     enviar_mail_categoria(
-        #         usuario.Email,
-        #         usuario.Nombre,
-        #         generalEnum.CategoriaEnum(usuario.IdCategoria).name
-        #     )
 
         return usuario
 

@@ -85,15 +85,17 @@ def miCuenta():
 @login_required
 @usuario_bp.route('/editUsuario', methods=['POST'])
 def editUsuario():
+    
+    
     id = current_user.Id
     usuarioModel = {
-        'Nombre': request.form.get('Nombre'),
-        'Apellido': request.form.get('Apellido'),
-        'Email': request.form.get('Email'),
-        'Direccion': request.form.get('Direccion'),
-        'Localidad': request.form.get('Localidad'),
-        'Telefono': request.form.get('Telefono'),
-        'Categoria': request.form.get('Categoria'),
+        'Nombre': request.form.get('nombre'),
+        'Apellido': request.form.get('apellido'),
+        'Email': request.form.get('email'),
+        'Direccion': request.form.get('direccion'),
+        'Localidad': request.form.get('localidad'),
+        'Telefono': request.form.get('telefono'),
+        'Categoria': request.form.get('categoria'),
     }
 
     usuario = usuarioController.getUsuarioById(id)
