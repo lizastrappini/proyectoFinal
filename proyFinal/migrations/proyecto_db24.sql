@@ -247,7 +247,7 @@ CREATE TABLE `faq` (
   `Respuesta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `PalabrasClave` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Tema` varchar(50) NOT NULL
-) ENGI
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Truncar tablas antes de insertar `faq`

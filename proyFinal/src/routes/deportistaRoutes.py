@@ -71,7 +71,7 @@ def filtrar():
 
 
 
-@@deportista_bp.route('/nuevoDeportista', methods=['POST'])
+@deportista_bp.route('/nuevoDeportista', methods=['POST'])
 def agregar_deportista():
     try:
         dni = request.form.get('dni')

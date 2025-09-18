@@ -431,6 +431,7 @@ function filtrar() {
       tabla.clear().rows.add(rows).draw();
       actualizarBotonPagar();
       if (resp.estadisticas) {
+        $('#estadisticasWrapper').removeClass('d-none');
         renderEstadisticas(resp.estadisticas);
       }
 
@@ -890,7 +891,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     const fechaHasta = $('#fechaHastaFiltro').val();
 
     filtrar();
-     $('#estadisticasWrapper').removeClass('d-none');
+     
   });
 });
       $('#importarPagosForm').on('submit', function (e) {
