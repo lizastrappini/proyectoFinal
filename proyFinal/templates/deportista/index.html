@@ -176,6 +176,7 @@
                               <label for="modalEditUserFirstName">Fecha Nacimiento</label>
                             </div>
                           </div>
+                          
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="categoria" class="form-label">Categoría</label>
@@ -218,6 +219,17 @@
                               <option value="">Seleccione una rama</option>
                               {% for rama in ramas %}
                                 <option value="{{ rama.text}}">{{ rama.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                           <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
+                            <label for="localidad" class="form-label">Localidad</label>
+                            <select class="form-select" id="localidad" name="localidad" required>
+                              <option value="">Seleccione una localidad</option>
+                              {% for localidad in localidades %}
+                                <option value="{{ localidad.text}}">{{ localidad.text }}</option>
                               {% endfor %}
                             </select>
                           </div>

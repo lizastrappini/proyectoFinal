@@ -42,7 +42,7 @@ def miCuenta(id):
             'localidad': localidad_nombre,
             'localidad_valor' : localidad_valor,
             'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
-            'direccion': usuario.Direccion,
+            'direccion': usuario.Direccion or 'No completado',
             'telefono': usuario.Telefono,
             'rol': generalEnum.RolEnum(usuario.IdRol).name ,
             'idEstado': usuario.IdEstado,
