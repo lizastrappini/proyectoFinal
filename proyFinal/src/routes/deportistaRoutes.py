@@ -33,6 +33,10 @@ def index():
     {'value': federado.value, 'text': federado.name}
     for federado in generalEnum.FederadoEnum
     ]
+    localidades = [
+    {'value': localidad.value, 'text': localidad.name}
+    for localidad in generalEnum.LocalidadEnum
+    ]
     deportistas = deportistaController.obtener_deportistas()  
     lista_deportistas = [
         {
@@ -42,7 +46,7 @@ def index():
         }
         for e in deportistas
     ]
-    return render_template('deportista/index.html', categorias=categorias,deportistas=lista_deportistas, ramas=ramas, divisiones=divisiones, federados= federados)
+    return render_template('deportista/index.html',localidades=localidades, categorias=categorias,deportistas=lista_deportistas, ramas=ramas, divisiones=divisiones, federados= federados)
 
 
 @deportista_bp.route('/filtrar')
@@ -82,8 +86,9 @@ def agregar_deportista():
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
-        categoriaExtra = request.form.getlist('categoriaExtra')
-        
+        categoriaExtra = request.form.get('categoriaExtra')
+        localidad_nombre = request.form.get('localidad')
+
         categoriaExtraIds = []
         if categoriaExtra:
             try:
@@ -98,6 +103,8 @@ def agregar_deportista():
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
+        if not localidad_nombre or localidad_nombre not in generalEnum.LocalidadEnum.__members__:
+            raise ValueError("Localidad inválida o no seleccionada")
         
         if not rama_nombre or rama_nombre not in generalEnum.RamaEnum.__members__:
             raise ValueError("Rama inválida o no seleccionada")
@@ -111,6 +118,7 @@ def agregar_deportista():
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
         federado_id = generalEnum.FederadoEnum[federado_nombre].value
+        localidad_id = generalEnum.LocalidadEnum[localidad_nombre].value
         caracteres = string.ascii_letters + string.digits  # letras + números
         password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
         
@@ -135,9 +143,9 @@ def agregar_deportista():
             #Password =  generate_password_hash(password_plana),
             # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"{nombre}_{dni}",
-            Localidad= 1,
+            Localidad= localidad_id,
             IdEstado=1,
-            Direccion="N/A",
+            # Direccion="N/A",
             Telefono=telefono,
             IdRol=2,
             Token=None,
@@ -213,6 +221,7 @@ def editar_deportista(dni):
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
         federado_nombre = request.form.get('federado')
+        localidad_nombre = request.form.get('localidad')
         categoria_extra = request.form.get('categoriaExtra')
         categoria = request.form.get('categoria')
 
@@ -230,7 +239,8 @@ def editar_deportista(dni):
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
         deportista.Federado = generalEnum.FederadoEnum[federado_nombre].value
         # deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
-        deportista.CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
+        deportista.CategoriaExtra = generalEnum.CategoriaEnum[categoria_extra].value
+        deportista.Localidad = generalEnum.LocalidadEnum[localidad_nombre].value
         
         
         if deportista.IdCategoria != categoria_vieja:

@@ -121,7 +121,7 @@
         <script src="../static/js/app-calendar.js"></script>
 
         <!-- CSS del chatbot -->
-  <style>
+<!-- <style>
     #chatbot-container { position: fixed; bottom: 20px; right: 20px; font-family: 'Open Sans', sans-serif; z-index: 9999; width: 320px; max-width: 90%; }
     #chatbot-header { background-color: #666cff; color: white; padding: 12px 15px; border-top-left-radius: 12px; border-top-right-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
     #chatbot-header button { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; line-height: 1; }
@@ -152,7 +152,7 @@
   display: block; /* visible por defecto */
   z-index: 9999;
 }
-  </style>
+  </style>  -->
     </head>
     <body data-rol="{{ current_user.IdRol }}">
 
@@ -519,7 +519,7 @@
             </div>
 
         </div>
-      <div id="chatbot-container">
+  <!-- <div id="chatbot-container">
   <div id="chatbot-box">
     <div id="chatbot-header">
       <span>VoleyChat</span>
@@ -536,6 +536,22 @@
       <button class="faq-btn">¿Cómo puedo ver mis pagos deportivos?</button>
     </div>
   </div>
+  <div id="chatbot-label">¡Soy VoleyChat!</div>
+  <button id="open-chat">💬</button>
+</div> -->
+<div id="chatbot-container">
+  <div id="chatbot-box" style="display: none;">
+    <div id="chatbot-header">
+      <span>VoleyChat 🤖</span>
+      <button id="close-chat" class="chat-close">&times;</button>
+    </div>
+    
+    <div id="chat-log">
+      <!-- Aquí se cargan dinámicamente los temas, preguntas y respuestas -->
+    </div>
+  </div>
+
+  <!-- Cartel flotante -->
   <div id="chatbot-label">¡Soy VoleyChat!</div>
   <button id="open-chat">💬</button>
 </div>
@@ -583,62 +599,273 @@
       <script src="../static/js/wizard-ex-checkout.js"></script>
       <script src="../static/js/app-calendar-events.js"></script>
       <script src="../static/js/app-calendar.js"></script>
-<script src="../static/js/config.js"></script>   
+      <script src="../static/js/config.js"></script>   
       <script src="../static/js/charts-apex.js"></script>
       <script src="../static/js/charts-chartjs.js"></script>
-      
-      <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const chatBox = document.getElementById('chatbot-box');
-  const chatLog = document.getElementById('chat-log');
-  const chatInput = document.getElementById('chat-input');
-  const sendBtn = document.getElementById('send-btn');
-  const openBtn = document.getElementById('open-chat');
-  const closeBtn = document.getElementById('close-chat');
-  const chatLabel = document.getElementById('chatbot-label');
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const chatLog = document.getElementById("chat-log");
+  const openBtn = document.getElementById("open-chat");
+  const closeBtn = document.getElementById("close-chat");
+  const chatbotBox = document.getElementById("chatbot-box");
+  const label = document.getElementById("chatbot-label");
 
-  function openChat() {
-    chatBox.style.display = 'flex';
-    openBtn.style.display = 'none'; // ocultamos el botón cuando está abierto
-    chatLabel.style.display = 'none'; 
-    if (!chatLog.innerHTML) chatLog.innerHTML += `<div class="bot-msg"><b>VoleyBot:</b> ¡Hola! Bienvenido. ¿En qué te puedo ayudar?</div>`;
-    chatLog.scrollTop = chatLog.scrollHeight;
+  // Mostrar chatbot
+  openBtn.addEventListener("click", () => {
+    chatbotBox.style.display = "flex";
+    openBtn.style.display = "none";
+    label.style.display = "none";
+    cargarTemas();
+  });
+
+  // Cerrar chatbot
+  closeBtn.addEventListener("click", () => {
+    chatbotBox.style.display = "none";
+    openBtn.style.display = "block";
+    label.style.display = "block";
+  });
+
+  function cargarTemas() {
+    chatLog.innerHTML = "";
+
+    // Mensaje de bienvenida
+    const welcome = document.createElement("div");
+    
+    welcome.innerHTML = `<h6>¡Hola! Soy VoleyChat. Elegí el tema que quieras consultar:</h6>`;
+    chatLog.appendChild(welcome);
+
+    fetch("/chatbot/temas")
+      .then(res => res.json())
+      .then(data => {
+        if (!data.temas || data.temas.length === 0) {
+          const msg = document.createElement("div");
+          msg.className = "bot-msg";
+          msg.innerText = "No hay temas disponibles.";
+          chatLog.appendChild(msg);
+          return;
+        }
+
+        data.temas.forEach(t => {
+          const btn = document.createElement("button");
+          btn.className = "chat-option bot-msg";
+          btn.innerText = t;
+          btn.onclick = () => cargarPreguntas(t);
+          chatLog.appendChild(btn);
+        });
+
+        chatLog.scrollTop = chatLog.scrollHeight;
+      })
+      .catch(err => console.error(err));
   }
 
-  function closeChat() {
-    chatBox.style.display = 'none';
-    openBtn.style.display = 'block'; // mostramos el botón al cerrar
-    chatLabel.style.display = 'block';
+  function cargarPreguntas(tema) {
+    chatLog.innerHTML = "";
+
+    const temaMsg = document.createElement("div");
+   
+    temaMsg.innerHTML = `<h6>Preguntas del tema: ${tema}</h6>`;
+    chatLog.appendChild(temaMsg);
+
+    fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.preguntas || data.preguntas.length === 0) {
+          const noData = document.createElement("div");
+          noData.className = "bot-msg";
+          noData.innerText = "No hay preguntas para este tema.";
+          chatLog.appendChild(noData);
+          return;
+        }
+
+        data.preguntas.forEach(p => {
+        const btn = document.createElement("button");
+        btn.className = "chat-question bot-msg";
+        btn.innerHTML = p.pregunta;
+        btn.onclick = () => {
+          const resp = document.createElement("div");
+          resp.className = "chat-answer bot-msg";
+          resp.innerHTML = `<b>Respuesta:</b> ${p.respuesta}`;
+          chatLog.appendChild(resp);
+          chatLog.scrollTop = chatLog.scrollHeight;
+        };
+        chatLog.appendChild(btn);
+      });
+
+
+        // Botón volver a temas
+        const back = document.createElement("button");
+        back.className = "chat-back bot-msg";
+        back.innerText = "⬅ Volver a temas";
+        back.onclick = cargarTemas;
+        chatLog.appendChild(back);
+
+        chatLog.scrollTop = chatLog.scrollHeight;
+      })
+      .catch(err => console.error(err));
   }
-
-  openBtn.addEventListener('click', openChat);
-  closeBtn.addEventListener('click', closeChat);
-
-  function sendQuestion(question) {
-    if (!question.trim()) return;
-    chatLog.innerHTML += `<div class="user-msg"><b>Vos:</b> ${question}</div>`;
-    chatLog.scrollTop = chatLog.scrollHeight;
-    fetch('/chatbot', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({pregunta: question})
-    })
-    .then(res => res.json())
-    .then(data => {
-      chatLog.innerHTML += `<div class="bot-msg"><b>VoleyBot:</b> ${data.respuesta}</div>`;
-      chatLog.scrollTop = chatLog.scrollHeight;
-    });
-  }
-
-  sendBtn.addEventListener('click', () => { sendQuestion(chatInput.value); chatInput.value = ''; });
-  chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') { sendQuestion(chatInput.value); chatInput.value = ''; } });
-  document.querySelectorAll('.faq-btn').forEach(btn => btn.addEventListener('click', () => sendQuestion(btn.innerText)));
 });
-
-
-
-
 </script>
+
+<style>
+/* Contenedor del chatbot */
+#chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Caja principal del chatbot */
+#chatbot-box {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-height: 450px;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  border: 1px solid #ddd;
+}
+
+/* Header del chatbot */
+#chatbot-header {
+  background: linear-gradient(90deg, #666cff, #8888ff);
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Botón de cerrar */
+.chat-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Log de mensajes */
+#chat-log {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  background-color: #f8f9fc;
+}
+
+/* Mensajes del bot */
+.bot-msg {
+  background-color: #ffffff;
+  color: #050505;
+  padding: 8px 10px;
+  border-radius: 15px;
+  max-width: 80%;
+  align-self: flex-start;
+  font-size: 14px;
+}
+
+/* Respuestas del bot destacadas */
+.chat-answer {
+  background-color: #666cff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  max-width: 80%;
+  align-self: flex-start;
+  font-size: 14px;
+}
+
+/* Botones de temas, preguntas y volver */
+.chat-option{
+  display: block;
+  width: 100%;
+  margin: 3px 0;
+  padding: 8px 14px;
+  border-radius: 15px;
+  background: #d5ccff;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.chat-question{
+  display: block;
+  width: 100%;
+  margin: 3px 0;
+  padding: 8px 14px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.chat-back {
+  display: block;
+  width: 100%;
+  margin: 3px 0;
+  padding: 8px 14px;
+  border-radius: 15px;
+  background: #d5ccff;    
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.chat-option:hover, 
+.chat-question:hover, 
+.chat-back:hover {
+  background: #666cff;
+  color: white;
+}
+
+/* Botón flotante para abrir chat */
+#open-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #666cff;
+  color: white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+
+#open-chat:hover {
+  transform: scale(1.1);
+}
+
+/* Etiqueta flotante sobre el botón */
+#chatbot-label {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: #666cff;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+</style>
+
+
       {% block scripts %}{% endblock %}
 
 
