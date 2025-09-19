@@ -57,9 +57,26 @@
           </div>
         
           <div class="d-flex justify-content-end align-items-center gap-3 mb-5">
-            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
+            <!-- <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
               <i class="ri-upload-line me-sm-1"></i> Exportar
+            </button> -->
+            <div class="btn-group">
+            <button class="btn btn-secondary btn-label-primary dropdown-toggle" 
+                    type="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false" 
+                    style="padding:10px;font-size:small;">
+              Exportar
             </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="javascript:;" id="descargarExcel">📊 Descargar Excel</a></li>
+              <li><a class="dropdown-item btn-export"  href="javascript:;" id="descargarDeportistas">👟 Descargar Deportistas</a></li>
+            </ul>
+          </div>
+           <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#importarDeportista" data-bs-toggle="modal">
+              Importar Deportistas
+            </a>
+
             <a href="javascript:;" class="btn btn-primary" data-bs-target="#addUser" data-bs-toggle="modal">
               Agregar
             </a>
@@ -163,7 +180,7 @@
                           
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
-                              <input type="text" class="form-control" id="fechaNacimiento" name="fechaNacimiento" placeholder="Fecha Nacimiento" autocomplete="off" required>
+                              <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" placeholder="Fecha Nacimiento" autocomplete="off" required>
                               <label for="fechaNacimiento">Fecha Nacimiento</label>
                             </div>
                           </div>
@@ -258,6 +275,51 @@
                 <!--/ Edit User Modal -->
                 <!-- /Modal -->
 
+                    
+                <!-- Modal Importar Masivo-->
+                <!-- Improtar Pago  Modal -->
+                <div class="modal fade" id="importarDeportista" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                    <div class="modal-content">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-body p-0">
+                        <div class="text-center mb-6">
+                          <h4 class="mb-2" id="tituloAdd">Importar Deportistas</h4>
+                          <p class="text-muted mb-0">Subí el excel para crear los deportistas</p>
+                          
+                        </div>
+                        <form id="importarDeportistaForm" class="row g-5" method="POST" action="{{ url_for('deportista.importar_deportistas') }}" enctype="multipart/form-data">
+                          <div class="mb-4">
+                              <label for="archivoExcel" class="form-label">Seleccionar archivo</label>
+                              <input 
+                                type="file" 
+                                class="form-control form-control-sm" 
+                                id="archivoExcel" 
+                                name="archivoExcel" 
+                                accept=".xlsx,.xls" 
+                                required>
+                                <small class="text-muted">Solo se aceptan archivos .xlsx o .xls</small>
+                            </div>
+                          
+                          <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary" id="btnImportar">Importar</button>
+                            <button
+                              type="reset"
+                              class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              aria-label="Close">
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--/  Modal Importar Masivo -->
+                <!-- /Modal -->
+
 
         </div>
       </div>
@@ -270,7 +332,7 @@
 <script>
   flatpickr("#fechaNacimiento", { 
     locale: "es", 
-    dateFormat: "d-m-Y",
+    dateFormat: "Y-m-d",
     maxDate: "today"
   });
 
@@ -381,10 +443,54 @@ $(document).ready(function () {
     if (tabla) tabla.button('.buttons-excel').trigger();
   });
 
+  $('#descargarExcel').on('click', function (e) {
+    e.preventDefault();
+    window.location.href = '/deportista/descargar_planilla';
+  });
+
+
   // ✅ Botón Filtrar
   $('#btnFiltrarDeportista').on('click', function () {
     filtrar();
   });
+
+  $('#importarDeportistaForm').on('submit', function (e) {
+  e.preventDefault();
+  const form = this;
+  const formData = new FormData(form);
+
+  fetch($(form).attr('action'), {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(async response => {
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al procesar');
+    }
+    return response.json();
+  })
+  .then(data => {
+    Swal.fire({ icon: 'success', title: 'Importación exitosa', text: data.message, timer: 2000, showConfirmButton: false,
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+     });
+    $('#importarDeportista').modal('hide');
+    filtrar(); // 🔑 refrescar la tabla con los filtros actuales
+  })
+  .catch(error => {
+    Swal.fire({ icon: 'error', title: 'Error', text: error.message,
+      didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
+     });
+  });
+});
+const labelColor = "#a8aab4";
 
   // Función filtrar
   function filtrar() {
