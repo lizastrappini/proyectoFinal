@@ -100,6 +100,12 @@ def agregar_deportista():
             except Exception:
                 raise ValueError("Categoría Extra inválida")
             
+             # Validar que sean mayores a la categoría principal
+            cat_principal_val = generalEnum.CategoriaEnum[categoria_nombre].value
+            for cat_extra in categoriaExtraIds:
+                if cat_extra <= cat_principal_val:
+                    raise ValueError("Las categorías extra deben ser mayores a la categoría principal")
+            
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
@@ -191,6 +197,12 @@ def editar_deportista(dni):
                 ]
             except Exception:
                 raise ValueError("Categoría Extra inválida")
+        
+            # Validar que sean mayores a la categoría principal
+            cat_principal_val = generalEnum.CategoriaEnum[categoria].value
+            for cat_extra in categoriaExtraIds:
+                if cat_extra <= cat_principal_val:
+                    raise ValueError("Las categorías extra deben ser mayores a la categoría principal")
 
         if nuevo_dni and int(nuevo_dni) != dni:
             usuario_existente = Usuario.query.filter_by(Dni=nuevo_dni).first()
