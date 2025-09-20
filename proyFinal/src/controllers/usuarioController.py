@@ -11,7 +11,7 @@ from email.message import EmailMessage
 from flask_mail import Message
 from src.utils.Mail import mail
 from datetime import datetime, timezone, timedelta
-from flask import render_template
+from flask import jsonify, render_template
 from werkzeug.security import check_password_hash
 from sqlalchemy import and_, cast, Date, or_, and_
 from datetime import date
@@ -19,6 +19,7 @@ from datetime import date
 
 def loginUser(username, password):
     usuario = Usuario.query.filter_by(NombreUsuario=username).first()
+        
     if usuario and check_password_hash(usuario.Password, password):
         return usuario
     return None
@@ -72,24 +73,7 @@ def actualizar_usuario(usuario):
 def getUsuarioById(id):
     return Usuario.query.filter_by(Id=id).first()
 
-# def update(id, datos):
-#     usuario = Usuario.query.filter_by(Id=id).first()
 
-#     if usuario:
-#         if 'Email' in datos:
-#             usuario.Email = datos['Email']
-#         if 'Direccion' in datos:
-#             usuario.Direccion = datos['Direccion']
-#         if 'Localidad' in datos and datos['Localidad']:
-#             usuario.Localidad = int(datos['Localidad'])
-#         if 'Telefono' in datos:
-#             usuario.Telefono = datos['Telefono']
-    
-#         db.session.commit()
-
-#         return usuario
-
-#     return None
 
 
 def ocultar_email_parcial(email, porcentaje=0.60):

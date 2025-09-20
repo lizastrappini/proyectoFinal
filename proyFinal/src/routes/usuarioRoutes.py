@@ -28,7 +28,14 @@ def login():
     username = request.form.get('username')  
     password = request.form.get('password') 
     usuario = usuarioController.loginUser(username, password)
-
+    
+    if usuario:
+        if usuario.IdEstado != generalEnum.EstadoEnum.Activo.value:
+            flash("El usuario no está activo", "danger")
+            return render_template('usuario/index.html')
+        
+        
+    
     if usuario:
         login_user(usuario, remember = True) 
         flash("Bienvenido!", "success")
@@ -58,7 +65,7 @@ def miCuenta():
     ]
     usuario = usuarioController.miCuenta(id)
   
-    return render_template('usuario/cuenta.html', localidades=localidades, usuario=usuario)
+    return render_template('usuario/cuenta.html', localidades=localidades, usuario=usuario, estados= generalEnum.EstadoEnum)
 
 
 
