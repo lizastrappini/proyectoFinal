@@ -19,10 +19,12 @@
 
           </div>
           <div class="col-12 col-md-2">
-            <select id="estadoFiltro" class="select2 form-select" data-placeholder="Estado" >
+            <select id="estadoFiltro"
+                    class="select2 form-select form-select-sm"
+                    data-placeholder="Estado">
               <option value=""></option>
               {% for estado in estados %}
-                  <option value="{{ estado.value }}">{{ estado.text }}</option>
+                <option value="{{ estado.value }}">{{ estado.text }}</option>
               {% endfor %}
             </select>
           </div>
@@ -117,6 +119,8 @@
 let tabla = null;
 let pagoIdSeleccionado = null;
 
+  
+
 function filtrar() {
   const estado     = $('#estadoFiltro').val();
   const fechaDesde = $('#fechaDesdeFiltro').val();
@@ -165,22 +169,26 @@ $('#formComprobante').on('submit', function(e) {
     contentType: false,
     processData: false,
     success: function(resp) {
-      if (resp.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: 'Comprobante subido correctamente',
-          didOpen: function () {
-            document.querySelector('.swal2-container').style.zIndex = 20000;
-            document.querySelector('.swal2-popup').style.zIndex = 20001;
-          }
-        });
-        $('#modalComprobante').modal('hide');
-        filtrar();
-      } else {
-        Swal.fire('Error', resp.error || 'No se pudo subir', 'error');
+  if (resp.success) {
+    const file = resp.ruta;
+    const nuevoEstado = resp.estado; // 👈 ahora lo recibís
+
+    $('#modalComprobante').modal('hide');
+    editarComprobante(pagoIdSeleccionado, file, nuevoEstado);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Éxito',
+      text: resp.message || 'Comprobante subido correctamente',
+      didOpen: () => {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
       }
-    },
+    });
+  } else {
+    Swal.fire('Error', resp.error || 'No se pudo subir', 'error');
+  }
+},
     error: function(xhr) {
       Swal.fire('Error', xhr.responseJSON?.error || 'Error en el servidor', 'error');
     }
@@ -194,6 +202,16 @@ function limpiar() {
 }
 
 $(document).ready(function () {
+
+  if ($.fn.select2) {
+  $('#estadoFiltro').select2({
+    dropdownParent: $('#estadoFiltro').parent(),
+    width: '160px',                 // ancho fijo
+    placeholder: 'Estado',
+    allowClear: true,
+    minimumResultsForSearch: Infinity
+  });
+}
   // Flatpickr enlazados
   const desde = $('#fechaDesdeFiltro').flatpickr({
     locale: flatpickr.l10ns.es,
@@ -216,86 +234,137 @@ $(document).ready(function () {
   });
 
   // DataTable: inicia vacía
-  tabla = $('#tablaPagos').DataTable({
-    data: [],  // arranca vacía
-    columns: [
-      { data: 'id' },
-      { data: 'fechaPago' },
-      { data: 'fechaVencimiento' },
-      {
-        data: 'importe',
-        render: function (data) {
-          const n = parseFloat(data ?? 0);
-          return isNaN(n) ? '' : `$ ${n.toLocaleString('es-AR')}`;
-        }
-      },
-      {
-        data: 'estado',
-        render: function (data) {
-          let badgeClass = '';
-          if (data === 'Pago') badgeClass = 'bg-label-success';
-          else if (data === 'Pendiente') badgeClass = 'bg-label-warning';
-          else if (data === 'NoPago') badgeClass = 'bg-label-danger';
-          else badgeClass = 'bg-label-secondary';
-          return `<span class="badge rounded-pill ${badgeClass}">${data ?? ''}</span>`;
-        }
-      },
-      {
-        data: 'comprobante',
-        render: function (data) {
-          return data === 'Cargado'
-            ? '<span class="badge rounded-pill bg-label-success">Cargado</span>'
+tabla = $('#tablaPagos').DataTable({
+  data: [],  // arranca vacía
+  columns: [
+    { data: 'id' },
+    { data: 'fechaPago' },
+    { data: 'fechaVencimiento' },
+    {
+      data: 'importe',
+      render: function (data) {
+        const n = parseFloat(data ?? 0);
+        return isNaN(n) ? '' : `$ ${n.toLocaleString('es-AR')}`;
+      }
+    },
+    {
+      data: 'estado',
+      render: function (data) {
+        let badgeClass = '';
+        if (data === 'Pago') badgeClass = 'bg-label-success';
+        else if (data === 'Pendiente') badgeClass = 'bg-label-warning';
+        else if (data === 'NoPago') badgeClass = 'bg-label-danger';
+        else badgeClass = 'bg-label-secondary';
+        return `<span class="badge rounded-pill ${badgeClass}">${data ?? ''}</span>`;
+      }
+    },
+    { data: 'comprobanteFoto',
+        render: function(data) {
+          return data
+            ? `<a href="/static/${data}" target="_blank"><img src="/static/${data}" style="height:40px;width:auto;object-fit:contain" /></a>`
             : 'No Cargado';
         }
       },
-      {
-        data: null,
-        orderable: false,
-        searchable: false,
-        render: function (data, type, row) {
-          return `
-            <div class="dropdown">
-              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="ri-more-2-line"></i>
-              </button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="javascript:void(0);" onclick="subirComprobante(${row.id})">
-                  <i class="ri-upload-line me-1"></i> Subir Comprobante
-                </a>
-              </div>
-            </div>
-          `;
-        }
-      }
-    ],
-    paging: false,
-    info: false,
-    searching: false,
-    ordering: true,
-    dom: 'frtip',
-    buttons: [
-      {
-        extend: 'excelHtml5',
-        text: 'Exportar a Excel',
-        title: 'Pagos',
-        className: 'buttons-excel',
-        exportOptions: { columns: ':not(:last-child)' }
-      }
-    ],
-    language: {
-      emptyTable: 'Ningún dato disponible. Intente filtrar',
-      zeroRecords: 'Ningún dato disponible. Intente filtrar'
-    },
-    initComplete: function () {
-      $('#tablaPagos').removeClass('dataTable no-footer stripe hover').addClass('table');
+    {
+  data: null,
+  orderable: false,
+  searchable: false,
+  render: function (data, type, row) {
+    const estado = (row.estado || '').toLowerCase();
+
+    // Sólo mostrar acciones si está Pendiente o NoPago
+    if (estado === 'pendiente' || estado === 'nopago') {
+      return `
+        <div class="dropdown">
+          <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ri-more-2-line"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="javascript:void(0);" onclick="subirComprobante(${row.id})">
+              <i class="ri-upload-line me-1"></i> Subir Comprobante
+            </a>
+          </div>
+        </div>
+      `;
     }
-  });
+
+    return '';
+  }
+}
+  ],
+
+  // 🔹 Configuración tomada del index
+  paging: true,
+  pageLength: 10,                 // filas por página
+  lengthMenu: [10, 25, 50, 100],  // opciones del selector
+  info: true,
+  searching: false,
+  ordering: true,
+  pagingType: 'simple_numbers',   // o 'full_numbers' si querés primero/último
+  autoWidth: false,
+  dom: 'frtip',
+
+  buttons: [
+    {
+      extend: 'excelHtml5',
+      text: 'Exportar a Excel',
+      title: 'Pagos',
+      className: 'buttons-excel',
+      exportOptions: { columns: ':not(:last-child)' }
+    }
+  ],
+
+  language: {
+    emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    lengthMenu:  "Mostrar _MENU_",
+    info:        "Mostrando _START_ a _END_ de _TOTAL_",
+    infoEmpty:   "Mostrando 0 a 0 de 0",
+    infoFiltered:"(filtrado de _MAX_ en total)",
+    paginate: {
+      previous: '<i class="ri-arrow-left-s-line"></i>',
+      next:     '<i class="ri-arrow-right-s-line"></i>',
+      first:    'Primero',
+      last:     'Último'
+    }
+  },
+
+  initComplete: function () {
+    $('#tablaPagos')
+      .removeClass('dataTable no-footer stripe hover')
+      .addClass('table');
+  }
+});
 
   // SOLO por botón (sin auto-change)
   $('#btnFiltrar').on('click', function () {
     filtrar();
   });
 });
+
+
+function editarComprobante(idPago, nuevoArchivo, nuevoEstado) {
+  const dt = $('#tablaPagos').DataTable();
+
+  const rowIdxArr = dt.rows().eq(0).filter(function (idx) {
+    const r = dt.row(idx).data();
+    return r && String(r.id) === String(idPago);
+  }).toArray();
+
+  if (!rowIdxArr.length) {
+    console.warn('No encontré la fila con id', idPago);
+    return;
+  }
+
+  const rowIdx = rowIdxArr[0];
+  const data = dt.row(rowIdx).data();
+
+  // Actualizar comprobante y estado
+  if (nuevoArchivo) data.comprobanteFoto = nuevoArchivo;
+  if (nuevoEstado) data.estado = nuevoEstado;
+
+  dt.row(rowIdx).data(data).invalidate().draw(false);
+}
 </script>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>

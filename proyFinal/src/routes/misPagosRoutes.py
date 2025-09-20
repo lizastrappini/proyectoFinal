@@ -90,7 +90,8 @@ def subir_comprobante(id_pago):
         pago.Comprobante = f"uploads/{filename}"
         pago.IdEstado = generalEnum.EstadoPagoEnum.Pendiente.value
         pagosController.actualizar_pago(pago)
-        return jsonify({"success": True, "message": "Comprobante subido correctamente", "ruta": pago.Comprobante})
+        
+        return jsonify({"success": True, "message": "Comprobante subido correctamente", "ruta": pago.Comprobante, "estado": generalEnum.EstadoPagoEnum(pago.IdEstado).name, "filename": filename}), 200
 
     else:
         return jsonify({"success": False, "message": "Formato de archivo no permitido"}), 400
