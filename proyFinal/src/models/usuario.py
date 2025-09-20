@@ -24,7 +24,7 @@ class Usuario(UserMixin, db.Model):
     FechaNacimiento = db.Column(db.DateTime, nullable=True)
     Federado = db.Column(db.Integer, nullable=False)
     CategoriaExtra = db.Column(db.String(30), nullable=True)
-    
+    FechaAlta = db.Column(db.DateTime, nullable=False)
 
 
     def get_id(self):

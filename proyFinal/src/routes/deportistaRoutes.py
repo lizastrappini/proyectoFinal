@@ -8,7 +8,7 @@ from src.controllers import deportistaController
 from src.controllers.usuarioController import enviar_mail_categoria
 from src.models.usuario import Usuario
 from werkzeug.security import generate_password_hash
-
+import pytz
 from src.utils.enums import generalEnum
 
 
@@ -129,6 +129,8 @@ def agregar_deportista():
         mail_usuario = Usuario.query.filter_by(Email=email).first()
         if mail_usuario:
          raise ValueError(f"Ya existe un usuario con el mismo email")
+        
+        arg = pytz.timezone("America/Argentina/Buenos_Aires")
 
         nuevo_deportista = Usuario(
             Dni= dni,
@@ -150,7 +152,8 @@ def agregar_deportista():
             TokenEnviado=False,
             FechaVencimientoToken=None,
             Federado = federado_id,
-            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
+            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
+            FechaAlta = datetime.now(arg)
         )
         deportistaController.agregarDeportista(nuevo_deportista)
         deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)

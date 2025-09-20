@@ -16,12 +16,16 @@ def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None
     query = Notificacion.query
 
     # --- Filtrado por rol ---
-    if current_user.IdRol == 2:  # Deportista
-        if current_user.IdCategoria is not None:
-            query = query.filter(
-                or_(Notificacion.IdCategoria == current_user.IdCategoria,
-                    Notificacion.IdCategoria == None)
+    if current_user.IdCategoria is not None:
+        query = query.filter(
+            and_(
+                Notificacion.FechaEnvio > current_user.FechaAlta,
+                or_(
+                    Notificacion.IdCategoria == current_user.IdCategoria,
+                    Notificacion.IdCategoria == None
+                )
             )
+        )
         if current_user.IdRama is not None:
             query = query.filter(
                 or_(Notificacion.IdRama == current_user.IdRama,

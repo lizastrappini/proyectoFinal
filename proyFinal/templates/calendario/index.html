@@ -24,7 +24,6 @@
 
           <button
             class="btn btn-primary btn-toggle-sidebar w-100"
-            data-bs-toggle="offcanvas"
             data-bs-target="#addEventSidebar"
             aria-controls="addEventSidebar">
             <i class="ri-add-line ri-16px me-1_5"></i>
@@ -122,8 +121,8 @@
               <form class="event-form pt-0" id="eventForm" action="/nuevoEvento" method="POST">
                 
                 <div class="form-floating form-floating-outline mb-5" id="tipoEvento-wrapper">
-                  <select id="tipoEvento" name="tipoEvento" class="select2 form-select" required>
-                    <option value="">Selecciona Tipo</option>
+                  <select id="tipoEvento" name="tipoEvento" class="select2 form-select" data-placeholder="Selecciona tipo de evento" required>
+                    <option value=""></option>
                     {% for evento in tipoeventos %}
                       <option value="{{ evento.value }}">{{ evento.text }}</option>
                     {% endfor %}
@@ -132,17 +131,17 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="titulo-wrapper">
-                  <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Titulo Evento" required/>
-                  <label for="titulo">Titulo</label>
+                  <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Titulo Evento" data-placeholder="Titulo" required/>
+                  <label for="titulo"></label>
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="fechaInicio-wrapper">
-                  <input type="text" class="form-control" id="eventStartDate" name="fechaInicio" placeholder="Fecha Inicio" required/>
+                  <input type="text" class="form-control" id="eventStartDate" name="fechaInicio" required/>
                   <label for="eventStartDate">Fecha Inicio</label>
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="fechaFin-wrapper">
-                  <input type="text" class="form-control" id="eventEndDate" name="fechaFin" placeholder="Fecha Fin" required />
+                  <input type="text" class="form-control" id="eventEndDate" name="fechaFin" required />
                   <label for="eventEndDate">Fecha Fin</label>
                 </div>
 
@@ -154,8 +153,8 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="categoria-wrapper">
-                  <select id="categoria" name="categoria" class="select2 form-select">
-                    <option value="">Selecciona Categoria</option>
+                  <select id="categoria" name="categoria" class="select2 form-select" data-placeholder="Selecciona categoria">
+                    <option value=""></option>
                     {% for categoria in categorias %}
                       <option value="{{ categoria.value }}">{{ categoria.text }}</option>
                     {% endfor %}
@@ -164,8 +163,8 @@
                 </div>
               
                 <div class="form-floating form-floating-outline mb-5" id="rama-wrapper">
-                  <select id="rama" name="rama" class="select2 form-select">
-                    <option value="">Selecciona Rama</option>
+                  <select id="rama" name="rama" class="select2 form-select" data-placeholder="Selecciona Rama">
+                    <option value=""></option>
                     {% for rama in ramas %}
                       <option value="{{ rama.value }}">{{ rama.text }}</option>
                     {% endfor %}
@@ -174,8 +173,8 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="division-wrapper">
-                  <select id="division" name="division" class="select2 form-select">
-                    <option value="">Selecciona division</option>
+                  <select id="division" name="division" class="select2 form-select" data-placeholder="Selecciona division">
+                    <option value=""></option>
                     {% for division in divisiones %}
                       <option value="{{ division.value }}">{{ division.text }}</option>
                     {% endfor %}
@@ -184,8 +183,8 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="contrincante-wrapper">
-                  <select id="contrincante" name="contrincante" class="select2 form-select">
-                    <option value="">Selecciona Contrincante</option>
+                  <select id="contrincante" name="contrincante" class="select2 form-select" data-placeholder="Selecciona contrincante">
+                    <option value=""></option>
                     {% for contrincante in contrincantes %}
                       <option value="{{ contrincante.value }}">{{ contrincante.text }}</option>
                     {% endfor %}
@@ -194,8 +193,8 @@
                 </div>
             
                 <div class="form-floating form-floating-outline mb-5" id="localidad-wrapper">
-                  <select id="localidad" name="localidad" class="select2 form-select">
-                    <option value="">Selecciona Localidad</option>
+                  <select id="localidad" name="localidad" class="select2 form-select" data-placeholder="Selecciona localidad">
+                    <option value=""></option>
                     {% for localidad in localidades %}
                       <option value="{{ localidad.value }}">{{ localidad.text }}</option>
                     {% endfor %}
@@ -261,8 +260,8 @@
               </div>
 
               <div class="form-floating form-floating-outline mb-5" id="categoria-wrapper">
-                  <select id="categoriaMasivo" name="categoriaMasivo" class="select2 form-select" required>
-                    <option value="">Selecciona Categoria</option>
+                  <select id="categoriaMasivo" name="categoriaMasivo" class="select2 form-select" data-placeholder="Selecciona categoria" required>
+                    <option value=""></option>
                     {% for categoria in categorias %}
                       <option value="{{ categoria.value }}">{{ categoria.text }}</option>
                     {% endfor %}
@@ -271,8 +270,8 @@
                 </div>
               
                 <div class="form-floating form-floating-outline mb-5" id="rama-wrapper">
-                  <select id="ramaMasivo" name="ramaMasivo" class="select2 form-select" required>
-                    <option value="">Selecciona Rama</option>
+                  <select id="ramaMasivo" name="ramaMasivo" class="select2 form-select" data-placeholder="Selecciona rama" required>
+                    <option value=""></option>
                     {% for rama in ramas %}
                       <option value="{{ rama.value }}">{{ rama.text }}</option>
                     {% endfor %}
@@ -281,8 +280,8 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="division-wrapper">
-                  <select id="divisionMasivo" name="divisionMasivo" class="select2 form-select" required>
-                    <option value="">Selecciona division</option>
+                  <select id="divisionMasivo" name="divisionMasivo" class="select2 form-select" data-placeholder="Selecciona division" required>
+                    <option value=""></option>
                     {% for division in divisiones %}
                       <option value="{{ division.value }}">{{ division.text }}</option>
                     {% endfor %}
@@ -291,8 +290,8 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-5" id="division-wrapper">
-                  <select id="diasMasivo" name="diasMasivo" class="select2 form-select" multiple="multiple" required>
-                    <option value="">Selecciona Dias</option>
+                  <select id="diasMasivo" name="diasMasivo" class="select2 form-select" data-placeholder="Selecciona dias" multiple="multiple" required>
+                    <option value=""></option>
                     {% for dia in dias %}
                       <option value="{{ dia.value }}">{{ dia.text }}</option>
                     {% endfor %}

@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
       eventStartDateMasivo = document.querySelector('#eventStartDateMasivo'),
       horaInicioMasivo = document.querySelector('#horaInicioMasivo'),
 
-      contrincante = document.querySelector('#contrincante-wrapper'),
+      contrincante = document.querySelector('#contrincante'),
       rama = document.querySelector('#rama'),
       division = document.querySelector('#division'),
 
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
         altInput: true,            // 👈 agrega un input visible
         altFormat: "d-m-Y H:i",    // 👈 lo que ve el usuario
         dateFormat: "Y-m-d H:i:S",  // 👈 lo que se guarda/envía
-        minDate: "today",
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -89,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
         altInput: true,            // 👈 agrega un input visible
         altFormat: "d-m-Y H:i",    // 👈 lo que ve el usuario
         dateFormat: "Y-m-d H:i:S",   // 👈 lo que se guarda/envía
-        minDate: "today",
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -348,8 +346,8 @@ fetch(`/evento/${eventToUpdate.id}`)
     if (rama)      $(rama).val(data.IdRama || '').trigger('change');
     if (division)  $(division).val(data.IdDivision || '').trigger('change');
     if (localidad) $(localidad).val(data.IdLocalidad || '').trigger('change');
-    if (contrincante) $(contrincante).val(data.IdContrincante || '').trigger('change');
-
+    if (contrincante) $(contrincante).val(String(data.IdContrincante || '')).trigger('change');
+    
     // tipo para decidir wrappers (ocultando el select de tipo)
     const tipoStr = String(data.tipo || '');
     if (tipoEvento) tipoEvento.value = tipoStr;
@@ -857,18 +855,59 @@ if (eventForm && typeof FormValidation !== 'undefined') {
     }
     // Reset event form inputs values
     // ------------------------------------------------
-    function resetValues() {
-      eventEndDate.value = '';
-      eventStartDate.value = '';
-      eventTitle.value = '';
-      allDaySwitch.checked = false;
-      eventDescription.value = '';
-    }
+    // === RESET FORM ===
+function resetValues() {
+  // inputs básicos
+  if (eventEndDate) eventEndDate.value = '';
+  if (eventStartDate) eventStartDate.value = '';
+  if (eventTitle) eventTitle.value = '';
+  if (eventDescription) eventDescription.value = '';
+  if (allDaySwitch) allDaySwitch.checked = false;
 
-    // When modal hides reset input values
-    addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
-      resetValues();
-    });
+  // selects con select2
+  if (categoria) $(categoria).val(null).trigger('change');
+  if (rama) $(rama).val(null).trigger('change');
+  if (division) $(division).val(null).trigger('change');
+  if (localidad) $(localidad).val(null).trigger('change');
+  if (contrincante) $(contrincante).val(null).trigger('change');
+  if (tipoEvento) $(tipoEvento).val(null).trigger('change');
+
+  // hidden id
+  const inputId = document.getElementById('eventoId');
+  if (inputId) inputId.value = '';
+}
+addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
+  resetValues();
+});
+
+// === ABRIR MODAL DESDE BOTÓN (NUEVO EVENTO) ===
+btnToggleSidebar.addEventListener('click', function () {
+  resetValues();
+
+  let offcanvas = bootstrap.Offcanvas.getInstance(addEventSidebar);
+  if (!offcanvas) {
+    offcanvas = new bootstrap.Offcanvas(addEventSidebar);
+  }
+  if (!addEventSidebar.classList.contains('show')) {
+    offcanvas.show();
+  }
+});
+
+// === DATECLICK (NUEVO EVENTO DESDE CALENDARIO) ===
+calendar.on('dateClick', function (info) {
+  resetValues();
+  eventStartDate.value = info.dateStr;
+  eventEndDate.value = info.dateStr;
+
+  let offcanvas = bootstrap.Offcanvas.getInstance(addEventSidebar);
+  if (!offcanvas) {
+    offcanvas = new bootstrap.Offcanvas(addEventSidebar);
+  }
+  if (!addEventSidebar.classList.contains('show')) {
+    offcanvas.show();
+  }
+});
+
 
     // Hide left sidebar if the right sidebar is open
     if (btnToggleSidebar) {

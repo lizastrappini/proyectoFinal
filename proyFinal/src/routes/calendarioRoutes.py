@@ -175,7 +175,7 @@ def evento_detalle(evento_id):
         data.update({
             "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
             "titulo": evento.Titulo,
-            "fechaInicio": evento.FechaInicio.isoformat()
+            "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M")
         })
 
     elif tipo == generalEnum.TipoEventoEnum.Partido.value:
