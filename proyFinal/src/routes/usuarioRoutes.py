@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import string
 from babel.dates import format_date
-from flask import Blueprint, redirect, request, render_template,flash, url_for
+from flask import Blueprint, jsonify, redirect, request, render_template,flash, url_for
 from sqlalchemy import Date, cast, desc
 import src.controllers.usuarioController as usuarioController
 from flask import session
@@ -52,69 +52,75 @@ def cuota_al_dia_route():
 @usuario_bp.route('/miCuenta', methods=['GET'])
 def miCuenta():
     id = current_user.Id
-    usuario = usuarioController.miCuenta(id)
     localidades = [
     {'value': loc.value, 'text': loc.name}
     for loc in generalEnum.LocalidadEnum
     ]
-    categorias = [
-    {'value': cat.value, 'text': cat.name}
-    for cat in generalEnum.CategoriaEnum
-    ]
-    if usuario is not None:
-        pagos = db.session.query(Pago).filter_by(IdUsuario=id).order_by(desc(Pago.FechaPago)).all()
+    usuario = usuarioController.miCuenta(id)
+  
+    return render_template('usuario/cuenta.html', localidades=localidades, usuario=usuario)
 
-        datos_pagos = []
-        for pago in pagos:
-            try:
-                est_enum = generalEnum.EstadoPagoEnum(int(pago.IdEstado))
-                estado_nombre = est_enum.name
-            except (ValueError, KeyError):
-                estado_nombre = 'Desconocido'
-            periodo = format_date(pago.FechaPago, "MMMM yyyy", locale="es_AR")
-            datos_pagos.append({
-                "fecha_pago": pago.FechaPago,
-                "estado": estado_nombre,
-                "periodo": periodo.capitalize()
-            })
-        return render_template('usuario/cuenta.html', usuario=usuario, pagos=datos_pagos, categorias= categorias,localidades=localidades)
-    else:
-        return render_template('usuario/index.html')
 
 
 @login_required
 @usuario_bp.route('/editUsuario', methods=['POST'])
 def editUsuario():
-    
-    
     id = current_user.Id
-    usuarioModel = {
-        'Nombre': request.form.get('nombre'),
-        'Apellido': request.form.get('apellido'),
-        'Email': request.form.get('email'),
-        'Direccion': request.form.get('direccion'),
-        'Localidad': request.form.get('localidad'),
-        'Telefono': request.form.get('telefono'),
-        'Categoria': request.form.get('categoria'),
-    }
+    try:
+        email = request.form.get('email')
+        direccion = request.form.get('direccion')
+        localidad = request.form.get('localidad')
+        telefono = request.form.getlist('telefono')
+        
+        
+        usuario = usuarioController.getUsuarioById(id)
+        
+        if not usuario:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Usuario no encontrado'}), 400
+            else:
+                flash('Usuario no encontrado', 'danger')
+                return redirect(url_for('usuario.miCuenta'))
+        
+        if email and email != usuario.Email:
+            email_usuario = Usuario.query.filter_by(Email=email).first()
+            if email_usuario:
+                raise ValueError(f"Ya existe un usuario con el mismo email")
 
-    usuario = usuarioController.getUsuarioById(id)
+    
+        # Actualiza campos
+        usuario.Email = email
+        usuario.Direccion = direccion
+        usuario.Localidad = generalEnum.LocalidadEnum[localidad].value
+        usuario.Telefono = telefono
+        
 
-    if(usuario is not None):   
-        usuarioController.update(id, usuarioModel)
-        usuario = usuarioController.miCuenta(id)
-        localidades = [
-            {'value': loc.value, 'text': loc.name}
-            for loc in generalEnum.LocalidadEnum
-            ]
-        categorias = [
-            {'value': cat.value, 'text': cat.name}
-            for cat in generalEnum.CategoriaEnum
-            ]
-        return render_template('usuario/cuenta.html', usuario=usuario, categorias=categorias, localidades=localidades)
-    else:
-        return render_template('usuario/index.html', error='Usuario o contraseña incorrectos')
+        usuarioController.actualizar_usuario(usuario)
 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': 'Usuario actualizado exitosamente'}), 200
+        else:
+            flash('Usuario actualizado exitosamente', 'success')
+            return redirect(url_for('usuarios.miCuenta'))
+
+    except ValueError as ve:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(ve)}), 400
+        else:
+            flash(str(ve), 'danger')
+            return redirect(url_for('usuarios.miCuenta'))
+
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': f'Error inesperado: {str(e)}'}), 500
+        else:
+            flash('Ocurrió un error inesperado', 'danger')
+            return redirect(url_for('usuarios.miCuenta'))
+
+
+    
+
+    
 
 @login_required
 @usuario_bp.route('/logout')

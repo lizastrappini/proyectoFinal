@@ -25,69 +25,71 @@ def loginUser(username, password):
 
 def miCuenta(id):
     usuario = Usuario.query.filter_by(Id=id).first()
-    if(usuario is not None):
-        localidad_valor = usuario.Localidad or 0
+    if not usuario:
+        return None
+
+    def enum_name(enum_class, valor, default="No completado"):
+        if valor is None:
+            return default
         try:
-            localidad_nombre = generalEnum.LocalidadEnum(int(localidad_valor)).name
+            # Si es numérico, lo convierto
+            valor_int = int(valor)
+            return enum_class(valor_int).name
         except (ValueError, TypeError):
-            localidad_nombre = 'No completado'
-        # localidad_nombre = generalEnum.LocalidadEnum(localidad_valor).name
-        categoria_valor = int(usuario.IdCategoria or 0)
-        categoria_nombre = generalEnum.CategoriaEnum(categoria_valor).name
-        return {
-            'id': usuario.Id,
-            'dni': usuario.Dni,
-            'nombre': usuario.Nombre,
-            'apellido': usuario.Apellido,
-            'email': usuario.Email,
-            'password': usuario.Password,
-            'usuario': usuario.NombreUsuario,
-            'idCategoria': categoria_nombre,
-            'localidad': localidad_nombre,
-            'localidad_valor' : localidad_valor,
-            'estado': generalEnum.EstadoEnum(int(usuario.IdEstado)).name,
-            'direccion': usuario.Direccion or 'No completado',
-            'telefono': usuario.Telefono,
-            'rol': generalEnum.RolEnum(usuario.IdRol).name ,
-            'idEstado': usuario.IdEstado,
-            'idRol': usuario.IdRol,
-            'federado': generalEnum.FederadoEnum(usuario.Federado).name,
-            'fechaNacimiento': usuario.FechaNacimiento.strftime('%d/%m/%Y') if usuario.FechaNacimiento else None,
-            'fechaNacimientoISO': usuario.FechaNacimiento.strftime('%Y-%m-%d') if usuario.FechaNacimiento else None,
+            # Si no, busco por nombre directo (si guardaste el nombre en la DB)
+            try:
+                return enum_class[valor].name
+            except (KeyError, TypeError):
+                return default
             
-        }
+    return {
+        'id': usuario.Id,
+        'dni': usuario.Dni,
+        'nombre': usuario.Nombre,
+        'apellido': usuario.Apellido,
+        'email': usuario.Email,
+        'password': usuario.Password,
+        'usuario': usuario.NombreUsuario,
+        'idCategoria': enum_name(generalEnum.CategoriaEnum, usuario.IdCategoria),
+        'localidad': enum_name(generalEnum.LocalidadEnum, usuario.Localidad),
+        'localidad_valor': usuario.Localidad or 0,
+        'estado': enum_name(generalEnum.EstadoEnum, usuario.IdEstado),
+        'direccion': usuario.Direccion or 'No completado',
+        'telefono': usuario.Telefono,
+        'rol': enum_name(generalEnum.RolEnum, usuario.IdRol),
+        'idEstado': usuario.IdEstado,
+        'idRol': usuario.IdRol,
+        'federado': enum_name(generalEnum.FederadoEnum, usuario.Federado),
+        'fechaNacimiento': usuario.FechaNacimiento.strftime('%d/%m/%Y') if usuario.FechaNacimiento else None,
+        'fechaNacimientoISO': usuario.FechaNacimiento.strftime('%Y-%m-%d') if usuario.FechaNacimiento else None,
+    }
 
 
+
+def actualizar_usuario(usuario):
+    db.session.commit()
 
 def getUsuarioById(id):
     return Usuario.query.filter_by(Id=id).first()
 
-def update(id, datos):
-    usuario = Usuario.query.filter_by(Id=id).first()
+# def update(id, datos):
+#     usuario = Usuario.query.filter_by(Id=id).first()
 
-    if usuario:
-        # categoria_vieja = usuario.IdCategoria
-        if 'Nombre' in datos:
-            usuario.Nombre = datos['Nombre']
-        if 'Apellido' in datos:
-            usuario.Apellido = datos['Apellido']
-        if 'Email' in datos:
-            usuario.Email = datos['Email']
-        if 'NombreUsuario' in datos:
-            usuario.NombreUsuario = datos['NombreUsuario']
-        if 'Direccion' in datos:
-            usuario.Direccion = datos['Direccion']
-        if 'Localidad' in datos and datos['Localidad']:
-            usuario.Localidad = int(datos['Localidad'])
-        if 'Telefono' in datos:
-            usuario.Telefono = datos['Telefono']
+#     if usuario:
+#         if 'Email' in datos:
+#             usuario.Email = datos['Email']
+#         if 'Direccion' in datos:
+#             usuario.Direccion = datos['Direccion']
+#         if 'Localidad' in datos and datos['Localidad']:
+#             usuario.Localidad = int(datos['Localidad'])
+#         if 'Telefono' in datos:
+#             usuario.Telefono = datos['Telefono']
     
+#         db.session.commit()
 
-        db.session.commit()
+#         return usuario
 
-        return usuario
-
-    return None
+#     return None
 
 
 def ocultar_email_parcial(email, porcentaje=0.60):

@@ -32,10 +32,6 @@
                               {{usuario.rol}}</span>
                         </div>
                         </div>
-
-                    
-                    
-
                   </div>
                 </div>
 
@@ -43,19 +39,13 @@
                 <div class="card-body pt-0">
                   <form id="formAccountSettings" method="POST" action="/editUsuario">
                     <div class="row mt-1 g-5">
-                      <!-- <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                          <input class="form-control" type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" />
-                          <label for="nombre">Nombre</label>
-                        </div>
-                      </div>
 
-                      <div class="col-md-6">
+                       <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                          <input class="form-control" type="text" id="apellido" name="apellido" value="{{ usuario.apellido }}" />
-                          <label for="apellido">Apellido</label>
+                          <input class="form-control" type="text" id="dni" name="dni" value="{{ usuario.dni }}" readonly disabled  />
+                          <label for="dni">DNI</label>
                         </div>
-                      </div> -->
+                      </div> 
 
                       <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
@@ -77,17 +67,20 @@
                           <label for="direccion">Dirección</label>
                         </div>
                       </div>
-                      <div class="col-md-6">
-                      <div class="form-floating form-floating-outline">
-                              <select id="localidad" name="localidad" class="select2 form-select">
-                                <option value="" disabled >Seleccioná una localidad</option>
-                                {% for localidad in localidades %}
-                                  <option value="{{ localidad.value }}">{{ localidad.text }}</option>
-                                {% endfor %}
-                              </select>
-                              <label for="localidad">Localidad</label>
-                            </div>
-                        </div>
+                      <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
+                            <label for="localidad" class="form-label">Localidad</label>
+                            <select class="select2 form-select" id="localidad" name="localidad" data-placeholder="" required>
+                              <option value=""></option>
+                              {% for localidad in localidades %}
+                               <option value="{{ localidad.text }}" {% if usuario.localidad == localidad.text %}selected{% endif %}>
+                                  {{ localidad.text }}
+                                </option>
+
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
 
 
                       {% if current_user.IdRol == RolEnum.Deportista %}
