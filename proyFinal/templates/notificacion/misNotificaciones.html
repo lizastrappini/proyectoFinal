@@ -27,7 +27,7 @@
           </div>
                 <!-- Modal -->
                 <!-- Agregar User Modal -->
-                <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
+                <!-- <div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-lg modal-simple modal-edit-user">
                     <div class="modal-content">
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -107,7 +107,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <!--/ Edit User Modal -->
                 <!-- /Modal -->
 
@@ -141,11 +141,31 @@
       { data: 'division' },
       { data: 'fechaEnvio'}
     ],
-    paging: false,
-    info: false,
     searching: false,
     ordering: true,
-    dom: 'frtip',
+    paging: true,
+    pageLength: 10,                 // filas por página
+    lengthMenu: [10, 25, 50, 100],  // opciones del selector
+    info: true,
+    pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+    autoWidth: false,
+    dom: "frtip",
+
+    language: {
+      emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+      zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+      lengthMenu:  "Mostrar _MENU_",
+      info:        "Mostrando _START_ a _END_ de _TOTAL_",
+      infoEmpty:   "Mostrando 0 a 0 de 0",
+      infoFiltered:"(filtrado de _MAX_ en total)",
+      paginate: {
+        previous: '<i class="ri-arrow-left-s-line"></i>',
+        next:     '<i class="ri-arrow-right-s-line"></i>',
+        first:    'Primero',
+        last:     'Último'
+      }
+    },
+
     initComplete: function () {
       $('#tablaNotificaciones')
         .removeClass('dataTable no-footer stripe hover')
@@ -153,81 +173,10 @@
     }
   });
 
-  // Función de filtrado
-  function filtrar() {
-    const categoria = $('#categoriaFiltro').val();
-    const division = $('#divisionFiltro').val();
-    const rama = $('#ramaFiltro').val();
-    const buscar = $('#filtroBuscar').val();
+  
 
-    const url = `/notificacion/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&buscar=${encodeURIComponent(buscar || '')}`;
 
-    tabla.ajax.url(url).load(); // ✅ carga la tabla
-  }
-
-  // Botón Filtrar
-  $('#btnFiltrarNotificacion').on('click', function () {
-    filtrar();
-  });
-
-  // Limpiar filtros
-  function limpiar() {
-    $('#categoriaFiltro').val('').trigger('change');
-    $('#divisionFiltro').val('').trigger('change');
-    $('#ramaFiltro').val('').trigger('change');
-    $('#filtroBuscar').val('');
-    filtrar(); // 👈 recarga todas las notificaciones
-  }
-
-  // Eliminar fila
-  function eliminarFila(rowIndex) {
-    const data = tabla.row(rowIndex).data();
-
-    Swal.fire({
-      title: '¿Estás segura/o?',
-      text: `Vas a eliminar la notificación: ${data.titulo}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      didOpen: function() {
-        document.querySelector('.swal2-container').style.zIndex = 20000;
-        document.querySelector('.swal2-popup').style.zIndex = 20001;
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`/notificacion/eliminar/${data.id}`, {
-          method: 'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(async r => {
-          if (!r.ok) {
-            const e = await r.json();
-            throw new Error(e.message || 'Error desconocido');
-          }
-          return r.json();
-        })
-        .then(data => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Eliminada',
-            text: data.message,
-            showConfirmButton: false,
-            timer: 2000
-          });
-          tabla.ajax.reload();
-        })
-        .catch(err => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: err.message || 'Hubo un error al intentar eliminar la notificación.'
-          });
-        });
-      }
-    });
-  }
-
+ 
   // 👇 carga inicial con todas las notificaciones
   $(document).ready(function () {
     filtrar();

@@ -113,7 +113,7 @@
                           <div class="col-12">
                             <div class="form-floating form-floating-outline">
                               <select id="division" name="division" class="form-select">
-                                <option value="" disabled selected>Seleccioná una división</option>
+                                  <option value="" disabled selected>Seleccioná una división</option>
                                 {% for div in divisiones %}
                                   <option value="{{ div.value }}">{{ div.text }}</option>
                                 {% endfor %}
@@ -245,65 +245,8 @@
     tabla.ajax.url(url).load(); // ✅ actualiza la tabla existente
   }
 
-  // Limpiar filtros
-  function limpiar() {
-    $('#categoriaFiltro').val('').trigger('change');
-    $('#divisionFiltro').val('').trigger('change');
-    $('#ramaFiltro').val('').trigger('change');
-    $('#filtroBuscar').val('');
-    if (tabla) {
-      tabla.clear().draw();
-    }
-  }
-
-  // Eliminar fila
-  function eliminarFila(rowIndex) {
-    const data = tabla.row(rowIndex).data();
-
-    Swal.fire({
-      title: '¿Estás segura/o?',
-      text: `Vas a eliminar la notificación: ${data.titulo}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      didOpen: function() {
-        document.querySelector('.swal2-container').style.zIndex = 20000;
-        document.querySelector('.swal2-popup').style.zIndex = 20001;
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`/notificacion/eliminar/${data.id}`, {
-          method: 'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(async r => {
-          if (!r.ok) {
-            const e = await r.json();
-            throw new Error(e.message || 'Error desconocido');
-          }
-          return r.json();
-        })
-        .then(data => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Eliminada',
-            text: data.message,
-            showConfirmButton: false,
-            timer: 2000
-          });
-          tabla.ajax.reload();
-        })
-        .catch(err => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: err.message || 'Hubo un error al intentar eliminar la notificación.'
-          });
-        });
-      }
-    });
-  }
+  
+  
 </script>
 
 
