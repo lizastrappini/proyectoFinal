@@ -429,5 +429,22 @@ if (formNuevoEvento) {
     });
   });
 }
+// Resetear formularios cuando se cierran los offcanvas
+const addEventSidebar = document.getElementById('addEventSidebar');
+if (addEventSidebar) {
+  addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
+    const form = document.getElementById('eventForm');
+    if (form) {
+      form.reset();
+      // resetear selects con select2
+      $('#tipoEvento').val('').trigger('change');
+      $('#categoria').val('').trigger('change');
+      $('#rama').val('').trigger('change');
+      $('#division').val('').trigger('change');
+      $('#contrincante').val('').trigger('change');
+      $('#localidad').val('').trigger('change');
+    }
+  });
+}
 </script>
 {% endblock %}

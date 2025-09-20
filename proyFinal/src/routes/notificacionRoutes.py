@@ -126,14 +126,12 @@ def nueva_notificacion():
 
         usuarios_destino = usuarios_query.all()
 
-       #
-       # if usuarios_destino:
-       #     for usuario in usuarios_destino:
-       #         notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
-       # else:
-            # Si no hay filtros o no se encontró nadie, se puede decidir
-            # enviar a todos (opcional)
-        #    pass
+       
+        if usuarios_destino:
+            for usuario in usuarios_destino:
+                notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
+        else:
+            pass
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Notificación creada exitosamente'}), 200

@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import date, datetime
+import os
 import secrets
 import string
-from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
+from flask import Blueprint, redirect, request, render_template,flash, jsonify, send_file, send_from_directory, url_for
 import openpyxl
 from src.controllers import deportistaController
 from src.controllers.usuarioController import enviar_mail_categoria
@@ -118,9 +119,9 @@ def agregar_deportista():
         division_id = generalEnum.DivisionEnum[division_nombre].value
         federado_id = generalEnum.FederadoEnum[federado_nombre].value
         localidad_id = generalEnum.LocalidadEnum[localidad_nombre].value
-        caracteres = string.ascii_letters + string.digits  # letras + números
-        password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
-        
+        # caracteres = string.ascii_letters + string.digits  # letras + números
+        # password_plana = ''.join(secrets.choice(caracteres) for _ in range(8))  
+
         usuario_existente = Usuario.query.filter_by(Dni=dni).first()
         if usuario_existente:
          raise ValueError(f"Ya existe un usuario con el DNI {dni}")
@@ -136,13 +137,11 @@ def agregar_deportista():
             Nombre=nombre,
             Apellido=apellido,
             Email= email,
-            FechaNacimiento= fechaNacimiento,
+            FechaNacimiento= fecha_nacimiento_dt,
             IdCategoria = categoria_id,
             IdRama = rama_id,
             IdDivision = division_id,
             Password = generate_password_hash(dni),
-            #Password =  generate_password_hash(password_plana),
-            # Password= generate_password_hash(password_plana),  # Contraseña aleatoria y hasheada
             NombreUsuario=f"{nombre}_{dni}",
             Localidad= localidad_id,
             IdEstado=1,
@@ -157,7 +156,7 @@ def agregar_deportista():
             FechaAlta = datetime.now(arg)
         )
         deportistaController.agregarDeportista(nuevo_deportista)
-        deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
+        deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Deportista creado exitosamente'}), 200
@@ -347,4 +346,321 @@ def getDeportista(dni):
     
 
     
+@deportista_bp.route('/descargar_planilla')
+def descargar_planilla():
+    carpeta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datos"))
+    return send_from_directory(carpeta, "plantilla_deportista.xlsx", as_attachment=True)
 
+
+# @deportista_bp.route('/importar_deportistas', methods=['POST'])
+# def importar_deportistas():
+#     try:
+#         archivo = request.files.get("archivoExcel")
+#         if not archivo:
+#             raise ValueError("Debe subir un archivo Excel")
+        
+#         # ---------- ABRIR ARCHIVO ----------
+#         try:
+#             wb = openpyxl.load_workbook(archivo)
+#             ws = wb.active
+#         except Exception:
+#             raise ValueError("No se pudo abrir el archivo Excel")
+
+
+#         # ---------- LEER FILAS ----------
+#         fila = 2
+#         registros_creados = 0
+#         errores = []
+
+#         while True:
+#             dni = ws.cell(row=fila, column=1).value
+#             if not dni:  # fin del archivo
+#                 break
+          
+#             try:
+#                 nombre_val = ws.cell(row=fila, column=2).value
+#                 apellido_val = ws.cell(row=fila, column=3).value
+#                 email_val = ws.cell(row=fila, column=4).value
+#                 fecha_nac_val = ws.cell(row=fila, column=5).value
+#                 telefono_val = ws.cell(row=fila, column=6).value
+#                 categoria_val = ws.cell(row=fila, column=7).value
+#                 rama_val = ws.cell(row=fila, column=8).value
+#                 division_val = ws.cell(row=fila, column=9).value
+#                 federado_val = ws.cell(row=fila, column=10).value
+#                 categoria_extra_val = ws.cell(row=fila, column=11).value
+#                 localidad_val = ws.cell(row=fila, column=12).value
+                
+#                 if not fecha_nac_val:
+#                     raise ValueError("Las fechas son obligatorias")
+               
+
+#                 # Parseo fechas si vienen en string
+               
+#                 if isinstance(fecha_nac_val, str):
+#                     for fmt in ("%d-%m-%Y", "%Y-%m-%d"):
+#                         try:
+#                             fecha_nac = datetime.strptime(fecha_nac_val, fmt)
+#                             break
+#                         except ValueError:
+#                             fecha_nac = None
+#                     if not fecha_nac:
+#                         raise ValueError(f"Formato de fecha inválido en fila {fila}. Use DD-MM-YYYY o YYYY-MM-DD")
+#                 elif isinstance(fecha_nac_val, datetime):
+#                     fecha_nac = fecha_nac_val
+#                 elif isinstance(fecha_nac_val, date):
+#                     fecha_nac = datetime.combine(fecha_nac_val, datetime.min.time())
+#                 else:
+#                     raise ValueError(f"Fecha de nacimiento inválida en fila {fila}")
+
+
+#                 if not categoria_val or categoria_val not in generalEnum.CategoriaEnum.__members__:
+#                     raise ValueError(f"Categoría inválida en fila {fila}")
+#                 categoria_id = generalEnum.CategoriaEnum[categoria_val].value
+#                 if not rama_val or rama_val not in generalEnum.RamaEnum.__members__:
+#                     raise ValueError(f"Rama inválida en fila {fila}")
+#                 rama_id = generalEnum.RamaEnum[rama_val].value
+
+
+#                 usuario_existente = Usuario.query.filter_by(Dni=dni).first()
+#                 if usuario_existente:
+#                     raise ValueError(f"Ya existe un usuario con el DNI {dni}")
+#                 if not dni or not str(dni).isdigit() or len(str(dni)) != 8:
+#                     raise ValueError(f"DNI inválido en fila {fila}")
+
+            
+#                 mail_usuario = Usuario.query.filter_by(Email=email_val).first()
+#                 if mail_usuario:
+#                     raise ValueError(f"Ya existe un usuario con el mismo email")
+#                 categoriaExtraIds = []
+#                 if categoria_extra_val:
+#                     try:
+#                         categoriaExtraIds = [
+#                             generalEnum.CategoriaEnum[nombre].value
+#                             for nombre in categoria_extra_val
+#                             if nombre in generalEnum.CategoriaEnum.__members__
+#                         ]
+#                     except Exception:
+#                         raise ValueError("Categoría Extra inválida")
+
+
+#                 nuevo_deportista = Usuario(
+#                     Dni = dni,
+#                     FechaNacimiento=fecha_nac,
+#                     Nombre=nombre_val,
+#                     Apellido=apellido_val,
+#                     Email = email_val,
+#                     Telefono= telefono_val,
+#                     Localidad = generalEnum.LocalidadEnum[localidad_val].value if localidad_val in generalEnum.LocalidadEnum.__members__ else None,
+#                     IdCategoria = generalEnum.CategoriaEnum[categoria_val].value if categoria_val in generalEnum.CategoriaEnum.__members__ else None,
+#                     IdRama = generalEnum.RamaEnum[rama_val].value if rama_val in generalEnum.RamaEnum.__members__ else None,
+#                     IdDivision = generalEnum.DivisionEnum[division_val].value if division_val in generalEnum.DivisionEnum.__members__ else None,
+#                     CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
+#                     Federado = generalEnum.FederadoEnum[federado_val].value if federado_val in generalEnum.FederadoEnum.__members__ else None,
+#                     Password = generate_password_hash(dni),
+#                     NombreUsuario=f"{nombre_val}_{dni}",
+#                     IdEstado=1,
+#                     IdRol=2,
+#                     Token=None,
+#                     TokenEnviado=False,
+#                     FechaVencimientoToken=None,
+           
+#                 )
+#                 deportistaController.agregarDeportista(nuevo_deportista)
+#                 deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)
+#                 registros_creados += 1
+
+#             except Exception as e:
+#                 errores.append(f"Fila {fila}: {str(e)}")
+
+#             fila += 1
+
+#         # ---------- RESPUESTA ----------
+#         if errores:
+#             mensaje = f"Se importaron {registros_creados} deportistas, con errores en algunas filas: {errores}"
+#             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#                 return jsonify({'success': False, 'message': mensaje}), 400
+#             else:
+#                 flash(mensaje, 'danger')
+#                 return redirect(url_for('deportista.index'))
+
+#         mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
+#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#             return jsonify({'success': True, 'message': mensaje_ok}), 200
+#         else:
+#             flash(mensaje_ok, 'success')
+#             return redirect(url_for('deportista.index'))
+
+#     except Exception as e:
+#         mensaje_error = str(e)
+#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#             return jsonify({'success': False, 'message': mensaje_error}), 400
+#         else:
+#             flash(f"Error al importar deportistas: {mensaje_error}", 'danger')
+#             return redirect(url_for('deportista.index'))
+        
+        
+@deportista_bp.route('/importar_deportistas', methods=['POST'])
+def importar_deportistas():
+    try:
+        archivo = request.files.get("archivoExcel")
+        if not archivo:
+            raise ValueError("Debe subir un archivo Excel")
+        
+        # ---------- ABRIR ARCHIVO ----------
+        try:
+            wb = openpyxl.load_workbook(archivo)
+            ws = wb.active
+        except Exception:
+            raise ValueError("No se pudo abrir el archivo Excel")
+
+        # ---------- LEER FILAS ----------
+        fila = 2
+        registros_creados = 0
+        errores = []
+
+        while True:
+            dni = ws.cell(row=fila, column=1).value
+            if not dni:  # fin del archivo
+                break
+          
+            try:
+                nombre_val = ws.cell(row=fila, column=2).value
+                apellido_val = ws.cell(row=fila, column=3).value
+                email_val = ws.cell(row=fila, column=4).value
+                fecha_nac_val = ws.cell(row=fila, column=5).value
+                telefono_val = ws.cell(row=fila, column=6).value
+                categoria_val = ws.cell(row=fila, column=7).value
+                rama_val = ws.cell(row=fila, column=8).value
+                division_val = ws.cell(row=fila, column=9).value
+                federado_val = ws.cell(row=fila, column=10).value
+                categoria_extra_val = ws.cell(row=fila, column=11).value
+                localidad_val = ws.cell(row=fila, column=12).value
+
+                # ---------- Validaciones ----------
+                # DNI
+                # if not dni or not str(dni).isdigit() or len(str(dni)) != 8:
+                #     raise ValueError(f"DNI inválido en fila {fila}")
+
+                usuario_existente = Usuario.query.filter_by(Dni=dni).first()
+                if usuario_existente:
+                    raise ValueError(f"Ya existe un usuario con el DNI {dni}")
+
+                # Email duplicado
+                mail_usuario = Usuario.query.filter_by(Email=email_val).first()
+                if mail_usuario:
+                    raise ValueError(f"Ya existe un usuario con el mismo email")
+
+                # Fecha
+                if not fecha_nac_val:
+                    raise ValueError("La fecha de nacimiento es obligatoria")
+
+                if isinstance(fecha_nac_val, str):
+                    for fmt in ("%d-%m-%Y", "%Y-%m-%d"):
+                        try:
+                            fecha_nac = datetime.strptime(fecha_nac_val, fmt)
+                            break
+                        except ValueError:
+                            fecha_nac = None
+                    if not fecha_nac:
+                        raise ValueError(f"Formato de fecha inválido en fila {fila}. Use DD-MM-YYYY o YYYY-MM-DD")
+                elif isinstance(fecha_nac_val, datetime):
+                    fecha_nac = fecha_nac_val
+                elif isinstance(fecha_nac_val, date):
+                    fecha_nac = datetime.combine(fecha_nac_val, datetime.min.time())
+                else:
+                    raise ValueError(f"Fecha de nacimiento inválida en fila {fila}")
+
+                # Enums obligatorios
+                if not categoria_val or categoria_val not in generalEnum.CategoriaEnum.__members__:
+                    raise ValueError(f"Categoría inválida en fila {fila}")
+                categoria_id = generalEnum.CategoriaEnum[categoria_val].value
+
+                if not rama_val or rama_val not in generalEnum.RamaEnum.__members__:
+                    raise ValueError(f"Rama inválida en fila {fila}")
+                rama_id = generalEnum.RamaEnum[rama_val].value
+
+                if not division_val or division_val not in generalEnum.DivisionEnum.__members__:
+                    raise ValueError(f"División inválida en fila {fila}")
+                division_id = generalEnum.DivisionEnum[division_val].value
+
+                if not federado_val or federado_val not in generalEnum.FederadoEnum.__members__:
+                    raise ValueError(f"Federado inválido en fila {fila}")
+                federado_id = generalEnum.FederadoEnum[federado_val].value
+
+                if not localidad_val or localidad_val not in generalEnum.LocalidadEnum.__members__:
+                    raise ValueError(f"Localidad inválida en fila {fila}")
+                localidad_id = generalEnum.LocalidadEnum[localidad_val].value
+
+                # Categoria Extra (puede venir como string separado por comas)
+                categoriaExtraIds = []
+                if categoria_extra_val:
+                    try:
+                        nombres_extra = [n.strip() for n in str(categoria_extra_val).split(",")]
+                        categoriaExtraIds = [
+                            generalEnum.CategoriaEnum[nombre].value
+                            for nombre in nombres_extra
+                            if nombre in generalEnum.CategoriaEnum.__members__
+                        ]
+                    except Exception:
+                        raise ValueError(f"Categoría Extra inválida en fila {fila}")
+
+                # ---------- Crear objeto ----------
+                nuevo_deportista = Usuario(
+                    Dni=dni,
+                    FechaNacimiento=fecha_nac,
+                    Nombre=nombre_val,
+                    Apellido=apellido_val,
+                    Email=email_val,
+                    Telefono=telefono_val,
+                    Localidad=localidad_id,
+                    IdCategoria=categoria_id,
+                    IdRama=rama_id,
+                    IdDivision=division_id,
+                    CategoriaExtra=",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
+                    Federado=federado_id,
+                    Password=generate_password_hash(dni),
+                    NombreUsuario=f"{nombre_val}_{dni}",
+                    IdEstado=1,
+                    IdRol=2,
+                    Token=None,
+                    TokenEnviado=False,
+                    FechaVencimientoToken=None,
+                )
+
+                deportistaController.agregarDeportista(nuevo_deportista)
+                deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)
+                registros_creados += 1
+
+            except Exception as e:
+                errores.append(f"Fila {fila}: {str(e)}")
+
+            fila += 1
+
+        # ---------- RESPUESTA ----------
+        if errores:
+            preview = errores[:5]
+            extra = len(errores) - len(preview)
+            mensaje = f"Se importaron {registros_creados} deportistas.\nErrores:\n" + "\n".join(preview)
+            if extra > 0:
+                mensaje += f"\n... y {extra} más"
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': mensaje}), 400
+            else:
+                flash(mensaje, 'danger')
+                return redirect(url_for('deportista.index'))
+
+        mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': mensaje_ok}), 200
+        else:
+            flash(mensaje_ok, 'success')
+            return redirect(url_for('deportista.index'))
+
+    except Exception as e:
+        mensaje_error = str(e)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': mensaje_error}), 400
+        else:
+            flash(f"Error al importar deportistas: {mensaje_error}", 'danger')
+            return redirect(url_for('deportista.index'))

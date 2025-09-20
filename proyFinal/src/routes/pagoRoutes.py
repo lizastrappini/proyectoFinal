@@ -46,9 +46,13 @@ def filtrar():
     estado = request.args.get('estado')
     fecha_desde = request.args.get('fechaDesde')
     fecha_hasta = request.args.get('fechaHasta')
-
+    filtrado_manual = request.args.get('filtrado_manual', 'false') == 'true'  # nuevo
+    # ⚠️ Solo mostrar mensaje si el filtrado es manual
     if not fecha_desde or not fecha_hasta:
-        return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
+        if filtrado_manual:
+            return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
+        else:
+            return jsonify({'data': [], 'message': '', 'estadisticas': {}})  # tabla vacía sin alerta
 
     if estado and estado.isdigit():
         estado = int(estado)
@@ -146,7 +150,7 @@ def agregar_pago():
     try:
         
         fechaPago_str = request.form.get('fechaPago')
-        fechaVencimiento = request.form.get('fechaVencimiento')
+        # fechaVencimiento = request.form.get('fechaVencimiento')
         # importe = request.form.get('importe')
         estado_nombre = request.form.get('estado')
         usuario_id = request.form.get('deportista')
@@ -169,6 +173,13 @@ def agregar_pago():
             importe = float(parametro.Valor)
         except ValueError:
             raise ValueError("El valor de ValorCuota no es un número válido")
+        
+        fechaVencimiento_str = request.form.get('fechaVencimiento')
+        if fechaVencimiento_str:
+            fechaVencimiento = datetime.strptime(fechaVencimiento_str, "%Y-%m-%d")
+        else:
+            fechaVencimiento = None
+
   
 
 
