@@ -396,7 +396,7 @@ function limpiar() {
 }
 
 
-function filtrar() {
+function filtrar(manual = false) {
   const estado     = $('#estadoFiltro').val();
   const fechaDesde = $('#fechaDesdeFiltro').val();
   const fechaHasta = $('#fechaHastaFiltro').val();
@@ -406,30 +406,36 @@ function filtrar() {
   if (fechaDesde) params.append('fechaDesde', fechaDesde);
   if (fechaHasta) params.append('fechaHasta', fechaHasta);
 
+  if (manual) params.append('filtrado_manual', 'true');
+
   const url = `/pago/filtrar?${params.toString()}`;
 
   $.getJSON(url)
     .done(resp => {
-      if (resp && resp.message) {
-        // mostrás el mensaje del backend abajo-centro usando tu container
-        showFlash(resp.message, 'danger');
-      }
-
       const rows = (resp && resp.data) ? resp.data : [];
       tabla.clear().rows.add(rows).draw();
       actualizarBotonPagar();
-      if (resp.estadisticas) {
+
+      // 🔹 solo mostrar estadísticas si es filtrado manual
+      if (manual && resp.estadisticas) {
         $('#estadisticasWrapper').removeClass('d-none');
         renderEstadisticas(resp.estadisticas);
+      } else {
+        $('#estadisticasWrapper').addClass('d-none');
+      }
+
+      if (manual && resp && resp.message) {
+        showFlash(resp.message, 'danger');
       }
 
     })
     .fail(() => {
       tabla.clear().draw();
       actualizarBotonPagar();
-      showFlash('No se pudieron obtener los datos.', 'danger');
+      if (manual) showFlash('No se pudieron obtener los datos.', 'danger');
     });
 }
+
 
 
 function editarFila(rowIndex) {
@@ -878,7 +884,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     const fechaDesde = $('#fechaDesdeFiltro').val();
     const fechaHasta = $('#fechaHastaFiltro').val();
 
-    filtrar();
+    filtrar(true);
      
   });
 });

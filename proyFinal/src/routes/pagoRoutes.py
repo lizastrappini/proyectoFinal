@@ -46,9 +46,13 @@ def filtrar():
     estado = request.args.get('estado')
     fecha_desde = request.args.get('fechaDesde')
     fecha_hasta = request.args.get('fechaHasta')
-
+    filtrado_manual = request.args.get('filtrado_manual', 'false') == 'true'  # nuevo
+    # ⚠️ Solo mostrar mensaje si el filtrado es manual
     if not fecha_desde or not fecha_hasta:
-        return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
+        if filtrado_manual:
+            return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
+        else:
+            return jsonify({'data': [], 'message': '', 'estadisticas': {}})  # tabla vacía sin alerta
 
     if estado and estado.isdigit():
         estado = int(estado)
