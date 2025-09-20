@@ -64,9 +64,22 @@
             <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#actualizarCuota" data-bs-toggle="modal">
               Actualizar Cuota
             </a>
-            <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
+            <!-- <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
               <i class="ri-upload-line me-sm-1"></i> Exportar
+            </button> -->
+            <div class="btn-group">
+            <button class="btn btn-secondary btn-label-primary dropdown-toggle" 
+                    type="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false" 
+                    style="padding:10px;font-size:small;">
+              Exportar
             </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="javascript:;" id="descargarExcel">📊 Descargar Excel</a></li>
+              <li><a class="dropdown-item btn-export"  href="javascript:;" id="descargarPagos">📥 Descargar Pagos</a></li>
+            </ul>
+          </div>
             <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#importarPago" data-bs-toggle="modal">
               <i class="ri-download-line me-sm-1"></i> Importar
             </a>
@@ -811,6 +824,10 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
 
   $('.btn-export').on('click', function () {
     tabla.button('.buttons-excel').trigger();
+  });
+   $('#descargarExcel').on('click', function (e) {
+    e.preventDefault();
+    window.location.href = '/pago/descargar_planilla';
   });
 
   $('#addPago').on('hidden.bs.modal', function () {

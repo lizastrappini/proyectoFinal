@@ -2,7 +2,7 @@ from datetime import datetime, timezone, date, timedelta
 import pytz
 from decimal import Decimal
 import secrets
-from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
+from flask import Blueprint, redirect, request, render_template,flash, jsonify, send_from_directory, url_for
 import openpyxl
 from src.controllers import deportistaController, pagosController, parametroController
 from src.models.parametro import Parametro
@@ -439,3 +439,9 @@ def actualizar_cuota():
         else:
             flash(f'Error al actualizar cuota: {mensaje_error}', 'danger')
             return redirect(url_for('pago.index'))
+        
+
+@pago_bp.route('/descargar_planilla')
+def descargar_planilla():
+    carpeta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datos"))
+    return send_from_directory(carpeta, "planilla_pagos.xlsx", as_attachment=True)
