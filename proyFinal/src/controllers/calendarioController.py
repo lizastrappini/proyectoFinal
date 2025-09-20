@@ -4,8 +4,7 @@ import src.utils.enums.generalEnum  as generalEnum
 from src import db
 from src.models.evento import Evento
 from datetime import datetime
-from sqlalchemy import func, or_, and_
-
+from sqlalchemy import func, or_, and_, between
 def crearEvento(nuevoEvento):
     
     db.session.add(nuevoEvento)
@@ -79,24 +78,34 @@ def obtenerEventos(inicio, fin, tipos, mi_categoria=None):
 
     return eventosTodos
 
-def getPartidosByCategoria(inicio, categoria, rama, division):
-    try: 
-        fecha_dt = datetime.strptime(inicio, "%d-%m-%Y").date() 
-    except ValueError: 
-        return [] 
-    
-    eventos = Evento.query.filter( 
-        Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value, 
-        Evento.IdCategoria == int(categoria), 
-        Evento.TieneEstadistica == False, 
-        Evento.IdRama == int(rama), 
-        Evento.IdDivision == int(division), 
-        func.date(Evento.FechaInicio) == fecha_dt ).all() 
-    
-    eventosTodos = [ 
-        { "value": evento.Id, 
-         "text": f"{evento.Titulo} - {generalEnum.RamaEnum(evento.IdRama).name}" } 
-        for evento in eventos ] 
+def getPartidosByCategoria(rango_fechas, categoria, rama, division):
+    try:
+        # separar las fechas: "01-09-2025 a 19-09-2025"
+        inicio_str, fin_str = [f.strip() for f in rango_fechas.split("a")]
+
+        fecha_inicio = datetime.strptime(inicio_str, "%d-%m-%Y").date()
+        fecha_fin = datetime.strptime(fin_str, "%d-%m-%Y").date()
+    except ValueError:
+        return []
+
+    eventos = (
+        Evento.query.filter(
+            Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value,
+            Evento.IdCategoria == int(categoria),
+            Evento.TieneEstadistica == False,
+            Evento.IdRama == int(rama),
+            Evento.IdDivision == int(division),
+            func.date(Evento.FechaInicio).between(fecha_inicio, fecha_fin)
+        ).all()
+    )
+
+    eventosTodos = [
+        {
+            "value": evento.Id,
+            "text": f"{evento.Titulo}"
+        }
+        for evento in eventos
+    ]
     return eventosTodos
 
 def getPartidosByCategoriaMostrar(fechas, categoria, rama, division):
@@ -134,9 +143,14 @@ def getPartidosByCategoriaMostrar(fechas, categoria, rama, division):
         for evento in eventos
     ]
 
-def getPartidosByCategoriaYFecha(inicio, categoria):
+def getPartidosByCategoriaYFecha(fecha, categoria):
     try:
-        fecha_dt = datetime.strptime(inicio, "%d-%m-%Y").date()
+        partes = fecha.split(" a ")
+        if len(partes) == 2:
+            inicio = datetime.strptime(partes[0], "%d-%m-%Y").date()
+            fin = datetime.strptime(partes[1], "%d-%m-%Y").date()
+        else:
+            inicio = fin = datetime.strptime(fecha, "%d-%m-%Y").date()
     except ValueError:
         return []
 
@@ -144,13 +158,13 @@ def getPartidosByCategoriaYFecha(inicio, categoria):
         Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Partido.value,
         Evento.IdCategoria == int(categoria),  
         Evento.TieneEstadistica == False,
-        func.date(Evento.FechaInicio) == fecha_dt
+        func.date(Evento.FechaInicio).between(inicio, fin)
     ).all()
 
     eventosTodos = [
         {
             "value": evento.Id,
-            "text": f"{evento.Titulo} - {generalEnum.RamaEnum(evento.IdRama).name}"
+            "text": f"{evento.Titulo}"
         }
         for evento in eventos
     ]

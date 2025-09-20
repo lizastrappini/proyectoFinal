@@ -185,13 +185,15 @@ $(document).ready(function() {
 flatpickr("#fechaDescargar", { 
     locale: "es", 
     dateFormat: "d-m-Y", 
-    maxDate: "today" // no permite seleccionar fechas futuras
+    maxDate: "today", // no permite seleccionar fechas futuras
+    mode: "range"
 });
 
 flatpickr("#fechaSubir", { 
     locale: "es", 
     dateFormat: "d-m-Y", 
-    maxDate: "today" // no permite seleccionar fechas futuras
+    maxDate: "today", // no permite seleccionar fechas futuras
+    mode: "range"
 });
 
   // --- FUNCIONES HABILITAR BOTONES ---
@@ -311,14 +313,46 @@ flatpickr("#fechaSubir", {
       processData:false,
       contentType:false,
       success: res => {
-        if(res.estado!=='ok') Swal.fire('Error', res.mensaje,'error');
-        else Swal.fire('Éxito', res.mensaje,'success');
+        if(res.estado!=='ok') {
+          Swal.fire({
+            title: 'Error',
+            text: res.mensaje,
+            icon: 'error',
+            didOpen: function() {
+              document.querySelector('.swal2-container').style.zIndex = 20000;
+              document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+            }
+          });
+        }
+        else {
+          Swal.fire({
+            title: 'Éxito',
+            text: res.mensaje,
+            icon: 'success',
+            didOpen: function() {
+              document.querySelector('.swal2-container').style.zIndex = 20000;
+              document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+            }
+          });
+        }
       },
-      error: xhr => {
+        error: xhr => {
         let msg = "Ocurrió un error en la solicitud";
         if(xhr.responseJSON && xhr.responseJSON.mensaje) msg = xhr.responseJSON.mensaje;
-        Swal.fire('Error', msg,'error');
+        Swal.fire({
+          title: 'Error',
+          text: msg,
+          icon: 'error',
+          didOpen: function() {
+            document.querySelector('.swal2-container').style.zIndex = 20000;
+            document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+          }
+        });
       }
+      
     });
   });
 
@@ -341,7 +375,16 @@ function cargarPartidosDescargar() {
         division: division
     }, function(res) {
         if(res.estado !== "ok") {
-            Swal.fire("Error", res.mensaje, "error");
+            Swal.fire({
+              title: "Error",
+              text: res.mensaje,
+              icon: "error",
+              didOpen: function() {
+                document.querySelector('.swal2-container').style.zIndex = 20000;
+                document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+              }
+            });
             $partidoDescargar.empty().append('<option value=""></option>').trigger('change.select2');
             verificarDescargar();
             return;
@@ -376,7 +419,16 @@ function cargarPartidosSubir() {
         categoria: categoria
     }, function(res) {
         if(res.estado !== "ok") {
-            Swal.fire("Error", res.mensaje, "error");
+            Swal.fire({
+              title: "Error",
+              text: res.mensaje,
+              icon: "error",
+              didOpen: function() {
+                document.querySelector('.swal2-container').style.zIndex = 20000;
+                document.querySelector('.swal2-popup').style.zIndex = 20001;
+
+              }
+            });
             $partidoSubir.empty().append('<option value=""></option>').trigger('change.select2');
             verificarSubir();
             return;

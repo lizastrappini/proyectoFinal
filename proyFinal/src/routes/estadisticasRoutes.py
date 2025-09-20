@@ -6,10 +6,12 @@ import re
 import os
 import openpyxl
 import io 
-import datetime
+from datetime import datetime, timezone, date, timedelta
+import pytz
 import src.controllers.usuarioController as usuarioController
 import src.controllers.calendarioController as calendarioController
 import src.controllers.estadisticaController as estadisticasController
+import src.controllers.notificacionController as notificacionController
 import src.utils.enums.generalEnum as generalEnum
 from openpyxl.utils import range_boundaries
 from src.models.usuario import Usuario
@@ -18,6 +20,7 @@ from src.models.estadisticaUsuarioPartido import EstadisticaUsuarioPartido
 from openpyxl.utils import column_index_from_string,range_boundaries
 from src import db
 from sqlalchemy.engine.row import Row
+from src.models.notificacion import Notificacion
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
 
@@ -150,6 +153,7 @@ def subir_estadisticas():
     archivo = request.files.get("archivo")
     fecha_str = request.form.get("fecha")  # dd-mm-YYYY
     idPartido = request.form.get("partido")
+    emails_jugadores_excel = []
 
     if not archivo or not fecha_str or not idPartido:
         return jsonify({"estado": "error", "mensaje": "Faltan datos"}), 400
@@ -196,12 +200,23 @@ def subir_estadisticas():
     except KeyError:
         return jsonify({"estado": "error", "mensaje": "Resultado del partido no reconocido"}), 400
 
-    # ---------- FECHA ----------
+    # ---------- FECHA DESDE EXCEL ----------
+    fecha_excel_value = ws['P5'].value
+
+    if not fecha_excel_value:
+        return jsonify({
+            "estado": "error",
+            "mensaje": "No se encontró la fecha en la planilla"
+        }), 400
+
     try:
-        fecha_str = fecha_str.strip()
-        fecha = datetime.datetime.strptime(fecha_str, "%d-%m-%Y")
-    except Exception:
-        return jsonify({"estado": "error", "mensaje": "Formato de fecha inválido, debe ser dd-mm-YYYY"}), 400
+        # como ya sabemos que es string con guiones
+        fecha = datetime.strptime(fecha_excel_value.strip(), "%d-%m-%Y").date()
+    except ValueError:
+        return jsonify({
+            "estado": "error",
+            "mensaje": f"Formato de fecha inválido en la planilla ({fecha_excel_value}), debe ser dd-mm-YYYY"
+        }), 400
 
     # ---------- CREAR ESTADISTICA ----------
     try:
@@ -235,6 +250,7 @@ def subir_estadisticas():
             usuario = Usuario.query.get(idUsuario)
             if usuario:
                 valores = {}
+                emails_jugadores_excel.append(usuario.Email)
                 for idx, campo in enumerate(columnas_modelo, start=3):
                     valor = get_cell_value(ws, fila, idx)
                     if valor is None:
@@ -252,6 +268,28 @@ def subir_estadisticas():
 
         # ---------- COMMIT FINAL ----------
         db.session.commit()
+
+        arg = pytz.timezone("America/Argentina/Buenos_Aires")
+        fecha = datetime.now(arg)
+
+        nueva_notif = Notificacion(
+            Titulo = "Estadísticas disponibles",
+            Descripcion= "Ya podes ver tus estadísticas del partido vs " + generalEnum.ContrincantesEnum(int(partido.IdContrincante)).name,
+            IdCategoria= partido.IdCategoria ,
+            IdDivision=  partido.IdDivision,
+            IdRama= partido.IdRama,
+            FechaEnvio=fecha
+        )
+        notificacionController.agregarNotificacion(nueva_notif)
+
+        for email in emails_jugadores_excel:
+            notificacionController.enviar_mail(
+                email,
+                "Estadísticas disponibles",
+                "Ya podes ver tus estadísticas del partido vs " +
+                generalEnum.ContrincantesEnum(int(partido.IdContrincante)).name
+            )
+    
         return jsonify({"estado": "ok", "mensaje": "Estadísticas cargadas correctamente"})
 
     except Exception as e:
