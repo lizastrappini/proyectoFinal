@@ -180,7 +180,8 @@
                           
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
-                              <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" placeholder="Fecha Nacimiento" autocomplete="off" required>
+                              <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" 
+                              placeholder="" required/>
                               <label for="fechaNacimiento">Fecha Nacimiento</label>
                             </div>
                           </div>
@@ -188,7 +189,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="categoria" class="form-label">Categoría</label>
-                            <select class="select2 form-select" id="categoria" name="categoria" data-placeholder="Categoria" required>
+                            <select class="select2 form-select" id="categoria" name="categoria" data-placeholder="" required>
                               <option value="">Seleccione una categoria</option>
                               {% for categoria in categorias %}
                                 <option value="{{ categoria.text }}">{{ categoria.text }}</option>
@@ -199,7 +200,7 @@
                            <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="4">
                             <label for="categoriaExtra" class="form-label">Categoría Extra</label>
-                            <select class="select2 form-select" id="categoriaExtra" name="categoriaExtra" data-placeholder="Categoria Extra" multiple="multiple">
+                            <select class="select2 form-select" id="categoriaExtra" name="categoriaExtra" data-placeholder="" multiple="multiple">
                               <option value="">Seleccione una categoria</option>
                               {% for cat in categorias %}
                                 <option value="{{ cat.text }}">{{ cat.text }}</option>
@@ -211,7 +212,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
                             <label for="division" class="form-label">Division</label>
-                            <select class="select2 form-select" id="division" name="division" data-placeholder="Division" required>
+                            <select class="select2 form-select" id="division" name="division" data-placeholder="" required>
                               <option value="">Seleccione una division</option>
                               {% for div in divisiones %}
                                 <option value="{{ div.text }}">{{ div.text }}</option>
@@ -223,7 +224,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
                             <label for="rama" class="form-label">Rama</label>
-                            <select class="select2 form-select" id="rama" name="rama" data-placeholder="Rama" required>
+                            <select class="select2 form-select" id="rama" name="rama" data-placeholder="" required>
                               <option value="">Seleccione una rama</option>
                               {% for rama in ramas %}
                                 <option value="{{ rama.text}}">{{ rama.text }}</option>
@@ -234,7 +235,7 @@
                            <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
                             <label for="localidad" class="form-label">Localidad</label>
-                            <select class="select2 form-select" id="localidad" name="localidad" data-placeholder="Localidad" required>
+                            <select class="select2 form-select" id="localidad" name="localidad" data-placeholder="" required>
                               <option value="">Seleccione una localidad</option>
                               {% for localidad in localidades %}
                                 <option value="{{ localidad.text}}">{{ localidad.text }}</option>
@@ -247,7 +248,7 @@
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="5">
                             <label for="federado" class="form-label">Federado</label>
-                            <select class="select2 form-select" id="federado" name="federado" data-placeholder="Federado" required>
+                            <select class="select2 form-select" id="federado" name="federado" data-placeholder="" required>
                               <option value="">Federado</option>
                               {% for federado in federados %}
                                 <option value="{{ federado.text}}">{{ federado.text }}</option>
@@ -538,6 +539,8 @@ const labelColor = "#a8aab4";
         $('#rama').val(detalle.rama).trigger('change');
         $('#division').val(detalle.division).trigger('change');
         $('#federado').val(detalle.federado).trigger('change');
+        $('#localidad').val(detalle.localidad).trigger('change');
+
 
         if (detalle.categoriaExtra) {
           const extras = Array.isArray(detalle.categoriaExtra)
@@ -657,7 +660,7 @@ const labelColor = "#a8aab4";
         });
         $('#addUser').modal('hide');
         $('#editDeportistaForm')[0].reset();
-        $('#categoria, #rama, #division, #federado, #categoriaExtra').val(null).trigger('change');
+        $('#categoria, #rama, #division, #federado, #categoriaExtra,#localidad').val(null).trigger('change');
         $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
         $('#submitBtn').text('Crear');
         $('#tituloAdd').text('Agregar Deportista');
@@ -675,7 +678,7 @@ const labelColor = "#a8aab4";
   $('#addUser').on('hidden.bs.modal', function () {
     const form = $('#editDeportistaForm')[0];
     form.reset();
-    $('#categoria, #rama, #division, #federado, #categoriaExtra').val(null).trigger('change');
+    $('#categoria, #rama, #division, #federado, #categoriaExtra, #localidad').val(null).trigger('change');
     $('#editDeportistaForm').attr('action', '{{ url_for("deportista.agregar_deportista") }}');
     $('#submitBtn').text('Crear');
     $('#tituloAdd').text('Agregar Deportista');

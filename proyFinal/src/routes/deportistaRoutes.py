@@ -100,11 +100,11 @@ def agregar_deportista():
             except Exception:
                 raise ValueError("Categoría Extra inválida")
             
-             # Validar que sean mayores a la categoría principal
-            cat_principal_val = generalEnum.CategoriaEnum[categoria_nombre].value
-            for cat_extra in categoriaExtraIds:
-                if cat_extra <= cat_principal_val:
-                    raise ValueError("Las categorías extra deben ser mayores a la categoría principal")
+        # Validar que sean mayores a la categoría principal
+        cat_principal_val = generalEnum.CategoriaEnum[categoria_nombre].value
+        for cat_extra in categoriaExtraIds:
+            if cat_extra <= cat_principal_val:
+                raise ValueError("Las categorías extras deben ser mayores a la categoría principal")
             
         # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
@@ -117,12 +117,17 @@ def agregar_deportista():
         
         if not division_nombre or division_nombre not in generalEnum.DivisionEnum.__members__:
             raise ValueError("División inválida o no seleccionada")
+        
+        if not fechaNacimiento:
+            raise ValueError("La fecha de nacimiento es requerida")
 
         fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  # Convertir string a datetime
         #categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
         #categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria_nombre].value
         categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+
+        
 
         if categoria_id_seleccionada != categoria_id_calculada:
             raise ValueError(f"La categoría seleccionada ({categoria_nombre}) no corresponde con la edad del deportista. Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}")
@@ -193,6 +198,21 @@ def editar_deportista(dni):
         nuevo_email = request.form.get('email')
         categoria = request.form.get('categoria')
         categoria_extra = request.form.getlist('categoriaExtra')
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        fechaNacimiento = request.form.get('fechaNacimiento')
+        telefono = request.form.get('telefono')
+        
+        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
+        categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria].value
+        # nueva_cat = request.form.get('categoria')
+        rama_nombre = request.form.get('rama')
+        division_nombre = request.form.get('division')
+        federado_nombre = request.form.get('federado')
+        localidad_nombre = request.form.get('localidad')
+        # categoria_extra = request.form.get('categoriaExtra')
+        # categoria = request.form.get('categoria')
 
         categoriaExtraIds = []
         if categoria_extra:
@@ -232,23 +252,6 @@ def editar_deportista(dni):
             if email_usuario:
                 raise ValueError(f"Ya existe un usuario con el mismo email")
         
-        categoria_vieja = deportista.IdCategoria
-        
-        nombre = request.form.get('nombre')
-        apellido = request.form.get('apellido')
-        fechaNacimiento = request.form.get('fechaNacimiento')
-        telefono = request.form.get('telefono')
-        
-        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
-        categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
-        categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria].value
-        # nueva_cat = request.form.get('categoria')
-        rama_nombre = request.form.get('rama')
-        division_nombre = request.form.get('division')
-        federado_nombre = request.form.get('federado')
-        localidad_nombre = request.form.get('localidad')
-        categoria_extra = request.form.get('categoriaExtra')
-        categoria = request.form.get('categoria')
 
         if categoria_id_seleccionada != categoria_id_calculada:
             raise ValueError(
@@ -264,7 +267,7 @@ def editar_deportista(dni):
         deportista.FechaNacimiento = fechaNacimiento
         deportista.Telefono = telefono
         deportista.IdCategoria = generalEnum.CategoriaEnum[categoria].value
-        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
+        # fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
         #deportista.IdCategoria = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
         deportista.IdRama = generalEnum.RamaEnum[rama_nombre].value
         deportista.IdDivision = generalEnum.DivisionEnum[division_nombre].value
@@ -273,6 +276,8 @@ def editar_deportista(dni):
         deportista.CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
         deportista.Localidad = generalEnum.LocalidadEnum[localidad_nombre].value
          
+        categoria_vieja = deportista.IdCategoria
+        
         if deportista.IdCategoria != categoria_vieja:
             enviar_mail_categoria(
                 deportista.Email,
@@ -363,6 +368,7 @@ def getDeportista(dni):
         "telefono": deportista.Telefono,
         # devolvemos los nombres porque tus selects usan .text
         "categoria": generalEnum.CategoriaEnum(deportista.IdCategoria).name if deportista.IdCategoria else None,
+        "localidad": generalEnum.LocalidadEnum(int(deportista.Localidad)).name if deportista.Localidad else None,
         "division": generalEnum.DivisionEnum(deportista.IdDivision).name if deportista.IdDivision else None,
         "rama": generalEnum.RamaEnum(deportista.IdRama).name if deportista.IdRama else None,
         "fechaNacimiento": deportista.FechaNacimiento.strftime("%Y-%m-%d") if deportista.FechaNacimiento else None,
@@ -388,6 +394,7 @@ def importar_deportistas():
         archivo = request.files.get("archivoExcel")
         if not archivo:
             raise ValueError("Debe subir un archivo Excel")
+            
         
         # ---------- ABRIR ARCHIVO ----------
         try:
@@ -400,11 +407,15 @@ def importar_deportistas():
         fila = 2
         registros_creados = 0
         errores = []
+        if not ws.cell(row=2, column=1).value:
+            raise ValueError("El archivo se encuentra vacío")
 
         while True:
             dni = ws.cell(row=fila, column=1).value
+            
             if not dni:  # fin del archivo
                 break
+                    
           
             try:
                 nombre_val = ws.cell(row=fila, column=2).value
@@ -486,6 +497,21 @@ def importar_deportistas():
                         ]
                     except Exception:
                         raise ValueError(f"Categoría Extra inválida en fila {fila}")
+                #validar que las cat extras no sean menores a la cat principal
+                cat_principal_val = generalEnum.CategoriaEnum[categoria_val].value
+                for cat_extra in categoriaExtraIds:
+                    if cat_extra <= cat_principal_val:
+                        raise ValueError("Las categorías extras deben ser mayores a la categoría principal")
+                
+                categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria_val].value
+                categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nac_val)
+
+                
+
+                if categoria_id_seleccionada != categoria_id_calculada:
+                    raise ValueError(f"La categoría seleccionada ({categoria_val}) no corresponde con la edad del deportista. Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}")
+                
+                arg = pytz.timezone("America/Argentina/Buenos_Aires")
 
                 # ---------- Crear objeto ----------
                 nuevo_deportista = Usuario(
@@ -496,7 +522,7 @@ def importar_deportistas():
                     Email=email_val,
                     Telefono=telefono_val,
                     Localidad=localidad_id,
-                    IdCategoria=categoria_id,
+                    IdCategoria=categoria_id_seleccionada,
                     IdRama=rama_id,
                     IdDivision=division_id,
                     CategoriaExtra=",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
@@ -508,6 +534,8 @@ def importar_deportistas():
                     Token=None,
                     TokenEnviado=False,
                     FechaVencimientoToken=None,
+                    FechaAlta = datetime.now(arg)
+                    
                 )
 
                 deportistaController.agregarDeportista(nuevo_deportista)
@@ -519,26 +547,26 @@ def importar_deportistas():
 
             fila += 1
 
-        # ---------- RESPUESTA ----------
-        if errores:
-            preview = errores[:5]
-            extra = len(errores) - len(preview)
-            mensaje = f"Se importaron {registros_creados} deportistas.\nErrores:\n" + "\n".join(preview)
-            if extra > 0:
-                mensaje += f"\n... y {extra} más"
+            # ---------- RESPUESTA ----------
+            if errores:
+                preview = errores[:5]
+                extra = len(errores) - len(preview)
+                mensaje = f"Se importaron {registros_creados} deportistas.\nErrores:\n" + "\n".join(preview)
+                if extra > 0:
+                    mensaje += f"\n... y {extra} más"
 
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({'success': False, 'message': mensaje}), 400
+                else:
+                    flash(mensaje, 'danger')
+                    return redirect(url_for('deportista.index'))
+
+            mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'success': False, 'message': mensaje}), 400
+                return jsonify({'success': True, 'message': mensaje_ok}), 200
             else:
-                flash(mensaje, 'danger')
+                flash(mensaje_ok, 'success')
                 return redirect(url_for('deportista.index'))
-
-        mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': True, 'message': mensaje_ok}), 200
-        else:
-            flash(mensaje_ok, 'success')
-            return redirect(url_for('deportista.index'))
 
     except Exception as e:
         mensaje_error = str(e)
