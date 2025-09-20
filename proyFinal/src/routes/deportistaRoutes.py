@@ -120,7 +120,13 @@ def agregar_deportista():
 
         fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  # Convertir string a datetime
         #categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
-        categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
+        #categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
+        categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria_nombre].value
+        categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+
+        if categoria_id_seleccionada != categoria_id_calculada:
+            raise ValueError(f"La categoría seleccionada ({categoria_nombre}) no corresponde con la edad del deportista. Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}")
+
         rama_id = generalEnum.RamaEnum[rama_nombre].value
         division_id = generalEnum.DivisionEnum[division_nombre].value
         federado_id = generalEnum.FederadoEnum[federado_nombre].value
@@ -144,7 +150,7 @@ def agregar_deportista():
             Apellido=apellido,
             Email= email,
             FechaNacimiento= fecha_nacimiento_dt,
-            IdCategoria = categoria_id,
+            IdCategoria = categoria_id_seleccionada,
             IdRama = rama_id,
             IdDivision = division_id,
             Password = generate_password_hash(dni),
@@ -185,6 +191,7 @@ def editar_deportista(dni):
     try:
         nuevo_dni = request.form.get('dni')
         nuevo_email = request.form.get('email')
+        categoria = request.form.get('categoria')
         categoria_extra = request.form.getlist('categoriaExtra')
 
         categoriaExtraIds = []
@@ -231,6 +238,10 @@ def editar_deportista(dni):
         apellido = request.form.get('apellido')
         fechaNacimiento = request.form.get('fechaNacimiento')
         telefono = request.form.get('telefono')
+        
+        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
+        categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
+        categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria].value
         # nueva_cat = request.form.get('categoria')
         rama_nombre = request.form.get('rama')
         division_nombre = request.form.get('division')
@@ -239,6 +250,12 @@ def editar_deportista(dni):
         categoria_extra = request.form.get('categoriaExtra')
         categoria = request.form.get('categoria')
 
+        if categoria_id_seleccionada != categoria_id_calculada:
+            raise ValueError(
+                f"La categoría seleccionada ({categoria}) no corresponde con la edad del deportista. "
+                f"Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}"
+                )
+    
         # Actualiza campos
         deportista.Dni = nuevo_dni
         deportista.Nombre = nombre
