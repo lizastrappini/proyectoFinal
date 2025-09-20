@@ -123,7 +123,7 @@
               </thead>
             </table>
           </div>
-                {% if current_user.IdRol == RolEnum.Admin %}
+               
                 <!-- Modal Agregar Pago-->
                 <!-- Agregar Pago Modal -->
                 <div class="modal fade" id="addPago" tabindex="-1" aria-hidden="true">
@@ -136,7 +136,7 @@
                         </div>
                         
                         <form id="editPagosForm" class="row g-5" method="POST" action="{{ url_for('pago.agregar_pago') }}">
-                          <div class="col-12 col-md-6">
+                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
                             <label for="usuario_id" class="form-label">Deportista</label>
                             <select class="select2 form-select" id="deportista" name="deportista" required>
@@ -146,7 +146,8 @@
                               {% endfor %}
                             </select>
                           </div>
-                          </div>
+                          </div> 
+
                         
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
@@ -214,7 +215,7 @@
                 </div>
                 <!--/ Edit Pago Modal -->
                 <!-- /Modal -->
-                {% endif %}
+              
 
 
                

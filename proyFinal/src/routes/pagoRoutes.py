@@ -146,7 +146,7 @@ def agregar_pago():
     try:
         
         fechaPago_str = request.form.get('fechaPago')
-        fechaVencimiento = request.form.get('fechaVencimiento')
+        # fechaVencimiento = request.form.get('fechaVencimiento')
         # importe = request.form.get('importe')
         estado_nombre = request.form.get('estado')
         usuario_id = request.form.get('deportista')
@@ -169,6 +169,13 @@ def agregar_pago():
             importe = float(parametro.Valor)
         except ValueError:
             raise ValueError("El valor de ValorCuota no es un número válido")
+        
+        fechaVencimiento_str = request.form.get('fechaVencimiento')
+        if fechaVencimiento_str:
+            fechaVencimiento = datetime.strptime(fechaVencimiento_str, "%Y-%m-%d")
+        else:
+            fechaVencimiento = None
+
   
 
 
