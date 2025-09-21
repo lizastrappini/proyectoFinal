@@ -539,7 +539,7 @@
   <div id="chatbot-label">¡Soy VoleyChat!</div>
   <button id="open-chat">💬</button>
 </div> -->
-<div id="chatbot-container">
+<!-- <div id="chatbot-container">
   <div id="chatbot-box" style="display: none;">
     <div id="chatbot-header">
       <span>VoleyChat 🤖</span>
@@ -547,14 +547,40 @@
     </div>
     
     <div id="chat-log">
-      <!-- Aquí se cargan dinámicamente los temas, preguntas y respuestas -->
+    
     </div>
   </div>
 
-  <!-- Cartel flotante -->
   <div id="chatbot-label">¡Soy VoleyChat!</div>
   <button id="open-chat">💬</button>
+</div> -->
+
+<div id="chatbot-container">
+  <!-- Caja principal -->
+  <div id="chatbot-box" style="display:none;">
+    <!-- Header -->
+    <div id="chatbot-header">
+      <span>🤖 VoleyChat</span>
+      <button id="close-chat" class="chat-close">&times;</button>
+    </div>
+
+    <!-- Log de mensajes -->
+    <div id="chat-log"></div>
+
+    <!-- Input del usuario -->
+    <div id="chat-input-container">
+      <input type="text" id="chat-input" placeholder="Escribí tu pregunta...">
+      <button id="send-btn">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Etiqueta flotante -->
+  <div id="chatbot-label">¡Soy VoleyChat!</div>
+  
+  <!-- Botón flotante -->
+  <button id="open-chat">💬</button>
 </div>
+
 
     
 
@@ -609,6 +635,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const closeBtn = document.getElementById("close-chat");
   const chatbotBox = document.getElementById("chatbot-box");
   const label = document.getElementById("chatbot-label");
+  const sendBtn = document.getElementById("send-btn");
+  const input = document.getElementById("chat-input");
 
   // Mostrar chatbot
   openBtn.addEventListener("click", () => {
@@ -625,98 +653,187 @@ document.addEventListener("DOMContentLoaded", function () {
     label.style.display = "block";
   });
 
-  function cargarTemas() {
-    chatLog.innerHTML = "";
+  // Enviar mensaje escrito
+  sendBtn.addEventListener("click", () => {
+    const msg = input.value.trim();
+    if (!msg) return;
 
-    // Mensaje de bienvenida
-    const welcome = document.createElement("div");
-    
-    welcome.innerHTML = `<h6>¡Hola! ¿Cual tema quieres consultar?</h6>`;
-    chatLog.appendChild(welcome);
+    mostrarMensajeUsuario(msg);
+    input.value = "";
+
+    fetch("/chatbot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pregunta: msg })
+    })
+      .then(res => res.json())
+      .then(data => {
+        mostrarMensajeBot(data.respuesta || "No encontré nada, elegí un tema 👇");
+        if (!data.respuesta) cargarTemas();
+      });
+  });
+
+  // Mostrar mensaje usuario
+  function mostrarMensajeUsuario(texto) {
+    const msg = document.createElement("div");
+    msg.className = "user-msg";
+    msg.innerText = texto;
+    chatLog.appendChild(msg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  // Mostrar mensaje bot
+  function mostrarMensajeBot(texto) {
+    const msg = document.createElement("div");
+    msg.className = "bot-msg";
+    msg.innerText = texto;
+    chatLog.appendChild(msg);
+   
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+  
+
+  // Cargar lista de temas
+  function cargarTemas() {
+    mostrarMensajeBot("Elegí un tema 👇");
 
     fetch("/chatbot/temas")
       .then(res => res.json())
       .then(data => {
         if (!data.temas || data.temas.length === 0) {
-          const msg = document.createElement("div");
-          msg.className = "bot-msg";
-          msg.innerText = "No hay temas disponibles.";
-          chatLog.appendChild(msg);
+          mostrarMensajeBot("No hay temas disponibles.");
           return;
         }
 
+        const opciones = document.createElement("div");
+        opciones.className = "bot-msg";
+
         data.temas.forEach(t => {
           const btn = document.createElement("button");
-          btn.className = "chat-option bot-msg";
+          btn.className = "chat-option";
           btn.innerText = t;
           btn.onclick = () => cargarPreguntas(t);
-          chatLog.appendChild(btn);
+          opciones.appendChild(btn);
         });
 
+        chatLog.appendChild(opciones);
         chatLog.scrollTop = chatLog.scrollHeight;
-      })
-      .catch(err => console.error(err));
+      });
   }
 
+  // Cargar preguntas de un tema
   function cargarPreguntas(tema) {
-  chatLog.innerHTML = "";
+    mostrarMensajeBot(`Preguntas sobre: ${tema}`);
 
-  const temaMsg = document.createElement("div");
-  temaMsg.className = "bot-msg";
-  temaMsg.innerText = `Preguntas relacionadas con: ${tema}`;
-  chatLog.appendChild(temaMsg);
+    fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.preguntas || data.preguntas.length === 0) {
+          mostrarMensajeBot("No hay preguntas en este tema.");
+          return;
+        }
 
-  fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data.preguntas || data.preguntas.length === 0) {
-        const noData = document.createElement("div");
-        noData.className = "bot-msg";
-        noData.innerText = "No hay preguntas para este tema.";
-        chatLog.appendChild(noData);
-        return;
-      }
+        const opciones = document.createElement("div");
+        opciones.className = "bot-msg";
 
-      data.preguntas.forEach(p => {
-        const btn = document.createElement("button");
-        btn.className = "chat-question bot-msg";
-        btn.innerText = p.pregunta;
-        btn.onclick = () => {
-          // Simular que el usuario "envía" la pregunta
-          const userMsg = document.createElement("div");
-          userMsg.className = "user-msg";
-          userMsg.innerText = p.pregunta;
-          chatLog.appendChild(userMsg);
+        data.preguntas.forEach(p => {
+          const btn = document.createElement("button");
+          btn.className = "chat-question";
+          btn.innerText = p.pregunta;
+          btn.onclick = () => {
+            mostrarMensajeUsuario(p.pregunta);
+            mostrarMensajeBot(p.respuesta);
+          };
+          opciones.appendChild(btn);
+        });
 
-          chatLog.scrollTop = chatLog.scrollHeight;
+        // Botón volver
+        const back = document.createElement("button");
+        back.className = "chat-back";
+        back.innerText = "⬅ Volver a temas";
+        back.onclick = cargarTemas;
+        opciones.appendChild(back);
 
-          // Simular respuesta del bot con delay
-          setTimeout(() => {
-            const resp = document.createElement("div");
-            resp.className = "bot-msg";
-            resp.innerHTML = `<b>Respuesta:</b> ${p.respuesta}`;
-            chatLog.appendChild(resp);
-            chatLog.scrollTop = chatLog.scrollHeight;
-          }, 500);
-        };
-        chatLog.appendChild(btn);
+        chatLog.appendChild(opciones);
+        chatLog.scrollTop = chatLog.scrollHeight;
       });
-
-      const back = document.createElement("button");
-      back.className = "chat-back bot-msg";
-      back.innerText = "⬅ Volver a temas";
-      back.onclick = cargarTemas;
-      chatLog.appendChild(back);
-
-      chatLog.scrollTop = chatLog.scrollHeight;
-    })
-    .catch(err => console.error(err));
-}
-
+  }
 });
 </script>
 
 <style>
+
+/* Input / footer del chat */
+#chat-input-container {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  background: linear-gradient(180deg,#f8f9fc,#f5f6fb);
+  align-items: center;
+}
+
+/* Input de texto */
+#chat-input {
+  flex: 1;
+  border-radius: 999px;
+  padding: 10px 14px;
+  border: 1px solid #e6e9fb;
+  background: #ffffff;
+  font-size: 14px;
+  color: #222;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.02);
+  transition: box-shadow .12s, border-color .12s, transform .08s;
+}
+
+/* Placeholder */
+#chat-input::placeholder {
+  color: #97a0d6; /* tono suave acorde a la paleta */
+}
+
+/* Focus del input */
+#chat-input:focus {
+  outline: none;
+  border-color: #666cff;
+  box-shadow: 0 6px 18px rgba(102,108,255,0.08);
+}
+
+/* Botón enviar (estilo 'pill') */
+#send-btn {
+  background: #666cff;
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(102,108,255,0.12);
+  transition: transform .12s, box-shadow .12s, opacity .12s;
+}
+
+/* Hover/activo */
+#send-btn:hover:not(:disabled) { transform: translateY(-2px); }
+#send-btn:active:not(:disabled) { transform: translateY(0); }
+
+/* Estado deshabilitado */
+#send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ajustes en pantallas pequeñas */
+@media (max-width: 420px) {
+  #chatbot-box { width: 90vw; right: 5vw; }
+  #send-btn { padding: 8px 10px; font-size: 13px; }
+  #chat-input { font-size: 13px; padding: 8px 10px; }
+}
+
   /* Mensaje del usuario */
 .user-msg {
   background-color: #666cff;

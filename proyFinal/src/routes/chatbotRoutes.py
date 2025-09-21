@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from flask import Blueprint, request, jsonify
 from flask_login import login_required
 from src.models.pregunta import Pregunta  # Tu tabla FAQ
@@ -40,3 +42,62 @@ def obtener_respuesta():
         return jsonify({"respuesta": "Pregunta no encontrada."})
 
     return jsonify({"respuesta": pregunta.Respuesta})
+
+# @chatbot_bp.route("/chatbot", methods=["POST"])
+# @login_required
+# def procesar_pregunta():
+#     data = request.get_json()
+#     pregunta_usuario = data.get("pregunta", "").lower()
+
+#     if not pregunta_usuario:
+#         return jsonify({"respuesta": "No entendí tu pregunta, probá elegir un tema 👇"})
+
+#     # Traigo todas las preguntas
+#     preguntas = Pregunta.query.all()
+
+#     for p in preguntas:
+#         # Palabras clave separadas por coma
+#         claves = [k.strip().lower() for k in (p.PalabrasClave or "").split(",")]
+
+#         # Si alguna palabra clave aparece en la pregunta del usuario
+#         if any(clave in pregunta_usuario for clave in claves):
+#             return jsonify({"respuesta": p.Respuesta})
+
+#     # Si no encuentra coincidencias
+#     return jsonify({"respuesta": None})
+
+
+def limpiar_texto(texto):
+    # Quita acentos y pasa a minúsculas
+    texto = unicodedata.normalize("NFKD", texto).encode("ASCII", "ignore").decode("utf-8")
+    # Quita signos de puntuación
+    texto = re.sub(r'[^\w\s]', '', texto)
+    return texto.lower()
+
+@chatbot_bp.route("/chatbot", methods=["POST"])
+@login_required
+def procesar_pregunta():
+    data = request.get_json()
+    pregunta_usuario = limpiar_texto(data.get("pregunta", ""))
+
+    if not pregunta_usuario:
+        return jsonify({"respuesta": "No entendí tu pregunta, probá elegir un tema 👇"})
+
+    preguntas = Pregunta.query.all()
+    mejor_coincidencia = None
+    max_matches = 0
+
+    for p in preguntas:
+        claves = [limpiar_texto(k) for k in (p.PalabrasClave or "").split(",")]
+
+        # Contar cuántas palabras clave coinciden con la pregunta
+        matches = sum(1 for clave in claves if clave in pregunta_usuario)
+
+        if matches > max_matches:
+            max_matches = matches
+            mejor_coincidencia = p
+
+    if mejor_coincidencia:
+        return jsonify({"respuesta": mejor_coincidencia.Respuesta})
+    else:
+        return jsonify({"respuesta": None})
