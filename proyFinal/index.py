@@ -11,7 +11,7 @@ from flask_login import LoginManager, current_user
 
 from config import DevelopmentConfig, app_configs
 from src import db
-from src.controllers import deportistaController, notificacionController
+from src.controllers import deportistaController, notificacionController, pagosController
 from src.models.parametro import Parametro
 from src.models.usuario import Usuario
 from src.routes.usuarioRoutes import usuario_bp
@@ -92,6 +92,11 @@ def inject_contacto_and_now():
 scheduler = BackgroundScheduler()
 # Se ejecuta todos los días a la medianoche
 scheduler.add_job(deportistaController.actualizar_categorias_automaticas, 'cron',month=1,day=1, hour=0, minute=0)
+scheduler.add_job(
+    pagosController.enviar_recordatorios_cuotas,
+    'cron',
+    hour=8, minute=0
+)
 scheduler.start()
         
 if __name__ == "__main__":

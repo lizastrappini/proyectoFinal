@@ -258,13 +258,33 @@ tabla = $('#tablaPagos').DataTable({
         return `<span class="badge rounded-pill ${badgeClass}">${data ?? ''}</span>`;
       }
     },
-    { data: 'comprobanteFoto',
-        render: function(data) {
-          return data
-            ? `<a href="/static/${data}" target="_blank"><img src="/static/${data}" style="height:40px;width:auto;object-fit:contain" /></a>`
-            : 'No Cargado';
-        }
-      },
+    {
+  data: 'comprobanteFoto',
+  render: function(data) {
+    if (!data) return 'No Cargado';
+
+    const extension = data.split('.').pop().toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
+      // Mostrar miniatura si es imagen
+      return `<a href="/static/${data}" target="_blank">
+                <img src="/static/${data}" 
+                     style="height:40px;width:auto;object-fit:contain" />
+              </a>`;
+    } else if (extension === 'pdf') {
+      // Mostrar botón "Ver PDF"
+      return `<a href="/static/${data}" target="_blank" >
+                <i class="ri-file-pdf-line me-1"></i> Ver pdf
+              </a>`;
+    } else {
+      // Cualquier otro archivo
+      return `<a href="/static/${data}" target="_blank">
+                <i class="ri-attachment-line me-1"></i> Descargar
+              </a>`;
+    }
+  }
+},
+
     {
   data: null,
   orderable: false,

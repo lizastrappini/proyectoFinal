@@ -13,6 +13,8 @@ import os
 from werkzeug.utils import secure_filename
 from collections import Counter
 import locale, calendar
+from src import db
+
 
 from src.utils.enums import generalEnum
 
@@ -150,10 +152,11 @@ def agregar_pago():
     try:
         
         fechaPago_str = request.form.get('fechaPago')
-        # fechaVencimiento = request.form.get('fechaVencimiento')
-        # importe = request.form.get('importe')
         estado_nombre = request.form.get('estado')
         usuario_id = request.form.get('deportista')
+        fechaVencimiento_str = request.form.get('fechaVencimiento')
+        parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
+        
         
         if fechaPago_str:
             fechaPago = datetime.strptime(fechaPago_str, "%Y-%m-%d")
@@ -165,7 +168,6 @@ def agregar_pago():
         if not estado_nombre or estado_nombre not in generalEnum.EstadoPagoEnum.__members__:
             raise ValueError("Estado inválido o no seleccionada")
         
-        parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
         if not parametro:
             raise ValueError("No se encontró el parámetro ValorCuota")
 
@@ -174,13 +176,43 @@ def agregar_pago():
         except ValueError:
             raise ValueError("El valor de ValorCuota no es un número válido")
         
-        fechaVencimiento_str = request.form.get('fechaVencimiento')
+        
         if fechaVencimiento_str:
             fechaVencimiento = datetime.strptime(fechaVencimiento_str, "%Y-%m-%d")
         else:
             fechaVencimiento = None
+        # Antes de crear el nuevo pago
+        if fechaVencimiento:
+            mes = fechaVencimiento.month
+            anio = fechaVencimiento.year
 
-  
+            pago_existente = Pago.query.filter(
+                Pago.IdUsuario == int(usuario_id),
+                db.extract('month', Pago.FechaVencimiento) == mes,
+                db.extract('year', Pago.FechaVencimiento) == anio
+            ).first()
+
+            if pago_existente:
+                raise ValueError("Ya existe un pago para este deportista en el mismo mes y año.")
+
+
+       
+        hoy = datetime.now().date()
+        if fechaPago is None:
+                if estado_nombre not in ["Pendiente", "NoPago"]:
+                    raise ValueError("Si no hay fecha de pago, el estado solo puede ser 'Pendiente' o 'NoPago'")
+        # Caso 1: No hay fecha de pago
+        if fechaPago is None:
+            if fechaVencimiento and fechaVencimiento.date() < hoy:
+                # Si venció y no se pagó, debe ser NoPago
+                if estado_nombre != "NoPago":
+                    raise ValueError("El estado debe ser 'NoPago' porque la cuota está vencida y no tiene fecha de pago")
+         # Caso 2: Hay fecha de pago
+        else:
+            if estado_nombre != "Pago":
+                raise ValueError("Si hay fecha de pago, el estado debe ser 'Pago'")
+           
+        
 
 
         estado_id = generalEnum.EstadoPagoEnum[estado_nombre].value
@@ -189,8 +221,15 @@ def agregar_pago():
             FechaVencimiento=fechaVencimiento,
             Importe=importe,
             IdEstado= estado_id,
-            IdUsuario =int(usuario_id)
+            IdUsuario =int(usuario_id),
         )
+        
+        # --- Envío de mail si corresponde ---
+        if fechaPago is None and fechaVencimiento and fechaVencimiento.date() < hoy and estado_nombre == "NoPago":
+            deportista = Usuario.query.get(int(usuario_id))
+            pagosController.enviar_recordatorio_individual(deportista, nuevo_pago)
+        
+        
         pagosController.agregarPago(nuevo_pago)
         
 
