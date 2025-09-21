@@ -631,7 +631,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mensaje de bienvenida
     const welcome = document.createElement("div");
     
-    welcome.innerHTML = `<h6>¡Hola! Soy VoleyChat. Elegí el tema que quieras consultar:</h6>`;
+    welcome.innerHTML = `<h6>¡Hola! ¿Cual tema quieres consultar?</h6>`;
     chatLog.appendChild(welcome);
 
     fetch("/chatbot/temas")
@@ -659,54 +659,87 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function cargarPreguntas(tema) {
-    chatLog.innerHTML = "";
+  chatLog.innerHTML = "";
 
-    const temaMsg = document.createElement("div");
-   
-    temaMsg.innerHTML = `<h6>Preguntas del tema: ${tema}</h6>`;
-    chatLog.appendChild(temaMsg);
+  const temaMsg = document.createElement("div");
+  temaMsg.className = "bot-msg";
+  temaMsg.innerText = `Preguntas relacionadas con: ${tema}`;
+  chatLog.appendChild(temaMsg);
 
-    fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data.preguntas || data.preguntas.length === 0) {
-          const noData = document.createElement("div");
-          noData.className = "bot-msg";
-          noData.innerText = "No hay preguntas para este tema.";
-          chatLog.appendChild(noData);
-          return;
-        }
+  fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.preguntas || data.preguntas.length === 0) {
+        const noData = document.createElement("div");
+        noData.className = "bot-msg";
+        noData.innerText = "No hay preguntas para este tema.";
+        chatLog.appendChild(noData);
+        return;
+      }
 
-        data.preguntas.forEach(p => {
+      data.preguntas.forEach(p => {
         const btn = document.createElement("button");
         btn.className = "chat-question bot-msg";
-        btn.innerHTML = p.pregunta;
+        btn.innerText = p.pregunta;
         btn.onclick = () => {
-          const resp = document.createElement("div");
-          resp.className = "chat-answer bot-msg";
-          resp.innerHTML = `<b>Respuesta:</b> ${p.respuesta}`;
-          chatLog.appendChild(resp);
+          // Simular que el usuario "envía" la pregunta
+          const userMsg = document.createElement("div");
+          userMsg.className = "user-msg";
+          userMsg.innerText = p.pregunta;
+          chatLog.appendChild(userMsg);
+
           chatLog.scrollTop = chatLog.scrollHeight;
+
+          // Simular respuesta del bot con delay
+          setTimeout(() => {
+            const resp = document.createElement("div");
+            resp.className = "bot-msg";
+            resp.innerHTML = `<b>Respuesta:</b> ${p.respuesta}`;
+            chatLog.appendChild(resp);
+            chatLog.scrollTop = chatLog.scrollHeight;
+          }, 500);
         };
         chatLog.appendChild(btn);
       });
 
+      const back = document.createElement("button");
+      back.className = "chat-back bot-msg";
+      back.innerText = "⬅ Volver a temas";
+      back.onclick = cargarTemas;
+      chatLog.appendChild(back);
 
-        // Botón volver a temas
-        const back = document.createElement("button");
-        back.className = "chat-back bot-msg";
-        back.innerText = "⬅ Volver a temas";
-        back.onclick = cargarTemas;
-        chatLog.appendChild(back);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    })
+    .catch(err => console.error(err));
+}
 
-        chatLog.scrollTop = chatLog.scrollHeight;
-      })
-      .catch(err => console.error(err));
-  }
 });
 </script>
 
 <style>
+  /* Mensaje del usuario */
+.user-msg {
+  background-color: #666cff;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 75%;
+  align-self: flex-end;   /* alineado a la derecha */
+  font-size: 14px;
+}
+
+/* Mensaje del bot */
+.bot-msg {
+  background-color: #e2e6ea;
+  color: #050505;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 75%;
+  align-self: flex-start;  /* alineado a la izquierda */
+  font-size: 14px;
+  margin-top: 4px;
+}
+
 /* Contenedor del chatbot */
 #chatbot-container {
   position: fixed;
