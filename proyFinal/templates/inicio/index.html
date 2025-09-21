@@ -15,8 +15,8 @@
           <div class="col-md-6 order-2 order-md-1">
             <div class="card-body">
               <h2 class="card-title mb-4">Hola <span class="fw-bold">{{ usuario.Nombre }}!</span> 😀</h2>
-              <h4 class="fw-bold">Bienvenido a tu centro de gestión:</h4>
-              <p>Entrenamientos, estadísticas y comunicación en un solo lugar.</p>
+              <h4 class="fw-bold">Acceso para deportistas</h4>
+              <p>Estás viendo la vista para los deportistas.</p>
               <a href="/miCuenta" class="btn btn-primary">Ver Perfil</a>
             </div>
           </div>
@@ -61,7 +61,7 @@
       </div>
     </div>
   
-  {% else %}
+  {% elif  usuario.IdRol == 1 %}
     <!-- Si NO es deportista, el contenedor ocupa todo el ancho -->
     <div class="col-md-12 col-lg-12">
       <div class="card h-100">
@@ -88,6 +88,33 @@
         </div>
       </div>
     </div>
+  {% else %}
+  <div class="col-md-12 col-lg-12">
+      <div class="card h-100">
+        <div class="d-flex align-items-end row">
+          <div class="col-md-6 order-2 order-md-1">
+            <div class="card-body">
+              <h2 class="card-title mb-4">Hola <span class="fw-bold">{{ usuario.Nombre }}!</span> 👋</h2>
+              <h4 class="fw-bold">Acceso para entrenadores</h4>
+              <p>Estás viendo la vista para los entrenadores.</p>
+              <a href="/miCuenta" class="btn btn-primary">Ver Perfil</a>
+            </div>
+          </div>
+          <div class="col-md-6 text-center text-md-end order-1 order-md-2">
+            <div class="card-body pb-0 px-0 pt-1_5">
+              <img
+                src="../../static/img/illustrations/illustration-daisy-light.png"
+                height="186"
+                class="scaleX-n1-rtl"
+                alt="View Profile"
+                data-app-light-img="illustrations/illustration-daisy-light.png"
+                data-app-dark-img="illustrations/illustration-daisy-dark.png" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   {% endif %}
 </div>
 
@@ -109,7 +136,7 @@
                                 <h3 class="card-title mb-2">Mi Cuenta</h3>
                               </div>
                             </a>
-                            <span class="fw-bold">Encuentra tus datos aquí</span>
+                            <span class="fw-bold">Encontrá tus datos aquí</span>
                           </div>
                         </div>
                       </div>
@@ -129,11 +156,11 @@
                                 <h3 class="card-title mb-2">Calendario</h3>
                               </div>
                             </a>
-                            <span class="fw-bold">Revisa las fechas importantes</span>
+                            <span class="fw-bold">Revisá las fechas importantes</span>
                           </div>
                         </div>
                       </div>
-
+                   {% if usuario.IdRol == 2 %}
                       <div class="col-md-3 mb-3">
                         <div class="card h-100">
                           <div class="card-body">
@@ -144,16 +171,37 @@
                                 </div>
                               </div>
                             </div>
-                            <a href="/estadisticas" class="text-decoration-none">
+                            <a href="/estadisticas/ver" class="text-decoration-none">
                               <div class="card-info">
                                 <h3 class="card-title mb-2">Estadísticas</h3>
                               </div>
                             </a>
-                            <span class="fw-bold">Mira tus estadísticas</span>
+                            <span class="fw-bold">Mirá tus estadísticas</span>
                           </div>
                         </div>
                       </div>
-
+                  {% else %}
+                  <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                          <div class="card-body">
+                            <div class="card-icon mb-2">
+                              <div class="avatar">
+                                <div class="avatar-initial rounded-3 bg-label-warning">
+                                  <i class="ri-bar-chart-2-line ri-24px"></i>
+                                </div>
+                              </div>
+                            </div>
+                            <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="text-decoration-none">
+                              <div class="card-info">
+                                <h3 class="card-title mb-2">Estadísticas</h3>
+                              </div>
+                            </a>
+                            <span class="fw-bold">Cargá estadísticas de los partidos</span>
+                          </div>
+                        </div>
+                      </div>
+                   {% endif %}
+                   {% if usuario.IdRol == 2 %}
                       <div class="col-md-3 mb-3">
                         <div class="card h-100">
                           <div class="card-body">
@@ -164,7 +212,7 @@
                                 </div>
                               </div>
                             </div>
-                            <a href="/miCuenta" class="text-decoration-none">
+                            <a href="/mipago" class="text-decoration-none">
                               <div class="card-info">
                                 <h3 class="card-title mb-2">Cuota Deportiva</h3>
                               </div>
@@ -174,6 +222,50 @@
                         </div>
                       </div>
                     </div>
+                  {% elif  usuario.IdRol == 1 %}
+                   <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                          <div class="card-body">
+                            <div class="card-icon mb-2">
+                              <div class="avatar">
+                                <div class="avatar-initial rounded-3 bg-label-info">
+                                  <i class="ri-bank-card-2-line ri-24px"></i>
+                                </div>
+                              </div>
+                            </div>
+                            <a href="/pago" class="text-decoration-none">
+                              <div class="card-info">
+                                <h3 class="card-title mb-2">Cuota Deportiva</h3>
+                              </div>
+                            </a>
+                            <span class="fw-bold">Todos los pagos deportivos aquí</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                   {% else %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                          <div class="card-body">
+                            <div class="card-icon mb-2">
+                              <div class="avatar">
+                                <div class="avatar-initial rounded-3 bg-label-info">
+                                  <i class="ri-bar-chart-2-line ri-24px"></i>
+                                </div>
+                              </div>
+                            </div>
+                            <a href="/estadisticas/ver" class="text-decoration-none">
+                              <div class="card-info">
+                                <h3 class="card-title mb-2">Ver Estadísticas</h3>
+                              </div>
+                            </a>
+                            <span class="fw-bold">Mirá las estadísticas de los partidos</span>
+                          </div>
+                        </div>
+                      </div>
+
+                   {% endif %}
+
                     <!-- /Customer cards -->
 
 
