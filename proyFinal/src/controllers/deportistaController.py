@@ -136,21 +136,22 @@ def calcular_categoria_por_fecha(fecha_nacimiento):
         return generalEnum.CategoriaEnum.NoEspecificada.value
     
     hoy = date.today()
-    edad = hoy.year - fecha_nacimiento.year - (
-        (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day)
-    )
+    edad = hoy.year - fecha_nacimiento.year
+    # - (
+    #     (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day)
+    # )
 
-    if edad < 12:
+    if edad <= 12:
         return CategoriaEnum.Sub12.value
-    elif edad < 13:
+    elif edad <= 13:
         return CategoriaEnum.Sub13.value
-    elif edad < 14:
+    elif edad <= 14:
         return CategoriaEnum.Sub14.value
-    elif edad < 16:
+    elif edad <= 16:
         return CategoriaEnum.Sub16.value
-    elif edad < 18:
+    elif edad <= 18:
         return CategoriaEnum.Sub18.value
-    elif edad < 21:
+    elif edad <= 21:
         return CategoriaEnum.Sub21.value
     else:
         return CategoriaEnum.Primera.value

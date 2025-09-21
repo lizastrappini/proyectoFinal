@@ -652,7 +652,8 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
         orderable: false,
         searchable: false,
         render: function(data, type, row) {
-          return `<input type="checkbox" class="check-pago form-check-input ml-1" data-id="${row?.id ?? ''}">`;
+          const disabled = row.estado === 'Pago' ? 'disabled' : '';
+          return `<input type="checkbox" class="check-pago form-check-input ml-1" data-id="${row?.id ?? ''}" ${disabled}>`;
         }
       },
       { data: 'deportista' },

@@ -24,7 +24,7 @@
             </select>
           </div>
 
-          <div class="form-floating form-floating-outline" style="min-width: 180px;">
+          <!-- <div class="form-floating form-floating-outline" style="min-width: 180px;">
             <select id="entrenadorFiltro"
                     class="select2 form-select form-select-sm" 
                     data-allow-clear="true"
@@ -34,7 +34,7 @@
                 <option value="{{ entrenador.dni }}">{{ entrenador.nombre }} {{ entrenador.apellido }}</option>
               {% endfor %}
             </select>
-          </div>
+          </div> -->
 
           <button id="btnFiltrarEntrenador" class="btn btn-primary waves-effect waves-light">
             Filtrar
@@ -305,9 +305,9 @@ $('.btn-export').on('click', function () {
   // Función de filtrado
   function filtrar() {
     const categoria = $('#categoriaFiltro').val();
-    const dni = $('#entrenadorFiltro').val();
+    
 
-    const url = `/entrenador/filtrar?categoria=${encodeURIComponent(categoria || '')}&dni=${encodeURIComponent(dni || '')}`;
+    const url = `/entrenador/filtrar?categoria=${encodeURIComponent(categoria || '')}`;
     tabla.ajax.url(url).load(); // ✅ recarga sobre la tabla ya creada
   }
 
@@ -431,7 +431,7 @@ $('.btn-export').on('click', function () {
   // Limpiar filtros
   function limpiar() {
     $('#categoriaFiltro').val('').trigger('change');
-    $('#entrenadorFiltro').val('').trigger('change');
+    
     filtrar(); // recarga sin filtros
   }
 
