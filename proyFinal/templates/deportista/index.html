@@ -22,14 +22,12 @@
 
         <div class="card-body">
           <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
-              <div class="form-floating form-floating-outline" style="min-width: 180px;">
-                <select id="deportistaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Deportista">
-                  <option value=""></option>
-                  {% for deportista in deportistas %}
-                      <option value="{{ deportista.dni }}">{{ deportista.nombre }} {{ deportista.apellido }}</option>
-                  {% endfor %}
-                </select>
+
+              <div class="form-floating form-floating-outline" style="min-width: 200px;">
+                <input type="text" id="filtroBuscar" class="form-control" placeholder="Buscar...">
+                <label for="filtroBuscar">Buscar</label>
               </div>
+
               <div class="form-floating form-floating-outline" style="min-width: 180px;">
                 <select id="categoriaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Categoría" >
                   <option value=""></option>
@@ -79,7 +77,7 @@
               Exportar
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="javascript:;" id="descargarExcel">📊 Descargar Excel</a></li>
+              <li><a class="dropdown-item" href="javascript:;" id="descargarExcel">📊 Descargar plantilla vacía</a></li>
               <li><a class="dropdown-item btn-export"  href="javascript:;" id="descargarDeportistas">👟 Descargar Deportistas</a></li>
             </ul>
           </div>
@@ -564,8 +562,8 @@ const labelColor = "#a8aab4";
     const division = $('#divisionFiltro').val();
     const rama = $('#ramaFiltro').val();
     const dni = $('#deportistaFiltro').val();
-
-    const url = `/deportista/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&dni=${encodeURIComponent(dni || '')}`;
+    const buscar = $('#filtroBuscar').val();
+    const url = `/deportista/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&dni=${encodeURIComponent(dni || '')}&buscar=${encodeURIComponent(buscar || '')}`;
     tabla.ajax.url(url).load();
   }
 
@@ -574,7 +572,7 @@ const labelColor = "#a8aab4";
     $('#categoriaFiltro').val('').trigger('change');
     $('#ramaFiltro').val('').trigger('change');
     $('#divisionFiltro').val('').trigger('change');
-    $('#deportistaFiltro').val('').trigger('change');
+    $('#filtroBuscar').val('').trigger('change');
     filtrar();
   }
 
