@@ -7,10 +7,20 @@
     <div class="container-xxl flex-grow-1 container-p-y">
       <!-- Basic Bootstrap Table -->
       <div class="card">
-        <h2 class="card-header">Deportistas</h2>
-        <div class="card-body">
+      <div class="card-header">
+        <div class="d-flex align-items-center">
+          <h2 class="mb-0">Deportistas</h2>
+          <a class="avatar avatar-sm avatar-initial bg-label-primary rounded-3 d-inline-flex justify-content-center align-items-center ms-2" 
+            href="javascript:void(0);" 
+            data-bs-toggle="modal" 
+            data-bs-target="#modalScrollable" 
+            onclick="Leyenda()">
+            <i class="tf-icons ri-question-line ri-20px"></i>
+          </a>
+        </div>
+      </div>
 
-          
+        <div class="card-body">
           <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
               <div class="form-floating form-floating-outline" style="min-width: 180px;">
                 <select id="deportistaFiltro" class="select2 form-select" data-allow-clear="true" data-placeholder="Deportista">
@@ -326,6 +336,61 @@
       </div>
     </div>
   </div>
+
+<div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+
+      <!-- Header del modal -->
+      <div class="modal-header">
+        <h5 class="modal-title">📋 Sección Deportistas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <hr>
+      <div class="modal-body">
+
+         <h5>📥 Cómo exportar un Excel vacío para cargar</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Descargá la plantilla:</strong> Hacé click en “Descargar plantilla vacía”.</p>
+  <p>2️⃣ <strong>Cargá los datos:</strong> Completá la planilla con los deportistas que quieras dar de alta de forma masiva.</p>
+  <p>⚠️ Asegurate de no modificar los encabezados de la planilla para que luego pueda subirse correctamente.</p>
+</div>
+
+<hr> <!-- Separación -->
+
+<!-- Exportar Excel con filtros -->
+<h5>📤 Cómo exportar un Excel con los deportistas filtrados</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Elegí los filtros:</strong> Podés filtrar por categoría, división, rama o nombre del deportista.</p>
+  <p>2️⃣ <strong>Generá el listado:</strong> La tabla mostrará solo los deportistas que cumplen con los filtros seleccionados.</p>
+  <p>3️⃣ <strong>Descargá el archivo:</strong> Hacé click en “Descargar deportistas” y obtendrás un archivo con esos resultados.</p>
+</div>
+
+<hr> <!-- Separación -->
+
+<!-- Agregar un deportista individual -->
+<h5>➕ Cómo agregar un deportista individual</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Abrí el formulario:</strong> Presioná el botón “Nuevo deportista”.</p>
+  <p>2️⃣ <strong>Completá los datos obligatorios:</strong> Nombre, apellido, DNI, fecha de nacimiento, rama y categoría.</p>
+  <p>3️⃣ <strong>Guardá el registro:</strong> Al confirmar, el deportista quedará agregado al sistema y aparecerá en la tabla.</p>
+</div>
+
+<hr> <!-- Separación -->
+
+<!-- Observaciones -->
+<h5>⚠️ Observaciones importantes</h5>
+<div class="mb-3">
+  <p>✅ Usá el Excel vacío solo como plantilla para carga masiva.</p>
+  <p>❌ No cambies el orden ni los encabezados de las columnas del Excel.</p>
+  <p>✅ Podés combinar métodos: cargar varios con Excel y después ajustar detalles editando deportistas individuales.</p>
+</div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 
   {% endblock %}
 

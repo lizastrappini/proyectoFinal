@@ -7,7 +7,18 @@
     <div class="container-xxl flex-grow-1 container-p-y">
       <!-- Basic Bootstrap Table -->
       <div class="card">
-        <h2 class="card-header">Cuotas Deportivas</h2>
+      <div class="card-header">
+        <div class="d-flex align-items-center">
+          <h2 class="mb-0">Cuotas Deportivas</h2>
+          <a class="avatar avatar-sm avatar-initial bg-label-primary rounded-3 d-inline-flex justify-content-center align-items-center ms-2" 
+            href="javascript:void(0);" 
+            data-bs-toggle="modal" 
+            data-bs-target="#modalScrollable" 
+            onclick="Leyenda()">
+            <i class="tf-icons ri-question-line ri-20px"></i>
+          </a>
+        </div>
+      </div>
 
         <div id="estadisticasWrapper" class="row mb-6 g-6 d-none">
         <!-- Tarjeta de Reviews -->
@@ -328,6 +339,65 @@
     </div>
   </div>
 
+<div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+
+      <!-- Header del modal -->
+      <div class="modal-header">
+        <h5 class="modal-title">📋 Sección Cuotas Deportivas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <hr>
+      <div class="modal-body">
+
+         <!-- Funciones de la página Cuotas Deportivas -->
+
+<!-- Agregar / Actualizar -->
+<h5>➕ Cómo agregar o actualizar pagos</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Agregar un pago:</strong> Hacé click en <strong>“Agregar Pago”</strong> y completá los datos del deportista, importe y fechas.</p>
+  <p>2️⃣ <strong>Actualizar precio de la cuota:</strong> Ingresa el nuevo monto y presioná <strong>“Guardar”</strong> para modificar su información.</p>
+  <p>3️⃣ <strong>Pagar:</strong> Una vez que un pago está registrado, podés marcarlo como abonado.</p>
+  <p>⚠️ El importe de la cuota aplicará a partir de la fecha actual y se actualizarán todas las cuotas que tengan estado <strong>No pago</strong>.</p>
+</div>
+
+<hr>
+
+<!-- Exportar / Importar -->
+<h5>📥 Cómo exportar o importar cuotas</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Exportar:</strong> Usá el botón <strong>“Descargar pagos”</strong> para descargar un archivo Excel con las cuotas cargadas.</p>
+  <p>2️⃣ <strong>Exportar un excel vacío:</strong> Usá el botón <strong>“Descargar plantilla vacía”</strong> para descargar un archivo Excel vacío como plantilla para rellenar.</p>
+  <p>3️⃣ <strong>Importar:</strong> Podés cargar varias cuotas en forma masiva desde un archivo Excel haciendo click en <strong>“Importar”</strong>. Asegurate de respetar el formato de la plantilla.</p>
+</div>
+
+<hr>
+
+<!-- Filtros -->
+<h5>🔎 Cómo usar los filtros</h5>
+<div class="mb-3">
+  <p>1️⃣ <strong>Filtrar por estado:</strong> Seleccioná “Pagado”, “Pendiente” u otro estado disponible.</p>
+  <p>2️⃣ <strong>Filtrar por fechas:</strong> Indicá un rango de <strong>Fecha Desde</strong> y <strong>Fecha Hasta</strong> para acotar los resultados.</p>
+  <p>3️⃣ <strong>Aplicar filtro:</strong> Hacé click en <strong>“Filtrar”</strong> y la tabla se actualizará mostrando solo las cuotas que cumplen con esas condiciones.</p>
+</div>
+
+<hr>
+
+<!-- Observaciones -->
+<h5>⚠️ Observaciones importantes</h5>
+<div class="mb-3">
+  <p>✅ Podés combinar filtros (ejemplo: Estado + rango de fechas) para búsquedas más precisas.</p>
+  <p>❌ Si el Excel no se importa correctamente, verificá que no se hayan cambiado los encabezados de la plantilla.</p>
+  <p>✅ La columna <strong>Comprobante</strong> permite visualizar los archivo subidos como comprobante de pago.</p>
+</div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div id="uiMsg" class="mt-2"></div>
 
   {% endblock %}
@@ -573,7 +643,6 @@ $(document).ready(function () {
 
   // Ajustar altura de la caja
   $('.select2-selection').css({
-    'height': '38px',
     'display': 'flex',
     'align-items': 'center'
   });
