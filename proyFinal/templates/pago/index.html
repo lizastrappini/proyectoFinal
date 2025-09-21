@@ -171,7 +171,7 @@
                                     name="fechaPago_display"
                                     placeholder="Fecha Pago"
                                     autocomplete="off"
-                                    required />
+                                     />
 
                               <!-- hidden -->
                               <input type="hidden" id="fechaPagoIso" name="fechaPago" value="{{ fecha_pago or '' }}" />
@@ -294,7 +294,7 @@
                                 type="number"
                                 id="importe"
                                 name="importe"
-                                step="1000" 
+                                step="0.01"
                                 class="form-control"
                                 value=""
                                 placeholder=""
@@ -674,13 +674,32 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
           return `<span class="badge rounded-pill ${badgeClass}">${data ?? ''}</span>`;
         }
       },
-      { data: 'comprobanteFoto',
-        render: function(data) {
-          return data
-            ? `<a href="/static/${data}" target="_blank"><img src="/static/${data}" style="height:40px;width:auto;object-fit:contain" /></a>`
-            : 'No Cargado';
-        }
-      },
+      {
+  data: 'comprobanteFoto',
+  render: function(data) {
+    if (!data) return 'No Cargado';
+
+    const extension = data.split('.').pop().toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
+      // Mostrar miniatura si es imagen
+      return `<a href="/static/${data}" target="_blank">
+                <img src="/static/${data}" 
+                     style="height:40px;width:auto;object-fit:contain" />
+              </a>`;
+    } else if (extension === 'pdf') {
+      // Mostrar botón "Ver PDF"
+      return `<a href="/static/${data}" target="_blank" >
+                <i class="ri-file-pdf-line me-1"></i> Ver pdf
+              </a>`;
+    } else {
+      // Cualquier otro archivo
+      return `<a href="/static/${data}" target="_blank">
+                <i class="ri-attachment-line me-1"></i> Descargar
+              </a>`;
+    }
+  }
+},
       { data: null,
         orderable: false,
         searchable: false,
@@ -837,7 +856,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     $('#estado').val(null).trigger('change');
     $('#deportista').val(null).trigger('change');
 
-    $('#editPagosForm').attr('action', '/pago/agregar_pago');
+    $('#editPagosForm').attr('action', '/pago/nuevoPago');
     $('#submitBtn').text('Crear');
     $('#tituloAdd').text('Agregar Pago');
   });
@@ -881,7 +900,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
       if (f) f.reset();
       $('#estado').val(null).trigger('change');
       $('#deportista').val(null).trigger('change');
-      $('#editPagosForm').attr('action', '/pago/agregar_pago');
+      $('#editPagosForm').attr('action', '/pago/nuevoPago');
       $('#submitBtn').text('Crear');
       $('#tituloAdd').text('Agregar Pago');
 
