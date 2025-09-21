@@ -881,17 +881,19 @@ addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
 });
 
 // === ABRIR MODAL DESDE BOTÓN (NUEVO EVENTO) ===
-btnToggleSidebar.addEventListener('click', function () {
-  resetValues();
+if (btnToggleSidebar) {
+  btnToggleSidebar.addEventListener('click', function () {
+    resetValues();
 
-  let offcanvas = bootstrap.Offcanvas.getInstance(addEventSidebar);
-  if (!offcanvas) {
-    offcanvas = new bootstrap.Offcanvas(addEventSidebar);
-  }
-  if (!addEventSidebar.classList.contains('show')) {
-    offcanvas.show();
-  }
-});
+    let offcanvas = bootstrap.Offcanvas.getInstance(addEventSidebar);
+    if (!offcanvas) {
+      offcanvas = new bootstrap.Offcanvas(addEventSidebar);
+    }
+    if (!addEventSidebar.classList.contains('show')) {
+      offcanvas.show();
+    }
+  });
+}
 
 // === DATECLICK (NUEVO EVENTO DESDE CALENDARIO) ===
 calendar.on('dateClick', function (info) {
