@@ -1,7 +1,7 @@
 import re
 import unicodedata
 from flask import Blueprint, request, jsonify
-from flask_login import login_required
+from flask_login import current_user, login_required
 from src.models.pregunta import Pregunta  # Tu tabla FAQ
 from src import db
 
@@ -23,8 +23,11 @@ def obtener_preguntas():
     tema = request.args.get("tema")
     if not tema:
         return jsonify({"preguntas": []})
-
-    preguntas = Pregunta.query.filter_by(Tema=tema).all()
+    preguntas = Pregunta.query.filter(
+        Pregunta.Tema == tema,
+        (Pregunta.Rol == current_user.IdRol) | (Pregunta.Rol == None)
+     ).all()
+    # preguntas = Pregunta.query.filter_by(Tema=tema).all()
     data = [{"id": p.Id, "pregunta": p.Pregunta, "respuesta": p.Respuesta} for p in preguntas]
     return jsonify({"preguntas": data})
 
