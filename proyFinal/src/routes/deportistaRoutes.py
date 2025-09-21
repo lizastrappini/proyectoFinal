@@ -52,6 +52,7 @@ def index():
 
 @deportista_bp.route('/filtrar')
 def filtrar():
+    buscar = request.args.get('buscar', '').strip()
     categoria = request.args.get('categoria')
     division = request.args.get('division')
     rama = request.args.get('rama')
@@ -66,7 +67,7 @@ def filtrar():
     if rama and rama.isdigit():
         rama = int(rama)
     
-    data = deportistaController.obtener_deportistas(categoria=categoria,dni=dni,rama=rama, division=division) #agregar division=division
+    data = deportistaController.obtener_deportistas(buscar=buscar, categoria=categoria,dni=dni,rama=rama, division=division) #agregar division=division
     return jsonify({'data': data})
 
 
