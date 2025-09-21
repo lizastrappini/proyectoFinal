@@ -1,4 +1,5 @@
 from datetime import date
+from sqlalchemy import or_, and_
 from flask import current_app, render_template, url_for
 from flask_mail import Message
 from src.controllers.usuarioController import enviar_mail_categoria
@@ -9,9 +10,19 @@ from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum
 from src import db
 from src.utils.Mail import mail
 
-def obtener_deportistas(categoria=None, division=None, rama=None , dni=None):
+def obtener_deportistas(buscar=None, categoria=None, division=None, rama=None , dni=None):
     query = Usuario.query.filter_by(IdRol=2)
 
+    if buscar:
+        like_pattern = f"%{buscar}%"
+        query = query.filter(
+            or_(
+                Usuario.Apellido.ilike(like_pattern),
+                Usuario.Nombre.ilike(like_pattern),
+                Usuario.Dni.ilike(like_pattern)
+            )
+        )
+        
     if categoria:
         try:
             categoria_valor = int(categoria)
