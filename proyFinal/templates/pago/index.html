@@ -837,7 +837,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     $('#estado').val(null).trigger('change');
     $('#deportista').val(null).trigger('change');
 
-    $('#editPagosForm').attr('action', '/pago/agregar_pago');
+    $('#editPagosForm').attr('action', '/pago/nuevoPago');
     $('#submitBtn').text('Crear');
     $('#tituloAdd').text('Agregar Pago');
   });
@@ -881,7 +881,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
       if (f) f.reset();
       $('#estado').val(null).trigger('change');
       $('#deportista').val(null).trigger('change');
-      $('#editPagosForm').attr('action', '/pago/agregar_pago');
+      $('#editPagosForm').attr('action', '/pago/nuevoPago');
       $('#submitBtn').text('Crear');
       $('#tituloAdd').text('Agregar Pago');
 
