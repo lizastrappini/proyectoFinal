@@ -292,10 +292,16 @@ $(document).ready(function () {
     }
   });});
 
-  // Botón Exportar
 $('.btn-export').on('click', function () {
-    tabla.button('.buttons-excel').trigger();
-  });
+  const cantidadFilas = tabla.rows({ search: 'applied' }).count();
+
+  if (cantidadFilas === 0) {
+    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+    return;
+  }
+
+  tabla.button('.buttons-excel').trigger();
+});
 
   // Botón Filtrar (ID correcto del botón en tu HTML)
   $('#btnFiltrarEntrenador').on('click', function () {

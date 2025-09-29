@@ -81,8 +81,8 @@
           <div
             class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative py-sm-12 px-12 py-6">
             <div class="w-px-400 mx-auto pt-5 pt-lg-0">
-              <h4 class="mb-1">Ingresa tu nueva contraseña 🔒</h4>
-              <p class="mb-5">Debe ser diferente de tu contraseña anterior</p>
+              <h4 class="mb-1">Ingresá tu nueva contraseña 🔒</h4>
+              <p class="mb-5">La contraseña debe contener al menos una mayúscula, un símbolo y 8 caracteres como mínimo.</p>
               <form id="formAuthentication" class="mb-5" action="cambiarPass" method="POST">
                 <div class="form-floating form-floating-outline mb-5">
                     <input
@@ -93,7 +93,7 @@
                         placeholder="Contraseña nueva" />
                     <label for="password">Nueva Contraseña</label>
                     <span class="input-password-toggle">
-                        <i class="ri-eye-off-line toggle-password" data-target="password" style="cursor: pointer; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);"></i>
+                        <i class="toggle-password" data-target="password" style="cursor: pointer; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);"></i>
                     </span>
                 </div>
 
@@ -106,7 +106,7 @@
                         placeholder="Contraseña nueva" />
                     <label for="confirmarPassword">Confirmar Contraseña</label>
                     <span class="input-password-toggle">
-                        <i class="ri-eye-off-line toggle-password" data-target="confirm-password" style="cursor: pointer; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);"></i>
+                        <i class="toggle-password" data-target="confirm-password" style="cursor: pointer; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);"></i>
                     </span>
                 </div>
 
@@ -206,8 +206,8 @@
                 message: 'La contraseña no puede estar vacía',
               },
               stringLength: {
-                min: 6,
-                message: 'La contraseña debe tener al menos 6 caracteres',
+                min: 8,
+                message: 'La contraseña debe tener al menos 8 caracteres',
               },
             },
           },
