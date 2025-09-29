@@ -609,6 +609,10 @@ document.addEventListener("DOMContentLoaded", function () {
     chatbotBox.style.display = "flex";
     openBtn.style.display = "none";
     label.style.display = "none";
+
+    mostrarMensajeBot("¡Hola! Soy VoleyChat 👋 ¿Sobre qué tema querés consultar?");
+
+
     cargarTemas();
   });
 
@@ -617,6 +621,9 @@ document.addEventListener("DOMContentLoaded", function () {
     chatbotBox.style.display = "none";
     openBtn.style.display = "block";
     label.style.display = "block";
+
+    chatLog.innerHTML = "";
+
   });
 
   // Enviar mensaje escrito
@@ -661,7 +668,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Cargar lista de temas
   function cargarTemas() {
-    mostrarMensajeBot("Elegí un tema 👇");
+    
+    
 
     fetch("/chatbot/temas")
       .then(res => res.json())
@@ -684,6 +692,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         chatLog.appendChild(opciones);
         chatLog.scrollTop = chatLog.scrollHeight;
+        
       });
   }
 
