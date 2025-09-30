@@ -123,7 +123,7 @@ def enviar_mail_alta_deportista(deportista, password):
         return False
 
     msg = Message(
-        subject="Voley App - Bienvenida",
+        subject="Voley App - Mensaje Bienvenida",
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[deportista.Email]
     )
