@@ -76,7 +76,6 @@ class FederadoEnum(enum.IntEnum):
 
 class ContrincantesEnum(enum.IntEnum):
     Sonder = 1
-    Central = 2
     Nautico = 3
     Normal3 = 4
     ElTala = 5

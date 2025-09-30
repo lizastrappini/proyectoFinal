@@ -1,6 +1,8 @@
+import datetime
 import secrets
 import string
 from flask import Blueprint, redirect, request, render_template,flash, jsonify, url_for
+import pytz
 from src.controllers import entrenadorController
 from src.models.usuario import Usuario
 import src.utils.enums.generalEnum as generalEnum
@@ -17,16 +19,16 @@ def index():
     {'value': cat.value, 'text': cat.name}
     for cat in generalEnum.CategoriaEnum
     ]
-    entrenadores = entrenadorController.obtener_entrenadores()  
-    lista_entrenadores = [
-        {
-            'dni': e['dni'],
-            'nombre': e['nombre'],
-            'apellido': e['apellido']
-        }
-        for e in entrenadores
-    ]
-    return render_template('entrenador/index.html', categorias=categorias,entrenadores=lista_entrenadores)
+    # entrenadores = entrenadorController.obtener_entrenadores()  
+    # lista_entrenadores = [
+    #     {
+    #         'dni': e['dni'],
+    #         'nombre': e['nombre'],
+    #         'apellido': e['apellido']
+    #     }
+    #     for e in entrenadores
+    # ]
+    return render_template('entrenador/index.html', categorias=categorias)
 
 
 @entrenador_bp.route('/filtrar')
@@ -85,7 +87,9 @@ def agregar_entrenador():
         mail_usuario = Usuario.query.filter_by(Email=email).first()
         if mail_usuario:
          raise ValueError(f"Ya existe un usuario con el mismo email")
-     
+
+        arg = pytz.timezone("America/Argentina/Buenos_Aires")
+        
         nuevo_entrenador = Usuario(
             Dni= dni,
             Nombre=nombre,
@@ -104,7 +108,8 @@ def agregar_entrenador():
             TokenEnviado=False,
             FechaVencimientoToken=None,
             Federado = 3,
-            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None
+            CategoriaExtra = ",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
+            FechaAlta = datetime.now(arg)
             
         )
         entrenadorController.agregarEntrenador(nuevo_entrenador)

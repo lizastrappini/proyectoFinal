@@ -9,7 +9,7 @@ class Pago(db.Model):
     FechaPago = db.Column(db.DateTime, nullable=True)
     Importe = db.Column(db.Numeric(16,2))
     Comprobante = db.Column(db.String(255), nullable=True)
-    # FechaAlta = db.Column(db.DateTime, nullable=False)
+    
 
     
 

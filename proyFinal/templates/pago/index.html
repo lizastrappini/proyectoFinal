@@ -356,7 +356,7 @@
 <!-- Agregar / Actualizar -->
 <h5>➕ Cómo agregar o actualizar pagos</h5>
 <div class="mb-3">
-  <p>1️⃣ <strong>Agregar un pago:</strong> Hacé click en <strong>“Agregar Pago”</strong> y completá los datos del deportista, importe y fechas.</p>
+  <p>1️⃣ <strong>Agregar un pago:</strong> Hacé click en <strong>“Agregar Pago”</strong> y completá los datos del deportista, estado de la cuota y fechas.</p>
   <p>2️⃣ <strong>Actualizar precio de la cuota:</strong> Ingresa el nuevo monto y presioná <strong>“Guardar”</strong> para modificar su información.</p>
   <p>3️⃣ <strong>Pagar:</strong> Una vez que un pago está registrado, podés marcarlo como abonado.</p>
   <p>⚠️ El importe de la cuota aplicará a partir de la fecha actual y se actualizarán todas las cuotas que tengan estado <strong>No pago</strong>.</p>
@@ -721,7 +721,8 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
         orderable: false,
         searchable: false,
         render: function(data, type, row) {
-          return `<input type="checkbox" class="check-pago form-check-input ml-1" data-id="${row?.id ?? ''}">`;
+          const disabled = row.estado === 'Pago' ? 'disabled' : '';
+          return `<input type="checkbox" class="check-pago form-check-input ml-1" data-id="${row?.id ?? ''}" ${disabled}>`;
         }
       },
       { data: 'deportista' },
@@ -910,9 +911,17 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     });
   });
 
-  $('.btn-export').on('click', function () {
-    tabla.button('.buttons-excel').trigger();
-  });
+$('.btn-export').on('click', function () {
+  const cantidadFilas = tabla.rows({ search: 'applied' }).count();
+
+  if (cantidadFilas === 0) {
+    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+    return;
+  }
+
+  tabla.button('.buttons-excel').trigger();
+});
+
    $('#descargarExcel').on('click', function (e) {
     e.preventDefault();
     window.location.href = '/pago/descargar_planilla';

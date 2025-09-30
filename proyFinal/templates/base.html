@@ -519,41 +519,7 @@
             </div>
 
         </div>
-  <!-- <div id="chatbot-container">
-  <div id="chatbot-box">
-    <div id="chatbot-header">
-      <span>VoleyChat</span>
-      <button id="close-chat">&times;</button>
-    </div>
-    <div id="chat-log"></div>
-    <div id="chat-input-container">
-      <input type="text" id="chat-input" placeholder="Escribí tu pregunta...">
-      <button id="send-btn">Enviar</button>
-    </div>
-    <div id="predefined-questions">
-      <button class="faq-btn">¿Cómo me registro en Voley App?</button>
-      <button class="faq-btn">Olvidé mi contraseña, ¿qué hago?</button>
-      <button class="faq-btn">¿Cómo puedo ver mis pagos deportivos?</button>
-    </div>
-  </div>
-  <div id="chatbot-label">¡Soy VoleyChat!</div>
-  <button id="open-chat">💬</button>
-</div> -->
-<!-- <div id="chatbot-container">
-  <div id="chatbot-box" style="display: none;">
-    <div id="chatbot-header">
-      <span>VoleyChat 🤖</span>
-      <button id="close-chat" class="chat-close">&times;</button>
-    </div>
-    
-    <div id="chat-log">
-    
-    </div>
-  </div>
 
-  <div id="chatbot-label">¡Soy VoleyChat!</div>
-  <button id="open-chat">💬</button>
-</div> -->
 
 <div id="chatbot-container">
   <!-- Caja principal -->
@@ -643,6 +609,10 @@ document.addEventListener("DOMContentLoaded", function () {
     chatbotBox.style.display = "flex";
     openBtn.style.display = "none";
     label.style.display = "none";
+
+    mostrarMensajeBot("¡Hola! Soy VoleyChat 👋 ¿Sobre qué tema querés consultar?");
+
+
     cargarTemas();
   });
 
@@ -651,6 +621,9 @@ document.addEventListener("DOMContentLoaded", function () {
     chatbotBox.style.display = "none";
     openBtn.style.display = "block";
     label.style.display = "block";
+
+    chatLog.innerHTML = "";
+
   });
 
   // Enviar mensaje escrito
@@ -695,7 +668,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Cargar lista de temas
   function cargarTemas() {
-    mostrarMensajeBot("Elegí un tema 👇");
+    
+    
 
     fetch("/chatbot/temas")
       .then(res => res.json())
@@ -718,6 +692,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         chatLog.appendChild(opciones);
         chatLog.scrollTop = chatLog.scrollHeight;
+        
       });
   }
 

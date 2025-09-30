@@ -502,10 +502,16 @@ $(document).ready(function () {
     }
   });
   });
-  // Botón Exportar
-  $('.btn-export').on('click', function () {
-    if (tabla) tabla.button('.buttons-excel').trigger();
-  });
+$('.btn-export').on('click', function () {
+  const cantidadFilas = tabla.rows({ search: 'applied' }).count();
+
+  if (cantidadFilas === 0) {
+    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+    return;
+  }
+
+  tabla.button('.buttons-excel').trigger();
+});
 
   $('#descargarExcel').on('click', function (e) {
     e.preventDefault();

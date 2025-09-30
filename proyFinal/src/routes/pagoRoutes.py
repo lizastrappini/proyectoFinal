@@ -208,7 +208,7 @@ def agregar_pago():
                 if estado_nombre != "NoPago":
                     raise ValueError("El estado debe ser 'NoPago' porque la cuota está vencida y no tiene fecha de pago")
          # Caso 2: Hay fecha de pago
-        else:
+        if fechaPago is not None: 
             if estado_nombre != "Pago":
                 raise ValueError("Si hay fecha de pago, el estado debe ser 'Pago'")
            
@@ -459,6 +459,11 @@ def actualizar_cuota():
         parametro.Valor = str(nuevo_valor)  # ⚠️ convertir a string si es Text
        
         parametroController.actualizar_parametro(parametro)
+        pagos_no_pago = Pago.query.filter_by(IdEstado=generalEnum.EstadoPagoEnum['NoPago'].value).all()
+        for pago in pagos_no_pago:
+            pago.Importe = nuevo_valor
+
+        db.session.commit()
        
         deportistas = Usuario.query.filter_by(IdRol=2).all()  # rol 2 = deportista
         enviados = parametroController.enviar_mail_actualizacion(deportistas, parametro)

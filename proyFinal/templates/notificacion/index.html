@@ -12,7 +12,7 @@
         {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador) %}
           <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
 
-            <div class="form-floating form-floating-outline" style="min-width: 200px;">
+            <div class="form-floating form-floating-outline" style="min-width: 180px;">
               <input type="text" id="filtroBuscar" class="form-control" placeholder="Buscar...">
               <label for="filtroBuscar">Buscar</label>
             </div>
@@ -170,7 +170,14 @@
   {% endblock %}
 
   {% block scripts %}
+<style>
+#tablaNotificaciones td.descripcion {
+    white-space: normal !important; /* permite salto de línea */
+    word-wrap: break-word;           /* fuerza quiebre de palabras largas */
+    max-width: 300px;                /* ancho máximo de la columna */
+}
 
+</style>
 
  <script>
   let tabla = null;
@@ -190,7 +197,7 @@
     columns: [
       { data: 'id' },
       { data: 'titulo' },
-      { data: 'descripcion' },
+      { data: 'descripcion', className: 'descripcion' },
       { data: 'categoria' },
       { data: 'rama' },
       { data: 'division' },
