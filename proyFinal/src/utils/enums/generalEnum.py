@@ -82,7 +82,7 @@ class ContrincantesEnum(enum.IntEnum):
     Citta = 6
     Ger = 7
     Provincial = 8
-    RedEstar = 9
+    RedStar = 9
     Rowing = 10
     Atalaya  = 11
     Regatas =12

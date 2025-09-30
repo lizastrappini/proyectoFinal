@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
     <html
     lang="en"
@@ -8,7 +7,6 @@
     data-assets-path="../static/"
     data-template="vertical-menu-template"
     data-style="light">
-  
 
     <head>
       <meta charset="utf-8" />
@@ -19,51 +17,29 @@
       <title>Inicio</title>
   
       <meta name="description" content="" />
-  
-      <!-- Favicon -->
-      
-      <link rel="icon" type="image/x-icon" href="../static/img/favicon/icono-pelota.png" />
-  
-        <!-- Fonts -->
+
+       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" type="image/x-icon" href="../static/img/favicon/icono-pelota.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-          rel="stylesheet" />
-
-        <!-- Icons -->
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="../static/fonts/remixicon/remixicon.css" />
         <link rel="stylesheet" href="../static/fonts/flag-icons.css" />
-
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-        <!-- Core CSS -->
         <link rel="stylesheet" href="../static/rtl/core.css" />
         <link rel="stylesheet" href="../static/rtl/theme-default.css" />
         <link rel="stylesheet" href="../static/rtl/demo.css" />
         <link rel="stylesheet" href="../static/pages/front-page.css" />
-
-        <!--css por paginas-->
         <link rel="stylesheet" href="../static/pages/wizard-ex-checkout.css" />
-
-        <!-- Vendors CSS -->
         <link rel="stylesheet" href="../static/libs/select2/select2.css" />
         <link rel="stylesheet" href="../static/libs/bs-stepper/bs-stepper.css" />
         <link rel="stylesheet" href="../static/libs/rateyo/rateyo.css" />
         <link rel="stylesheet" href="../static/libs/@form-validation/form-validation.css" />
-
-        <!-- bootstrap -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-        <!-- Helpers -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <script src="../static/js/helpers.js"></script>
-        <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-        <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
         <script src="../static/js/template-customizer.js"></script>
-        <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
         <script src="../static/js/front-config.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-        <!-- Vendors CSS -->
         <link rel="stylesheet" href="../static/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
         <link rel="stylesheet" href="../static/vendor/libs/typeahead-js/typeahead.css" />
         <link rel="stylesheet" href="../static/vendor/libs/fullcalendar/fullcalendar.css" />
@@ -71,89 +47,26 @@
         <link rel="stylesheet" href="../static/vendor/libs/select2/select2.css" />
         <link rel="stylesheet" href="../static/vendor/libs/quill/editor.css" />
         <link rel="stylesheet" href="../static/vendor/libs/@form-validation/form-validation.css" />
-
-        <!-- Page CSS -->
-
         <link rel="stylesheet" href="../static/vendor/css/pages/app-calendar.css" />
-
-            <!-- Helpers -->
-        <script src="../static/vendor/js/helpers.js"></script>
-        <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-        <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
         <script src="../static/vendor/js/template-customizer.js"></script>
-        <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-        <!-- CSS de Select2 -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-        <!-- SweetAlert2 CSS -->
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
-        <!-- SweetAlert2 JS -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <!-- DataTables Buttons CSS -->
         <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
-
-        <!-- DataTables y Buttons JS -->
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-        <!-- FullCalendar CSS -->
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet" />
-
-        <!-- FullCalendar JS -->
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.global.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
-        <!-- Tu archivo de configuración -->
-        <!-- Font Awesome -->
-         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
-
-   
+        <link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
         <script src="../static/js/app-calendar.js"></script>
 
-        <!-- CSS del chatbot -->
-<!-- <style>
-    #chatbot-container { position: fixed; bottom: 20px; right: 20px; font-family: 'Open Sans', sans-serif; z-index: 9999; width: 320px; max-width: 90%; }
-    #chatbot-header { background-color: #666cff; color: white; padding: 12px 15px; border-top-left-radius: 12px; border-top-right-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    #chatbot-header button { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; line-height: 1; }
-    #chatbot-box { display: none; background: #f8f9fc; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); overflow: hidden; flex-direction: column; max-height: 450px; }
-    #chat-log { flex: 1; padding: 12px; overflow-y: auto; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
-    #chat-log .bot-msg { background: #e2e6ea; color: #333; padding: 8px 12px; border-radius: 12px; align-self: flex-start; max-width: 80%; word-wrap: break-word; }
-    #chat-log .user-msg { background: #666cff; color: white; padding: 8px 12px; border-radius: 12px; align-self: flex-end; max-width: 80%; word-wrap: break-word; }
-    #chat-input-container { display: flex; border-top: 1px solid #ddd; }
-    #chat-input { flex: 1; padding: 10px 12px; border: none; font-size: 14px; }
-    #send-btn { background-color: #666cff; border: none; color: white; padding: 0 18px; cursor: pointer; font-weight: 600; }
-    #predefined-questions { display: flex; flex-wrap: wrap; padding: 10px; gap: 6px; background: #f1f3f5; }
-    .faq-btn { background-color: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-    .faq-btn:hover { background-color: #666cff; color: white; border-color: #666cff; }
-    #open-chat { background-color: #666cff; border: none; color: white; padding: 14px 18px; border-radius: 50%; cursor: pointer; font-size: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); position: fixed; bottom: 20px; right: 20px; z-index: 9998; transition: all 0.2s; }
-    #open-chat:hover { transform: scale(1.1); }
-    #chatbot-label {
-  position: absolute;
-  bottom: 70px; /* altura sobre el botón */
-  right: 20px; /* alineado con el botón */
-  background-color: #666cff;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  white-space: nowrap;
-  display: block; /* visible por defecto */
-  z-index: 9999;
-}
-  </style>  -->
     </head>
+
     <body data-rol="{{ current_user.IdRol }}">
 
         <script src="../static/js/dropdown-hover.js"></script>
@@ -555,7 +468,7 @@
       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
       
       <!-- Bootstrap Bundle JS (con Popper incluido, no hace falta Popper aparte) -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
       <!-- Plugins que dependen de jQuery -->
       <script src="../static/libs/select2/select2.js"></script>
@@ -578,7 +491,6 @@
       <script src="../static/vendor/libs/i18n/i18n.js"></script>
       <script src="../static/vendor/libs/typeahead-js/typeahead.js"></script>
       <script src="../static/vendor/js/menu.js"></script>
-      <script src="../static/json/locales/calendar-es.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
