@@ -1,23 +1,23 @@
 from flask import current_app, render_template, url_for
 from flask_mail import Message
+from sqlalchemy import or_
 from src.models.usuario import Usuario
 from src.utils.enums import generalEnum
-from src.utils.enums.generalEnum import CategoriaEnum , EstadoEnum
+from src.utils.enums.generalEnum import CategoriaEnum, DivisionEnum , EstadoEnum, RamaEnum
 from src import db
 from src.utils.Mail import mail
 
-def obtener_entrenadores(categoria=None, dni=None):
+def obtener_entrenadores(buscar=None):
     query = Usuario.query.filter_by(IdRol=3)
-
-    if categoria:
-        try:
-            categoria_valor = int(categoria)
-            query = query.filter_by(IdCategoria=str(categoria_valor))
-        except KeyError:
-            return []
-    if dni:
-        query = query.filter(Usuario.Dni == int(dni))
-
+    if buscar:
+        like_pattern = f"%{buscar}%"
+        query = query.filter(
+            or_(
+                Usuario.Apellido.ilike(like_pattern),
+                Usuario.Nombre.ilike(like_pattern),
+                Usuario.Dni.ilike(like_pattern)
+            )
+        )
     entrenadores = []
     for e in query.all():
         try:
@@ -25,6 +25,26 @@ def obtener_entrenadores(categoria=None, dni=None):
             categoria_nombre = cat_enum.name 
         except (ValueError, KeyError):
             categoria_nombre = 'Desconocido'
+        # Division
+        if e.IdDivision is not None:
+            try:
+                div_enum = DivisionEnum(int(e.IdDivision))
+                division_nombre = div_enum.name
+            except (ValueError, KeyError):
+                division_nombre = "Desconocido"
+        else:
+            division_nombre = "-"
+
+        # Rama
+        if e.IdRama is not None:
+            try:
+                rama_enum = RamaEnum(int(e.IdRama))
+                rama_nombre = rama_enum.name
+            except (ValueError, KeyError):
+                rama_nombre = "Desconocido"
+        else:
+            rama_nombre = "-"
+
 
         try:
             est_enum = EstadoEnum(int(e.IdEstado))
@@ -41,6 +61,8 @@ def obtener_entrenadores(categoria=None, dni=None):
             'email': e.Email,
             'telefono': e.Telefono,
             'categoria': categoria_nombre,
+            'division': division_nombre,
+            'rama': rama_nombre,
             'estado': estado_nombre
         })
 
@@ -73,7 +95,7 @@ def enviar_mail_alta_entrenador(entrenador, password):
         return False
 
     msg = Message(
-        subject="Voley App - Bienvenida",
+        subject="Voley App - Mensaje Bienvenida",
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[entrenador.Email]
     )

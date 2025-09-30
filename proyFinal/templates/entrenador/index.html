@@ -10,7 +10,7 @@
       <h2 class="card-header">Entrenadores</h2>
       <div class="card-body">
         <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
-          <div class="form-floating form-floating-outline" style="min-width: 180px;"> 
+          <!-- <div class="form-floating form-floating-outline" style="min-width: 180px;"> 
             <select id="categoriaFiltro"
                     class="select2 form-select" 
                     data-allow-clear="true"
@@ -20,19 +20,12 @@
                 <option value="{{ cat.value }}">{{ cat.text }}</option>
               {% endfor %}
             </select>
-          </div>
-
-          <!-- <div class="form-floating form-floating-outline" style="min-width: 180px;">
-            <select id="entrenadorFiltro"
-                    class="select2 form-select form-select-sm" 
-                    data-allow-clear="true"
-                    data-placeholder="Entrenador">
-              <option value=""></option>
-              {% for entrenador in entrenadores %}
-                <option value="{{ entrenador.dni }}">{{ entrenador.nombre }} {{ entrenador.apellido }}</option>
-              {% endfor %}
-            </select>
           </div> -->
+          <div class="form-floating form-floating-outline" style="min-width: 200px;">
+                <input type="text" id="filtroBuscar" class="form-control" placeholder="Buscar...">
+                <label for="filtroBuscar">Buscar</label>
+              </div>
+
 
           <button id="btnFiltrarEntrenador" class="btn btn-primary waves-effect waves-light">
             Filtrar
@@ -56,7 +49,9 @@
                 <th>Apellido</th>
                 <th>Email</th> 
                 <th>Teléfono</th> 
-                <th>Categorías</th> 
+                <th>Categoría</th> 
+                <th>División</th> 
+                <th>Rama</th> 
                 <th>Estado</th> 
                 <th>Acciones</th>
               </tr>
@@ -138,10 +133,11 @@
                               class="form-control"
                               value=""
                               placeholder="" 
-                              required/>
+                              />
                             <label for="modalEditUserLastName">Teléfono</label>
                           </div>
                         </div>
+                     
                        
                      <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
@@ -154,6 +150,31 @@
                             </select>
                           </div>
                           </div>
+                           <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
+                            <label for="division" class="form-label">División</label>
+                            <select class="form-select" id="division" name="division" >
+                              <option value="">Seleccione una división</option>
+                              {% for division in divisiones %}
+                                <option value="{{ division.text }}">{{ division.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                          <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="3">
+                            <label for="rama" class="form-label">Rama</label>
+                            <select class="form-select" id="rama" name="rama" >
+                              <option value="">Seleccione una rama</option>
+                              {% for rama in ramas %}
+                                <option value="{{ rama.text }}">{{ rama.text }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          </div>
+                           
+
+                        
 
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="4">
@@ -214,6 +235,8 @@ $(document).ready(function () {
       { data: 'email' },
       { data: 'telefono' },
       { data: 'categoria' },
+      { data: 'division' },
+      { data: 'rama' },
       {
         data: 'estado',
         render: function (data) {
@@ -308,10 +331,10 @@ $('.btn-export').on('click', function () {
 
   // Función de filtrado
   function filtrar() {
-    const categoria = $('#categoriaFiltro').val();
     
-
-    const url = `/entrenador/filtrar?categoria=${encodeURIComponent(categoria || '')}`;
+    const buscar = $('#filtroBuscar').val();
+    
+    const url = `/entrenador/filtrar?buscar=${encodeURIComponent(buscar || '')}`;
     tabla.ajax.url(url).load(); // ✅ recarga sobre la tabla ya creada
   }
 
@@ -338,6 +361,10 @@ $('.btn-export').on('click', function () {
       $('#email').val(detalle.email);
       $('#telefono').val(detalle.telefono);
       $('#categoria').val(detalle.categoria).trigger('change');
+      $('#rama').val(detalle.rama).trigger('change');
+      $('#division').val(detalle.division).trigger('change');
+      
+
 
       if (detalle.categoriaExtra) {
         const extras = Array.isArray(detalle.categoriaExtra)
@@ -365,7 +392,7 @@ $('.btn-export').on('click', function () {
     errorDiv.classList.add('d-none');
     errorDiv.textContent = '';
     $('#editEntrenadorForm')[0].reset();
-    $('#categoria, #categoriaExtra').val(null).trigger('change');
+    $('#categoria, #categoriaExtra, #rama, #division').val(null).trigger('change');
     $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
     $('#submitBtn').text('Crear');
     $('#tituloAdd').text('Agregar Entrenador');
@@ -389,7 +416,7 @@ $('.btn-export').on('click', function () {
       Swal.fire({ icon: 'success', title: data.message.includes('creado') ? 'Entrenador creado' : 'Entrenador actualizado', text: data.message, showConfirmButton: false, timer: 2000 });
       $('#addUser').modal('hide');
       $('#editEntrenadorForm')[0].reset();
-      $('#categoria,#categoriaExtra').val(null).trigger('change');
+      $('#categoria,#categoriaExtra,#rama, #division').val(null).trigger('change');
       $('#editEntrenadorForm').attr('action', '{{ url_for("entrenador.agregar_entrenador") }}');
       $('#submitBtn').text('Crear');
       $('#tituloAdd').text('Agregar Entrenador');
@@ -434,8 +461,8 @@ $('.btn-export').on('click', function () {
 
   // Limpiar filtros
   function limpiar() {
-    $('#categoriaFiltro').val('').trigger('change');
-    
+    $('#filtroBuscar').val('').trigger('change');
+
     filtrar(); // recarga sin filtros
   }
 

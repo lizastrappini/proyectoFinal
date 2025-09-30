@@ -30,7 +30,7 @@ class LocalidadEnum(enum.IntEnum):
     Carcaraña = 12
     CañadaDeGomez = 13
     SanNicolas = 14 
-    NoDefinido = 0
+    
 
 
 class CategoriaEnum(enum.IntEnum): 
@@ -41,7 +41,7 @@ class CategoriaEnum(enum.IntEnum):
     Sub18 = 5
     Sub21 = 6
     Primera = 7
-    NoEspecificada = 0
+    SinCategoria = 0
     
 class DivisionEnum(enum.IntEnum):
     A = 1
