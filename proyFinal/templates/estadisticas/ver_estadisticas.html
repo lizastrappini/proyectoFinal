@@ -103,28 +103,68 @@
     </div>
   </div>
 
-  <div class="col-xxl-4 col-md-6 col-sm-12">
-    <div class="card h-100">
-      <div class="card-header">
-        <h5 class="mb-0">Bloqueos</h5>
-      </div>
-      <div class="card-body">
-        <div id="bloqueosPartidos" style="height:240px;"></div>
-      </div>
-    </div>
-  </div>
+  
 
   <div class="col-xxl-4 col-md-4 col-sm-12">
     <div class="card h-100">
       <div class="card-header">
         <h5 class="mb-0">Recepciones</h5>
       </div>
-      <div class="card-body">
+      <div class="card-body" style="margin-top: 6%;">
         <div id="recepcionesPartidos" style="height:240px;"></div>
       </div>
     </div>
   </div>
 
+  
+  <div class="col-xxl-8 col-md-6 col-sm-12">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="mb-0">Rotaciones</h5>
+      </div>
+      <div class="card-body">
+        <div id="rotacionesPartidos" style="height:240px;"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="col-xxl-6 col-md-6 col-sm-12">
+  <div class="card h-100">
+    <div class="card-header">
+      <h5 class="mb-0"></h5>
+    </div>
+    <div class="card-body" style="margin-top: 8%">
+      <div class="row">
+        <!-- Bloqueos -->
+        <div class="col-md-6 col-12 d-flex flex-column align-items-center">
+          <h5 class="mb-2">Bloqueos</h5>
+          <div id="bloqueosPartidos" style="height:240px; width:100%;"></div>
+        </div>
+
+        <!-- Saques -->
+        <div class="col-md-6 col-12 d-flex flex-column align-items-center">
+          <h5 class="mb-2">Saques</h5>
+          <div id="saquesPartidos" style="height:240px; width:100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-xxl-6 col-md-6 col-sm-12">
+  <div class="card h-100">
+    <div class="card-header">
+      <h5 class="mb-0">Transiciones</h5>
+    </div>
+    <div class="card-body">
+      <div id="transicionesProgressList" class="row g-4"></div>
+    </div>
+  </div>
+</div>
+
+
+       
+</div>
 </div>
 
 
@@ -243,6 +283,9 @@ $('#partidoDescargar').select2({
         partidosPorCategoria(res.partidos);
         bloqueoPartidos(res.partidos);
         renderRecepcionesChart(res.partidos);
+        renderRotacionesChart(res.partidos);
+        renderTransicionesChart(res.partidos);
+        saquesPartidos(res.partidos);
     });
   });
 });
@@ -250,6 +293,7 @@ const partidosResultadoEl = document.querySelector('#partidosResultado');
 const partidosPorCategoriaEl = document.querySelector('#partidosPorCategoria');
 const bloqueosEl = document.querySelector('#bloqueosPartidos');
 const recepcionesPartidosEl = document.querySelector('#recepcionesPartidos');
+const saquesEl = document.querySelector('#saquesPartidos');
 
 function resultadoPartidos(estadisticas) {
   const ganados = estadisticas.partidos_ganados ?? 0;
@@ -448,7 +492,9 @@ function renderRecepcionesChart(estadisticas) {
     estadisticas.RE2 ?? 0,
     estadisticas.RE3 ?? 0
   ];
+
   const categories = ['E', 'V', '1', '2', '3'];
+  const etiquetasTooltip = ['EJEMPLO LEYENDA', 'REV', 'RE1', 'RE2', 'RE3']; // LEYENDA PARA RECEPCIONES
 
   const recepcionesChartEl = document.querySelector('#recepcionesPartidos');
 
@@ -460,59 +506,398 @@ function renderRecepcionesChart(estadisticas) {
       toolbar: { show: false }
     },
     plotOptions: {
-    bar: {
+      bar: {
         borderRadius: 12,
-        distributed: true,   // cada barra puede tener su color
+        distributed: true,
         columnWidth: '50%',
         endingShape: 'rounded',
         startingShape: 'rounded'
-    }
+      }
     },
     series: [{ data: seriesData }],
-    tooltip: { enabled: false },
+    tooltip: {
+      enabled: true,
+      style: {
+        fontSize: '12px'
+      },
+      onDatasetHover: {
+        highlightDataSeries: false
+      },
+      custom: function ({ dataPointIndex }) {
+        const nombre = etiquetasTooltip[dataPointIndex];
+        return `<div class="px-3 py-2">
+                  <span>${nombre}</span>
+                </div>`;
+      }
+    },
     legend: { show: false },
     dataLabels: {
       enabled: true,
       style: {
         fontSize: '0.9rem',
         fontWeight: 'bold',
-        colors: ['#000'] // color de los números
+        colors: ['#000']
       },
-      formatter: function(val) { return val; }, // mostrar valor exacto
-      offsetY: -6 // que quede encima de la barra
+      formatter: function(val) {
+        return val;
+      },
+      offsetY: -6
     },
     colors: [
-        config.colors_label.warning,  // REE
-        config.colors.warning,        // REV
-        config.colors.success,        // RE1
-        config.colors.info,           // RE2
-        config.colors.danger          // RE3
-        ],
-    grid: { show: false, padding: { top: -15, left: -7, right: -4 } },
-    states: { 
-      hover: { filter: { type: 'none' } }, 
-      active: { filter: { type: 'none' } } 
+      config.colors_label.warning,  // REE
+      config.colors.warning,        // REV
+      config.colors.success,        // RE1
+      config.colors.info,           // RE2
+      config.colors.danger          // RE3
+    ],
+    grid: {
+      show: false,
+      padding: {
+        top: -15,
+        left: -7,
+        right: -4
+      }
+    },
+    states: {
+      hover: { filter: { type: 'none' } },
+      active: { filter: { type: 'none' } }
     },
     xaxis: {
       axisTicks: { show: false },
       axisBorder: { show: false },
       categories: categories,
-      labels: { style: { colors: config.colors.bodyColor } }
+      labels: {
+        style: {
+          colors: config.colors.bodyColor
+        }
+      }
     },
-    yaxis: { show: false },
+    yaxis: {
+      show: false
+    },
     responsive: [
-      { breakpoint: 1200, options: { chart: { height: 266 } } }
+      {
+        breakpoint: 1200,
+        options: {
+          chart: { height: 266 }
+        }
+      }
     ]
   };
 
   if (recepcionesChartEl) {
     if (window.recepcionesChart) {
-      window.recepcionesChart.updateOptions({ series: [{ data: seriesData }], xaxis: { categories } });
+      window.recepcionesChart.updateOptions({
+        series: [{ data: seriesData }],
+        xaxis: { categories }
+      });
     } else {
       window.recepcionesChart = new ApexCharts(recepcionesChartEl, recepcionesChartConfig);
       window.recepcionesChart.render();
     }
   }
 }
+
+function renderRotacionesChart(estadisticas) {
+  const seriesData = [
+    estadisticas.ROE ?? 0,
+    estadisticas.ROB ?? 0,
+    estadisticas.RO1 ?? 0,
+    estadisticas.RO2 ?? 0,
+    estadisticas.RO3 ?? 0,
+    estadisticas.RO4 ?? 0
+  ];
+
+  const etiquetasVisibles = ['E', 'B', '1', '2', '3', '4'];
+  const etiquetasTooltip = ['Recepciones vendidas', 'ROB', 'RO1', 'RO2', 'RO3', 'RO4']; //LEYENDA PARA ROTACIONES
+
+  const rotacionesChartEl = document.querySelector('#rotacionesPartidos');
+
+  const rotacionesChartConfig = {
+    chart: {
+      height: 270,
+      type: 'bar',
+      toolbar: { show: false }
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        distributed: true,
+        barHeight: '70%',
+        borderRadius: 7
+      }
+    },
+    series: [{
+      data: seriesData
+    }],
+    colors: [
+      '#FFD700',
+      '#FF69B4',
+      '#40E0D0',
+      '#FF4500',
+      '#8A2BE2',
+      '#00BFFF'
+    ],
+    dataLabels: {
+      enabled: true,
+      style: {
+        colors: ['#000'],
+        fontWeight: 500,
+        fontSize: '13px',
+        fontFamily: 'var(--bs-body-font-family)'
+      },
+      formatter: function (val) {
+        return val;
+      },
+      offsetX: 0
+    },
+    tooltip: {
+  enabled: true,
+  style: {
+    fontSize: '12px'
+  },
+  onDatasetHover: {
+    highlightDataSeries: false
+  },
+  custom: function ({ dataPointIndex }) {
+    const nombre = etiquetasTooltip[dataPointIndex];
+    return `<div class="px-3 py-2">
+              <span>${nombre}</span>
+            </div>`;
+  }
+},
+
+    yaxis: {
+      categories: etiquetasVisibles,
+      labels: {
+        show: true,
+        style: {
+          colors: config.colors.bodyColor,
+          fontFamily: 'var(--bs-body-font-family)',
+          fontSize: '13px'
+        }
+      }
+    },
+    xaxis: {
+      labels: {
+        style: {
+          colors: config.colors.bodyColor,
+          fontSize: '13px',
+          fontFamily: 'var(--bs-body-font-family)'
+        }
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
+    },
+    grid: {
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: false } },
+      padding: { top: -15, left: 10, right: 20 }
+    },
+    legend: { show: false },
+     labels: ['E', 'B', '1', '2', '3', '4'], //NOMBRE PARA CADA BARRA EN EL EJE Y
+  };
+
+  if (rotacionesChartEl) {
+    if (window.rotacionesChart) {
+      window.rotacionesChart.updateOptions({
+        series: [{ data: seriesData }],
+        yaxis: { categories: etiquetasVisibles }
+      });
+    } else {
+      window.rotacionesChart = new ApexCharts(rotacionesChartEl, rotacionesChartConfig);
+      window.rotacionesChart.render();
+    }
+  }
+}
+
+function radialBarChart(colorIndex, value, show) {
+  const fixedColors = [
+    '#7367F0', // primary
+    '#28C76F', // success
+    '#FF9F43', // warning
+    '#00CFE8', // info
+    '#EA5455', // danger
+    '#82868b', // secondary
+    '#343a40'  // dark
+  ];
+
+  const color = fixedColors[colorIndex % fixedColors.length];
+
+  const radialBarChartOpt = {
+    chart: {
+      height: show == 'true' ? 58 : 55,
+      width: show == 'true' ? 58 : 45,
+      type: 'radialBar'
+    },
+    plotOptions: {
+      radialBar: {
+        hollow: {
+          size: show == 'true' ? '45%' : '25%'
+        },
+        dataLabels: {
+          show: show == 'true',
+          value: {
+            offsetY: -10,
+            fontSize: '15px',
+            fontWeight: 500,
+            fontFamily: 'var(--bs-body-font-family)',
+            color: '#000'  // texto negro
+          }
+        },
+        track: {
+          background: '#e9ecef'
+        }
+      }
+    },
+    stroke: {
+      lineCap: 'round'
+    },
+    colors: [color],
+    grid: {
+      padding: {
+        top: show == 'true' ? -12 : -15,
+        bottom: show == 'true' ? -17 : -15,
+        left: show == 'true' ? -17 : -5,
+        right: -15
+      }
+    },
+    series: [Number(value)],
+    labels: show == 'true' ? [''] : ['']
+  };
+
+  return radialBarChartOpt;
+}
+
+  const chartProgressList = document.querySelectorAll('.chart-progress');
+if (chartProgressList) {
+  chartProgressList.forEach(function (chartProgressEl, index) {
+    const series = chartProgressEl.dataset.series;
+    const variant = chartProgressEl.dataset.progress_variant;
+    const options = radialBarChart(index, series, variant); // 👈 usamos el index
+    const chart = new ApexCharts(chartProgressEl, options);
+    chart.render();
+  });
+}
+
+function renderTransicionesChart(estadisticas) {
+  const transiciones = [
+    { key: 'TRE', label: 'EJEMPLO TITULO TRE' }, //LEYENDAS PARA TRANSICIONES
+    { key: 'TRB', label: 'EJEMPLO TITULO' },
+    { key: 'TR0', label: 'EJEMPLO TITULO' },
+    { key: 'TR1', label: 'EJEMPLO TITULO' },
+    { key: 'TR2', label: 'EJEMPLO TITULO' },
+    { key: 'TR3', label: 'EJEMPLO TITULO' },
+    { key: 'TR4', label: 'EJEMPLO TITULO' }
+  ];
+
+  const total = estadisticas.TRTOTAL ?? 1; 
+  const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary', 'dark'];
+
+  const container = document.querySelector('#transicionesProgressList');
+  container.innerHTML = ''; 
+
+
+transiciones.forEach((trans, index) => {
+  const valor = estadisticas[trans.key] ?? 0;
+  const porcentaje = Math.round((valor / total) * 100);
+
+  const div = document.createElement('div');
+
+  // 👇 si es el último (index === transiciones.length - 1) -> centrado
+  if (index === transiciones.length - 1) {
+    div.className = 'col-12 col-md-4 offset-md-4 d-flex justify-content-center';
+  } else {
+    div.className = 'col-12 col-md-4 d-flex justify-content-center';
+  }
+
+  div.innerHTML = `
+    <div class="d-flex flex-column align-items-center">
+      <div class="chart-progress mb-2"
+           data-index="${index}"
+           data-series="${porcentaje}"
+           data-progress_variant="true"></div>
+      <h6 class="mb-1">${trans.label}</h6>
+      <p class="mb-0 small">${valor} de ${total}</p>
+    </div>
+  `;
+
+  container.appendChild(div);
+});
+
+
+// Render Apex radial charts
+const chartProgressList = document.querySelectorAll('.chart-progress');
+if (chartProgressList) {
+  chartProgressList.forEach(function (chartProgressEl) {
+    const index = parseInt(chartProgressEl.dataset.index);
+    const series = chartProgressEl.dataset.series;
+    const variant = chartProgressEl.dataset.progress_variant;
+    const options = radialBarChart(index, series, variant); // 👈 ahora sí index
+    const chart = new ApexCharts(chartProgressEl, options);
+    chart.render();
+  });
+}
+}
+
+function saquesPartidos(estadisticas) {
+  const saquesEl = document.querySelector('#saquesPartidos');
+
+  const series = [
+    estadisticas.SA0 ?? 0,
+    estadisticas.SA1 ?? 0,
+    estadisticas.SA2 ?? 0,
+    estadisticas.SA3 ?? 0,
+    estadisticas.SA4 ?? 0
+  ];
+
+  if (window.saquesChart) {
+    window.saquesChart.updateSeries(series);
+  } else {
+    const configSaques = {
+      chart: { height: 240, type: 'donut' },
+      labels: ['Error (SA0)', 'Malo (SA1)', 'Regular (SA2)', 'Bueno (SA3)', 'Excelente (SA4)'], //LEYENDAS PARA SAQUES
+      series: series,
+      colors: [
+          '#FFD700', // amarillo
+          '#FF69B4', // rosa
+          '#40E0D0', // turquesa
+          '#FF4500', // naranja/rojo
+          '#8A2BE2'  // violeta
+        ],
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '70%',
+            labels: {
+              show: true,
+              value: {
+                fontWeight: 600,
+                fontFamily: 'var(--bs-body-font-family)',
+                formatter: function(val) { return parseInt(val); }
+              },
+              total: {
+                show: true,
+                fontSize: '1.2rem',
+                color: config.colors.headingColor,
+                fontWeight: 600,
+                label: 'Total',
+                fontFamily: 'var(--bs-body-font-family)',
+                formatter: function(w) {
+                  return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                }
+              }
+            }
+          }
+        }
+      },
+      legend: { show: false },
+      dataLabels: { enabled: false }
+    };
+    window.saquesChart = new ApexCharts(saquesEl, configSaques);
+    window.saquesChart.render();
+  }
+}
+
 </script>
 {% endblock %}

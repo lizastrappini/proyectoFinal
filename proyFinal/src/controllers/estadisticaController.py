@@ -125,6 +125,56 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
         *filtros_usuario
     ).one()
 
+    # --- Rotaciones ---
+    rotaciones_resumen = db.session.query(
+        func.sum(EstadisticaUsuarioPartido.ROE).label("ROE"),
+        func.sum(EstadisticaUsuarioPartido.ROB).label("ROB"),
+        func.sum(EstadisticaUsuarioPartido.RO1).label("RO0"),
+        func.sum(EstadisticaUsuarioPartido.RO1).label("RO1"),
+        func.sum(EstadisticaUsuarioPartido.RO2).label("RO2"),
+        func.sum(EstadisticaUsuarioPartido.RO3).label("RO3"),
+        func.sum(EstadisticaUsuarioPartido.RO4).label("RO4"),
+        func.sum(EstadisticaUsuarioPartido.ROTOTAL).label("ROTOTAL")
+    ).join(
+        EstadisticaPorPartido, EstadisticaUsuarioPartido.IdEstadisticaPorPartido == EstadisticaPorPartido.Id
+    ).filter(
+        *filtros_usuario
+    ).one()
+
+
+
+    # --- Transiciones ---
+    transiciones_resumen = db.session.query(
+        func.sum(EstadisticaUsuarioPartido.TRE).label("TRE"),
+        func.sum(EstadisticaUsuarioPartido.TRB).label("TRB"),
+        func.sum(EstadisticaUsuarioPartido.TR0).label("TR0"),
+        func.sum(EstadisticaUsuarioPartido.TR1).label("TR1"),
+        func.sum(EstadisticaUsuarioPartido.TR2).label("TR2"),
+        func.sum(EstadisticaUsuarioPartido.TR3).label("TR3"),
+        func.sum(EstadisticaUsuarioPartido.TR4).label("TR4"),
+        func.sum(EstadisticaUsuarioPartido.TRTOTAL).label("TRTOTAL")
+    ).join(
+        EstadisticaPorPartido, EstadisticaUsuarioPartido.IdEstadisticaPorPartido == EstadisticaPorPartido.Id
+    ).filter(
+        *filtros_usuario
+    ).one()
+
+
+    # --- Saques ---
+    saques_resumen = db.session.query(
+        func.sum(EstadisticaUsuarioPartido.SA0).label("SA0"),
+        func.sum(EstadisticaUsuarioPartido.SA1).label("SA1"),
+        func.sum(EstadisticaUsuarioPartido.SA2).label("SA2"),
+        func.sum(EstadisticaUsuarioPartido.SA3).label("SA3"),
+        func.sum(EstadisticaUsuarioPartido.SA4).label("SA4"),
+        func.sum(EstadisticaUsuarioPartido.SATOTAL).label("SATOTAL")
+    ).join(
+        EstadisticaPorPartido, EstadisticaUsuarioPartido.IdEstadisticaPorPartido == EstadisticaPorPartido.Id
+    ).filter(
+        *filtros_usuario
+    ).one()
+
+
     # --- Resumen final ---
     resumen_dict = {
         "partidos_jugados": int(partidos_resumen.partidos_jugados or 0),
@@ -143,7 +193,29 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
         "REV": int(recepciones_resumen.REV or 0),
         "RE1": int(recepciones_resumen.RE1 or 0),
         "RE2": int(recepciones_resumen.RE2 or 0),
-        "RE3": int(recepciones_resumen.RE3 or 0)
+        "RE3": int(recepciones_resumen.RE3 or 0),
+        "ROE": int(rotaciones_resumen.ROE or 0),
+        "ROB": int(rotaciones_resumen.ROB or 0),
+        "RO0": int(rotaciones_resumen.RO0 or 0),
+        "RO1": int(rotaciones_resumen.RO1 or 0),
+        "RO2": int(rotaciones_resumen.RO2 or 0),
+        "RO3": int(rotaciones_resumen.RO3 or 0),
+        "RO4": int(rotaciones_resumen.RO4 or 0),
+        "ROTOTAL": int(rotaciones_resumen.ROTOTAL or 0),
+        "TRE": int(transiciones_resumen.TRE or 0),
+        "TRB": int(transiciones_resumen.TRB or 0),
+        "TR0": int(transiciones_resumen.TR0 or 0),
+        "TR1": int(transiciones_resumen.TR1 or 0),
+        "TR2": int(transiciones_resumen.TR2 or 0),
+        "TR3": int(transiciones_resumen.TR3 or 0),
+        "TR4": int(transiciones_resumen.TR4 or 0),
+        "TRTOTAL": int(transiciones_resumen.TRTOTAL or 0),
+        "SA0": int(saques_resumen.SA0 or 0),
+        "SA1": int(saques_resumen.SA1 or 0),
+        "SA2": int(saques_resumen.SA2 or 0),
+        "SA3": int(saques_resumen.SA3 or 0),
+        "SA4": int(saques_resumen.SA4 or 0),
+        "SATOTAL": int(saques_resumen.SATOTAL or 0)
     }
 
     return resumen_dict
