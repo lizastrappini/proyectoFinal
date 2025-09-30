@@ -46,6 +46,13 @@
                           <label for="dni">DNI</label>
                         </div>
                       </div> 
+                      
+                       <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <input class="form-control" type="text" id="usuario" name="usuario" value="{{ usuario.usuario }}" readonly disabled  />
+                          <label for="usuario">Usuario</label>
+                        </div>
+                      </div> 
 
                       <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
@@ -153,6 +160,7 @@
                                         id="newPassword"
                                         name="newPassword"
                                         placeholder="••••••••••••"
+                                        required
                                         class="form-control {% if errors and errors.newPassword %}is-invalid{% endif %}" />
                                       <label for="newPassword">Nueva Contraseña</label>
                                     </div>
@@ -178,12 +186,11 @@
                                         id="confirmPassword"
                                         name="confirmPassword"
                                         placeholder="••••••••••••"
+                                        required
                                         class="form-control {% if errors and errors.confirmPassword %}is-invalid{% endif %}" />
                                       <label for="confirmPassword">Confirmar nueva contraseña</label>
                                     </div>
-                                    <!-- <span class="input-group-text cursor-pointer toggle-password">
-                                      <i class="ri-eye-off-line"></i>
-                                    </span> -->
+                            
                                   </div>
                                   {% if errors and errors.confirmPassword %}
                                     <div class="invalid-feedback d-block">

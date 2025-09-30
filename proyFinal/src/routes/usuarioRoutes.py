@@ -226,7 +226,18 @@ def cambiar_contraseña():
 
     if errors:
         usuario = usuarioController.miCuenta(current_user.Id)
-        return render_template('usuario/cuenta.html', usuario=usuario, errors=errors)
+        localidades = [
+            {'value': loc.value, 'text': loc.name}
+            for loc in generalEnum.LocalidadEnum
+        ]
+        return render_template(
+            'usuario/cuenta.html',
+            usuario=usuario,
+            errors=errors,
+            localidades=localidades,
+            estados=generalEnum.EstadoEnum
+        )
+
 
     exito = usuarioController.actualizar_contraseña(current_user.Id, nueva)
 

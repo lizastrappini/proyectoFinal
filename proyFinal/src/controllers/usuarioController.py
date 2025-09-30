@@ -55,7 +55,7 @@ def miCuenta(id):
         'localidad': enum_name(generalEnum.LocalidadEnum, usuario.Localidad),
         'localidad_valor': usuario.Localidad or 0,
         'estado': enum_name(generalEnum.EstadoEnum, usuario.IdEstado),
-        'direccion': usuario.Direccion or 'No completado',
+        'direccion': usuario.Direccion,
         'telefono': usuario.Telefono,
         'rol': enum_name(generalEnum.RolEnum, usuario.IdRol),
         'idEstado': usuario.IdEstado,
@@ -143,14 +143,6 @@ def cambiarContraseña(token, nueva_contraseña):
     return False
 
 
-# def verificarPass(token,password):
-#     usuario = Usuario.query.filter_by(Token=token).first()
-#     if usuario:
-#         if usuario.Password == password:
-#             return True
-#         else:
-#             return False
-#     return False
 
 def verificarPass(token, password):
     usuario = Usuario.query.filter_by(Token=token).first()

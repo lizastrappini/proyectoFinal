@@ -86,8 +86,10 @@ def inject_notificaciones():
 # Context processor para datos de contacto y fecha actual
 @app.context_processor
 def inject_contacto_and_now():
-    contacto = Parametro.query.first()
+    contacto_obj = Parametro.query.all()  # traemos todos los parámetros
+    contacto = {c.Titulo.lower(): c.Valor for c in contacto_obj}
     return {'contacto': contacto, 'now': datetime.now()}
+
 
 scheduler = BackgroundScheduler()
 # Se ejecuta todos los días a la medianoche
