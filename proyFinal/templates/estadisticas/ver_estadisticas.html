@@ -139,8 +139,8 @@
       <div class="card-header">
         <h5 class="mb-0">Recepciones</h5>
       </div>
-      <div class="card-body" style="margin-top: 6%;">
-        <div id="recepcionesPartidos" style="height:240px;"></div>
+      <div class="card-body">
+              <div id="recepcionesPartidos" class="row g-4"></div>
       </div>
     </div>
   </div>
@@ -572,118 +572,53 @@ function bloqueoPartidos(estadisticas) {
 }
 
 function renderRecepcionesChart(estadisticas) {
-  const seriesData = [
-    estadisticas.REE ?? 0,
-    estadisticas.REV ?? 0,
-    estadisticas.RE1 ?? 0,
-    estadisticas.RE2 ?? 0,
-    estadisticas.RE3 ?? 0
+  const recepciones = [
+    { key: 'REE', label: 'Error' },
+    { key: 'REV', label: 'Vendida' },
+    { key: 'RE1', label: 'Exclamativa' },
+    { key: 'RE2', label: 'Positiva' },
+    { key: 'RE3', label: 'Doble positiva' }
   ];
 
-  const categories = ['E', 'V', '!', '+', '#'];
-  const etiquetasTooltip = ['Error', 'Vendida', 'Exclamativa', 'Positiva', 'Doble positiva']; // LEYENDA PARA RECEPCIONES
+  const total = recepciones.reduce((acc, r) => acc + (estadisticas[r.key] ?? 0), 0);
+  const container = document.querySelector('#recepcionesPartidos');
+  container.innerHTML = '';
 
-  const recepcionesChartEl = document.querySelector('#recepcionesPartidos');
+  recepciones.forEach((rec, index) => {
+    const valor = estadisticas[rec.key] ?? 0;
+    const porcentaje = total > 0 ? Math.round((valor / total) * 100) : 0;
 
-  const recepcionesChartConfig = {
-    chart: {
-      height: 238,
-      type: 'bar',
-      parentHeightOffset: 0,
-      toolbar: { show: false }
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 12,
-        distributed: true,
-        columnWidth: '50%',
-        endingShape: 'rounded',
-        startingShape: 'rounded'
-      }
-    },
-    series: [{ data: seriesData }],
-    tooltip: {
-      enabled: true,
-      style: {
-        fontSize: '12px'
-      },
-      onDatasetHover: {
-        highlightDataSeries: false
-      },
-      custom: function ({ dataPointIndex }) {
-        const nombre = etiquetasTooltip[dataPointIndex];
-        return `<div class="px-3 py-2">
-                  <span>${nombre}</span>
-                </div>`;
-      }
-    },
-    legend: { show: false },
-    dataLabels: {
-      enabled: true,
-      style: {
-        fontSize: '0.9rem',
-        fontWeight: 'bold',
-        colors: ['#000']
-      },
-      formatter: function(val) {
-        return val;
-      },
-      offsetY: -6
-    },
-    colors: [
-      config.colors_label.warning,  // REE
-      config.colors.warning,        // REV
-      config.colors.success,        // RE1
-      config.colors.info,           // RE2
-      config.colors.danger          // RE3
-    ],
-    grid: {
-      show: false,
-      padding: {
-        top: -15,
-        left: -7,
-        right: -4
-      }
-    },
-    states: {
-      hover: { filter: { type: 'none' } },
-      active: { filter: { type: 'none' } }
-    },
-    xaxis: {
-      axisTicks: { show: false },
-      axisBorder: { show: false },
-      categories: categories,
-      labels: {
-        style: {
-          colors: config.colors.bodyColor
-        }
-      }
-    },
-    yaxis: {
-      show: false
-    },
-    responsive: [
-      {
-        breakpoint: 1200,
-        options: {
-          chart: { height: 266 }
-        }
-      }
-    ]
-  };
+    const div = document.createElement('div');
+    div.className = 'col-12 col-md-4 d-flex justify-content-center';
 
-  if (recepcionesChartEl) {
-    if (window.recepcionesChart) {
-      window.recepcionesChart.updateOptions({
-        series: [{ data: seriesData }],
-        xaxis: { categories }
-      });
-    } else {
-      window.recepcionesChart = new ApexCharts(recepcionesChartEl, recepcionesChartConfig);
-      window.recepcionesChart.render();
-    }
-  }
+    div.innerHTML = `
+      <div class="d-flex flex-column align-items-center">
+        <div class="chart-progress mb-2"
+             data-index="${index}"
+             data-series="${porcentaje}"
+             data-progress_variant="true"></div>
+        <h6 class="mb-1">${rec.label}</h6>
+        <p class="mb-0 small">${valor} de ${total}</p>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+
+  const chartProgressList = document.querySelectorAll('#recepcionesPartidos .chart-progress');
+  chartProgressList.forEach(function (chartEl) {
+    const index = parseInt(chartEl.dataset.index);
+    const series = chartEl.dataset.series;
+    const variant = chartEl.dataset.progress_variant;
+    const options = radialBarChart(index, series, variant);
+    const chart = new ApexCharts(chartEl, options);
+    chart.render();
+  });
 }
+
+
+
+
 
 function renderRotacionesChart(estadisticas) {
   const seriesData = [
@@ -868,67 +803,97 @@ if (chartProgressList) {
 }
 
 function renderTransicionesChart(estadisticas) {
-  const transiciones = [
-    { key: 'TRE', label: 'Error' }, //LEYENDAS PARA TRANSICIONES
-    { key: 'TRB', label: 'Bloqueo' },
-    { key: 'TR0', label: 'Doble negativa' },
-    { key: 'TR1', label: 'Negativa' },
-    { key: 'TR2', label: 'Exclamativa' },
-    { key: 'TR3', label: 'Positiva' },
-    { key: 'TR4', label: 'Doble positiva' }
+  const seriesData = [
+    estadisticas.TRE ?? 0,
+    estadisticas.TRB ?? 0,
+    estadisticas.TR0 ?? 0,
+    estadisticas.TR1 ?? 0,
+    estadisticas.TR2 ?? 0,
+    estadisticas.TR3 ?? 0,
+    estadisticas.TR4 ?? 0
   ];
 
-  const total = estadisticas.TRTOTAL ?? 0; 
-  const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary', 'dark'];
+  const categories = ['E', 'B', '=', '-', '!', '+', '#'];
+  const etiquetasTooltip = ['Error', 'Bloqueo', 'Doble negativa', 'Negativa', 'Exclamativa', 'Positiva', 'Doble positiva'];
 
-  const container = document.querySelector('#transicionesProgressList');
-  container.innerHTML = ''; 
+  const transicionesChartEl = document.querySelector('#transicionesProgressList');
+  transicionesChartEl.innerHTML = ''; // Limpia el contenedor
 
+  const chartContainer = document.createElement('div');
+  chartContainer.style.height = '240px';
+  transicionesChartEl.appendChild(chartContainer);
 
-transiciones.forEach((trans, index) => {
-  const valor = estadisticas[trans.key] ?? 0;
+  const chartConfig = {
+    chart: {
+      height: 238,
+      type: 'bar',
+      parentHeightOffset: 0,
+      toolbar: { show: false }
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 12,
+        distributed: true,
+        columnWidth: '50%',
+        endingShape: 'rounded',
+        startingShape: 'rounded'
+      }
+    },
+    series: [{ data: seriesData }],
+    tooltip: {
+      enabled: true,
+      custom: function ({ dataPointIndex }) {
+        const nombre = etiquetasTooltip[dataPointIndex];
+        return `<div class="px-3 py-2"><span>${nombre}</span></div>`;
+      }
+    },
+    legend: { show: false },
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: '0.9rem',
+        fontWeight: 'bold',
+        colors: ['#000']
+      },
+      formatter: function(val) {
+        return val;
+      },
+      offsetY: -6
+    },
+    colors: [
+      config.colors_label.warning,  // TRE
+      config.colors.warning,        // TRB
+      config.colors.secondary,      // TR0
+      config.colors.info,           // TR1
+      config.colors.success,        // TR2
+      config.colors.primary,        // TR3
+      config.colors.danger          // TR4
+    ],
+    grid: {
+      show: false,
+      padding: {
+        top: -15,
+        left: -7,
+        right: -4
+      }
+    },
+    xaxis: {
+      categories: categories,
+      labels: {
+        style: {
+          colors: config.colors.bodyColor
+        }
+      }
+    },
+    yaxis: {
+      show: false
+    }
+  };
 
-  // 👇 Si total es 0, forzamos porcentaje = 0
-  const porcentaje = total > 0 ? Math.round((valor / total) * 100) : 0;
-
-
-  const div = document.createElement('div');
-
-  // 👇 si es el último (index === transiciones.length - 1) -> centrado
-  if (index === transiciones.length - 1) {
-    div.className = 'col-12 col-md-4 offset-md-4 d-flex justify-content-center';
-  } else {
-    div.className = 'col-12 col-md-4 d-flex justify-content-center';
-  }
-
-  div.innerHTML = `
-    <div class="d-flex flex-column align-items-center">
-      <div class="chart-progress mb-2"
-           data-index="${index}"
-           data-series="${porcentaje}"
-           data-progress_variant="true"></div>
-      <h6 class="mb-1">${trans.label}</h6>
-      <p class="mb-0 small">${valor} de ${total}</p>
-    </div>
-  `;
-
-  container.appendChild(div);
-});
-
-
-// Render Apex radial charts
-const chartProgressList = document.querySelectorAll('.chart-progress');
-if (chartProgressList) {
-  chartProgressList.forEach(function (chartProgressEl) {
-    const index = parseInt(chartProgressEl.dataset.index);
-    const series = chartProgressEl.dataset.series;
-    const variant = chartProgressEl.dataset.progress_variant;
-    const options = radialBarChart(index, series, variant); // 👈 ahora sí index
-    const chart = new ApexCharts(chartProgressEl, options);
-    chart.render();
-  });
+  const chart = new ApexCharts(chartContainer, chartConfig);
+  chart.render();
 }
-}
+
 
 function saquesPartidos(estadisticas) {
   const saquesEl = document.querySelector('#saquesPartidos');
