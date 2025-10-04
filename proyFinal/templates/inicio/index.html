@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% block title %}Inicio{% endblock %}
 {% block content %}
 
  <!-- Content wrapper -->
@@ -120,155 +120,169 @@
 
  
                   <!-- Customer cards -->
-                    <div class="row g-4 mb-4">
-                      <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-primary">
-                                  <i class="ri-home-smile-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/miCuenta" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Mi Cuenta</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Encontrá tus datos aquí</span>
-                          </div>
-                        </div>
-                      </div>
+<div class="row g-4 mb-4">
 
-                      <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-success">
-                                  <i class="ri-gift-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/calendario" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Calendario</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Revisá las fechas importantes</span>
-                          </div>
-                        </div>
-                      </div>
-                   {% if usuario.IdRol == 2 %}
-                      <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-warning">
-                                  <i class="ri-bar-chart-2-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/estadisticas/ver" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Estadísticas</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Mirá tus estadísticas</span>
-                          </div>
-                        </div>
-                      </div>
-                  {% else %}
-                  <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-warning">
-                                  <i class="ri-bar-chart-2-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Estadísticas</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Cargá estadísticas de los partidos</span>
-                          </div>
-                        </div>
-                      </div>
-                   {% endif %}
-                   {% if usuario.IdRol == 2 %}
-                      <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-info">
-                                  <i class="ri-bank-card-2-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/mipago" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Cuota Deportiva</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Todos tus pagos están aquí</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  {% elif  usuario.IdRol == 1 %}
-                   <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-info">
-                                  <i class="ri-bank-card-2-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/pago" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Cuota Deportiva</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Todos los pagos deportivos aquí</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                   {% else %}
-                    <div class="col-md-3 mb-3">
-                        <div class="card h-100">
-                          <div class="card-body">
-                            <div class="card-icon mb-2">
-                              <div class="avatar">
-                                <div class="avatar-initial rounded-3 bg-label-info">
-                                  <i class="ri-bar-chart-2-line ri-24px"></i>
-                                </div>
-                              </div>
-                            </div>
-                            <a href="/estadisticas/ver" class="text-decoration-none">
-                              <div class="card-info">
-                                <h3 class="card-title mb-2">Ver Estadísticas</h3>
-                              </div>
-                            </a>
-                            <span class="fw-bold">Mirá las estadísticas de los partidos</span>
-                          </div>
-                        </div>
-                      </div>
+  <div class="col-md-3 mb-3">
+    <a href="/miCuenta" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-primary">
+                <i class="ri-home-smile-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Mi Cuenta</h3>
+          </div>
+          <span class="fw-bold">Encontrá tus datos aquí</span>
+        </div>
+      </div>
+    </a>
+  </div>
 
-                   {% endif %}
+  <div class="col-md-3 mb-3">
+    <a href="/calendario" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-success">
+                <i class="ri-gift-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Calendario</h3>
+          </div>
+          <span class="fw-bold">Revisá las fechas importantes</span>
+        </div>
+      </div>
+    </a>
+  </div>
 
-                    <!-- /Customer cards -->
+  {% if usuario.IdRol == 2 %}
+  <div class="col-md-3 mb-3">
+    <a href="/estadisticas/ver" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-warning">
+                <i class="ri-bar-chart-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Estadísticas</h3>
+          </div>
+          <span class="fw-bold">Mirá tus estadísticas</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% else %}
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-warning">
+                <i class="ri-bar-chart-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Estadísticas</h3>
+          </div>
+          <span class="fw-bold">Cargá estadísticas de los partidos</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
+
+  {% if usuario.IdRol == 2 %}
+  <div class="col-md-3 mb-3">
+    <a href="/mipago" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-info">
+                <i class="ri-bank-card-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Cuota Deportiva</h3>
+          </div>
+          <span class="fw-bold">Todos tus pagos están aquí</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% elif usuario.IdRol == 1 %}
+  <div class="col-md-3 mb-3">
+    <a href="/pago" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-info">
+                <i class="ri-bank-card-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Cuota Deportiva</h3>
+          </div>
+          <span class="fw-bold">Todos los pagos deportivos aquí</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% else %}
+  <div class="col-md-3 mb-3">
+    <a href="/estadisticas/ver" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-info">
+                <i class="ri-bar-chart-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Ver Estadísticas</h3>
+          </div>
+          <span class="fw-bold">Mirá las estadísticas de los partidos</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+<!-- /Customer cards -->
 
 
+{% block styles %}
+<style>
+  .customer-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.customer-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+</style>
+{% endblock %}
             </div>
       
          </div>

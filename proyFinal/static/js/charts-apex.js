@@ -3,7 +3,7 @@
  */
 
 'use strict';
-
+var isDarkStyle = window.isDarkStyle ?? false;
 (function () {
   let cardColor, headingColor, labelColor, borderColor, legendColor;
 

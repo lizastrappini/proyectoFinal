@@ -32,9 +32,9 @@ def index():
 @estadisticas_bp.route('/ver', methods=['GET'])
 def ver():
     categorias = [
-    {'value': cat.value, 'text': cat.name}
-    for cat in generalEnum.CategoriaEnum
-    ]
+        {'value': cat.value, 'text': cat.name}
+        for cat in generalEnum.CategoriaEnum
+        ]
     ramas = [
         {'value': r.value, 'text': r.name}
         for r in generalEnum.RamaEnum
@@ -43,7 +43,11 @@ def ver():
         {'value': d.value, 'text': d.name}
         for d in generalEnum.DivisionEnum
         ]
-    return render_template('estadisticas/ver_estadisticas.html',categorias=categorias, ramas=ramas, division = division)
+    contrincantes = [
+        {'value': c.value, 'text': c.name}
+        for c in generalEnum.ContrincantesEnum
+    ]
+    return render_template('estadisticas/ver_estadisticas.html',categorias=categorias, ramas=ramas, division = division, contrincantes=contrincantes)
 
 def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None):
     carpeta_actual = os.path.dirname(__file__)
@@ -402,7 +406,6 @@ def partidos_por_categoria_mostrar():
     return jsonify({"estado": "ok", "partidos": partidos})
 
 
-
 @estadisticas_bp.route('/partidos_por_categoriayfecha', methods=['GET'])
 def partidos_por_categoriayfecha():
     categoria = request.args.get("categoria")
@@ -424,6 +427,7 @@ def datos_graficos():
     division = request.args.get("division")
     partido = request.args.get("partido")
     misEstadisticas = request.args.get("misEstadisticas", "false").lower() == "true"
+    contrincante = request.args.get("contrincante")
     idUsuario = None
 
     if(misEstadisticas):
@@ -433,6 +437,6 @@ def datos_graficos():
     if not fecha:
         return jsonify({"estado": "error", "mensaje": "No se seleccionó categoría"}), 400
 
-    partidos = estadisticasController.armarEstadisticas(categoria, rama, division, fecha, partido, idUsuario, misEstadisticas)
+    partidos = estadisticasController.armarEstadisticas(categoria, rama, division, fecha, partido, idUsuario, contrincante, misEstadisticas)
 
     return jsonify({"estado": "ok", "partidos": partidos})

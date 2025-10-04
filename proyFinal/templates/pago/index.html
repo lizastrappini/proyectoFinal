@@ -1,5 +1,5 @@
   {% extends "base.html" %}
-
+{% block title %}Pago{% endblock %}
   {% block content %}
 
   <div class="content-wrapper">
@@ -106,7 +106,7 @@
             <select id="estadoFiltro"
                     class="select2 form-select form-select-sm"
                     data-placeholder="Estado"
-                    style="width:140px; min-height:32px;">
+                    style="width:140px; max-height:32px;">
               <option value=""></option>
               {% for estado in estados %}
                 <option value="{{ estado.value }}">{{ estado.text }}</option>
@@ -634,13 +634,21 @@ $(document).ready(function () {
 
   if ($.fn.select2) {
   $('#estadoFiltro').select2({
-    dropdownParent: $('#estadoFiltro').parent(),
-    width: '160px',                 // ancho fijo
-    placeholder: 'Estado',
-    allowClear: true,
-    minimumResultsForSearch: Infinity
-  });
+  dropdownParent: $('#estadoFiltro').parent(),
+  width: '140px',
+  minimumResultsForSearch: Infinity,
+  placeholder: 'Estado'
+}).on('select2:open', function() {
+  // fuerza el alto cuando se abre
+  $('.select2-selection--single').css('height', '38px');
+  $('.select2-selection__rendered').css('line-height', '38px'); 
+  $('.select2-selection__arrow').css('height', '38px');
+});
 
+// también lo forzamos al cargar
+$('.select2-selection--single').css('height', '38px');
+$('.select2-selection__rendered').css('line-height', '38px'); 
+$('.select2-selection__arrow').css('height', '38px');
   // Ajustar altura de la caja
   $('.select2-selection').css({
     'display': 'flex',

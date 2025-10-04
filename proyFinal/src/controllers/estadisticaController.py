@@ -11,7 +11,7 @@ from src.models.estadisticaUsuarioPartido import EstadisticaUsuarioPartido
 from datetime import datetime
 from sqlalchemy import func, and_, case
 
-def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idUsuario=None, misEstadisticas=False):
+def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idUsuario=None, contrincante=None, misEstadisticas=False):
     filtros_partidos = []
 
     # --- Filtros básicos ---
@@ -23,6 +23,8 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
         filtros_partidos.append(EstadisticaPorPartido.IdDivision == division)
     if idPartido:
         filtros_partidos.append(EstadisticaPorPartido.IdPartido == idPartido)
+    if contrincante:   
+        filtros_partidos.append(EstadisticaPorPartido.IdContrincante == contrincante)
 
     # --- Filtrar por fecha (rango o día único) ---
     if fechaHasta:
