@@ -21,6 +21,7 @@ from openpyxl.utils import column_index_from_string,range_boundaries
 from src import db
 from sqlalchemy.engine.row import Row
 from src.models.notificacion import Notificacion
+from werkzeug.utils import secure_filename
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
 
@@ -224,6 +225,7 @@ def subir_estadisticas():
 
     # ---------- CREAR ESTADISTICA ----------
     try:
+        arg = pytz.timezone("America/Argentina/Buenos_Aires")
         # ---------- CREAR ESTADISTICA ----------
         estadistica = EstadisticaPorPartido(
             Fecha=fecha,
@@ -232,7 +234,9 @@ def subir_estadisticas():
             IdRama=partido.IdRama,
             IdDivision=partido.IdDivision,
             Resultado=idResultado,
-            IdPartido=partido.Id
+            IdPartido=partido.Id,
+            IdEntrenador=session.get('_user_id'),
+            FechaSubida= datetime.now(arg)
         )
         db.session.add(estadistica)
 
@@ -293,7 +297,19 @@ def subir_estadisticas():
                 "Ya podes ver tus estadísticas del partido vs " +
                 generalEnum.ContrincantesEnum(int(partido.IdContrincante)).name
             )
-    
+
+        #guardo el archivo
+        UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads_estadisticas")
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+        nombre_archivo = f"estadisticas_{estadistica.Id}.xlsx"
+        ruta_guardado = os.path.join(UPLOAD_FOLDER, nombre_archivo)
+        archivo.stream.seek(0)     # 👈 esto es clave
+        archivo.save(ruta_guardado)
+
+        estadistica.RutaArchivo = nombre_archivo
+        db.session.add(estadistica)
+        db.session.commit()
         return jsonify({"estado": "ok", "mensaje": "Estadísticas cargadas correctamente"})
 
     except Exception as e:
@@ -440,3 +456,88 @@ def datos_graficos():
     partidos = estadisticasController.armarEstadisticas(categoria, rama, division, fecha, partido, idUsuario, contrincante, misEstadisticas)
 
     return jsonify({"estado": "ok", "partidos": partidos})
+
+
+@estadisticas_bp.route('/lista', methods=['GET'])
+def lista_estadisticas():
+    categorias = [
+        {'value': cat.value, 'text': cat.name}
+        for cat in generalEnum.CategoriaEnum
+        ]
+    ramas = [
+        {'value': r.value, 'text': r.name}
+        for r in generalEnum.RamaEnum
+    ]
+    division = [
+        {'value': d.value, 'text': d.name}
+        for d in generalEnum.DivisionEnum
+        ]
+    entrenadores = [
+        {'value': u.Id, 'text': f'{u.Nombre} {u.Apellido}'}
+        for u in Usuario.query.filter_by(IdRol=3).all()
+    ]
+    return render_template('estadisticas/listar_estadisticas.html',categorias=categorias, ramas=ramas, division = division, entrenadores=entrenadores)
+
+@estadisticas_bp.route('/listar_estadisticas', methods=['POST'])
+def listar_estadisticas():
+    categoria = request.form.get("categoria")
+    fecha = request.form.get("fecha")
+    rama = request.form.get("rama")
+    division = request.form.get("division")
+    entrenador = request.form.get("entrenador")
+
+    fecha_desde = ''
+    fecha_hasta = ''
+
+    if fecha:
+        try:
+            if " a " in fecha:
+                partes = fecha.split(" a ")
+                fecha_desde = datetime.strptime(partes[0].strip(), "%d-%m-%Y").date()
+                fecha_hasta = datetime.strptime(partes[1].strip(), "%d-%m-%Y").date()
+            else:
+                fecha_unica = datetime.strptime(fecha.strip(), "%d-%m-%Y").date()
+                fecha_desde = fecha_unica
+                fecha_hasta = fecha_unica
+        except ValueError:
+            pass
+
+    data = {
+        "categoria": categoria or '',
+        "fecha_desde": fecha_desde,
+        "fecha_hasta": fecha_hasta,
+        "rama": rama or '',
+        "division": division or '',
+        "entrenador": entrenador or ''
+    }
+
+    estadisticas = estadisticasController.obtenerEstadisticasCargadas(data)
+
+    return estadisticas
+
+@estadisticas_bp.route('/eliminar_estadistica', methods=['POST'])
+def eliminar_estadistica():
+    id = request.form.get("id")
+    if not id:
+        return jsonify({"estado": "error", "mensaje": "El ID no es válido"}), 400
+
+    resultado = estadisticasController.eliminarEstadistica(id)
+
+    if not resultado:
+        return jsonify({"estado": "error", "mensaje": "No se pudo eliminar la estadística"}), 400
+
+    return jsonify({"estado": "ok", "mensaje": "Estadística eliminada con éxito"})
+
+
+@estadisticas_bp.route('/descargar_estadistica/<int:id>', methods=['GET'])
+def descargar_estadistica(id):
+    estadistica = EstadisticaPorPartido.query.get(id)
+    if not estadistica or not estadistica.RutaArchivo:
+        return jsonify({"estado": "error", "mensaje": "Archivo no encontrado"}), 404
+
+    return send_from_directory(
+        "uploads_estadisticas",        
+        estadistica.RutaArchivo,       
+        as_attachment=True,
+        download_name=f"estadisticas_{id}.xlsx"
+    )

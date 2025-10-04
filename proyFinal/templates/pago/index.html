@@ -106,7 +106,8 @@
             <select id="estadoFiltro"
                     class="select2 form-select form-select-sm"
                     data-placeholder="Estado"
-                    style="width:140px; max-height:32px;">
+                    style="width:140px; max-height:32px;"
+                    data-allow-clear="true">
               <option value=""></option>
               {% for estado in estados %}
                 <option value="{{ estado.value }}">{{ estado.text }}</option>
@@ -123,8 +124,8 @@
           </div>
         </div>
 
-          <div class="table-responsive overflow-visible">
-            <table class="invoice-list-table table dataTable no-footer dtr-column" id="tablaPagos">
+          <div class="table-responsive">
+            <table id="tablaPagos" class="table w-100">
               <thead>
                 <tr>
                   <!-- {% if current_user.IdRol == RolEnum.Admin %} -->
@@ -723,6 +724,9 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
 
   tabla = $('#tablaPagos').DataTable({
     data: [], // arranca vacía pero “pintada”
+    autoWidth: true,
+  scrollX: false,
+  responsive: false,
     columns: [
       { 
         data: null,
@@ -818,7 +822,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
   pageLength: 10,                 // filas por página
   lengthMenu: [10, 25, 50, 100],  // opciones del selector
   info: true,
-  pagingType: 'simple_numbers',   // o 'full_numbers' para «primero/último»
+  pagingType: 'simple',   // o 'full_numbers' para «primero/último»
   autoWidth: false,
 
   // Footer al estilo «info a la izquierda, paginador a la derecha»
@@ -1009,6 +1013,9 @@ $('.btn-export').on('click', function () {
     filtrar(true);
      
   });
+
+  tabla.columns.adjust();
+$(window).on('resize orientationchange', () => tabla.columns.adjust());
 });
   
 $('#importarPagosForm').on('submit', function (e) {

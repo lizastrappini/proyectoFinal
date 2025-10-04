@@ -627,6 +627,7 @@ eventBorderColor: null,
   console.log("tipo:", tipo, "clase:", colorClass);
   return colorClass ? ['fc-event-' + colorClass] : [];
 },
+/*
       dateClick: function (info) {
         let date = moment(info.date).format('YYYY-MM-DD');
         resetValues();
@@ -643,7 +644,7 @@ eventBorderColor: null,
         eventStartDate.value = date;
         eventEndDate.value = date;
       },
-
+*/
 
       eventClick: function (info) {
         eventClick(info);
@@ -895,6 +896,7 @@ if (btnToggleSidebar) {
   });
 }
 
+/*
 // === DATECLICK (NUEVO EVENTO DESDE CALENDARIO) ===
 calendar.on('dateClick', function (info) {
   resetValues();
@@ -908,7 +910,7 @@ calendar.on('dateClick', function (info) {
   if (!addEventSidebar.classList.contains('show')) {
     offcanvas.show();
   }
-});
+});*/
 
 
     // Hide left sidebar if the right sidebar is open

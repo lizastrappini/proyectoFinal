@@ -10,6 +10,9 @@ class EstadisticaPorPartido(db.Model):
     IdRama = db.Column(db.Integer, nullable=False)
     IdDivision = db.Column(db.Integer, nullable=False)
     Resultado = db.Column(db.Integer, nullable=False)
+    IdEntrenador = db.Column(db.Integer, nullable=False)
+    FechaSubida = db.Column(db.DateTime, nullable=False)
+    RutaArchivo = db.Column(db.String(255), nullable=True)
 
     def get_id(self):
         return str(self.Id)

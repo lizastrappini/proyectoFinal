@@ -18,37 +18,38 @@
           <div class="col d-flex justify-content-end">
 
           </div>
-          <div class="col-12 col-md-2">
+          <div class="col-12 col-md-2 mt-2">
             <select id="estadoFiltro"
                     class="select2 form-select form-select-sm"
-                    data-placeholder="Estado">
+                    data-placeholder="Estado"
+                    data-allow-clear="true">
               <option value=""></option>
               {% for estado in estados %}
                 <option value="{{ estado.value }}">{{ estado.text }}</option>
               {% endfor %}
             </select>
           </div>
-          <div class="col-12 col-md-2">
+          <div class="col-12 col-md-2 mt-2">
 
             <div class="form-floating form-floating-outline" >
-              <input type="text" class="form-control" id="fechaDesdeFiltro" name="fechaDesdeFiltro" placeholder="Fecha Desde" required/>
+              <input type="text" class="form-control form-control-sm" id="fechaDesdeFiltro" name="fechaDesdeFiltro" placeholder="Fecha Desde" required/>
               <label for="fechaDesdeFiltro">Fecha Desde</label>
             </div>
             <!-- <input type="date" id="fechaDesdeFiltro" class="form-control" placeholder="Fecha Desde"> -->
           </div>
-          <div class="col-12 col-md-2">
+          <div class="col-12 col-md-2 mt-2">
             <div class="form-floating form-floating-outline" >
-              <input type="text" class="form-control" id="fechaHastaFiltro" name="fechaHastaFiltro" placeholder="Fecha Hasta" required/>
+              <input type="text" class="form-control form-control-sm" id="fechaHastaFiltro" name="fechaHastaFiltro" placeholder="Fecha Hasta" required/>
               <label for="fechaHastaFiltro">Fecha Hasta</label>
             </div>
             <!-- <input type="date" id="fechaHastaFiltro" class="form-control" placeholder="Fecha Hasta"> -->
           </div>
-          <div class="col-auto d-flex justify-content-end">
+          <div class="col-auto d-flex justify-content-end mt-2">
             <button id="btnFiltrar" class="btn btn-primary">Filtrar</button>
           </div>
         </div>
-          <div class="table-responsive text-nowrap overflow-visible">
-            <table id="tablaPagos" class="table">
+          <div class="table-responsive">
+            <table id="tablaPagos" class="table w-100">
               <thead>
                 <tr>
                   <th>Id</th>
@@ -236,6 +237,9 @@ $(document).ready(function () {
   // DataTable: inicia vacía
 tabla = $('#tablaPagos').DataTable({
   data: [],  // arranca vacía
+  autoWidth: true,
+  scrollX: false,
+  responsive: false,
   columns: [
     { data: 'id' },
     { data: 'fechaPago' },
@@ -320,7 +324,7 @@ tabla = $('#tablaPagos').DataTable({
   info: true,
   searching: false,
   ordering: true,
-  pagingType: 'simple_numbers',   // o 'full_numbers' si querés primero/último
+  pagingType: 'simple',   // o 'full_numbers' si querés primero/último
   autoWidth: false,
   dom: 'frtip',
 
@@ -360,6 +364,9 @@ tabla = $('#tablaPagos').DataTable({
   $('#btnFiltrar').on('click', function () {
     filtrar();
   });
+
+  tabla.columns.adjust();
+$(window).on('resize orientationchange', () => tabla.columns.adjust());
 });
 
 

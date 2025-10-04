@@ -1,0 +1,305 @@
+
+{% extends "base.html" %}
+{% block title %}Estadisticas Cargadas{% endblock %}
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h1>Estadísticas Cargadas</h1>
+    <div class="card mt-5">
+        <div class="card-body">
+            <div class="d-flex justify-content-end align-items-end flex-wrap gap-2 mb-3">
+                <div class="col-12 col-md-auto">
+                    <div class="form-floating form-floating-outline" style="min-width:170px">
+                        <input type="text"
+                            class="form-control form-control-sm w-100"
+                            id="fechaFiltro"
+                            placeholder="Fecha">
+                        <label for="fechaFiltro">Fecha</label>
+                    </div>
+                </div>
+
+                <div class="mt-2 col-12 col-md-auto" style="min-width:190px"> 
+                    <select id="entrenadorFiltro"
+                            class="select2 form-select form-select-sm w-100"
+                            data-placeholder="Entrenador"
+                            data-allow-clear="true">
+                        <option value=""></option>
+                        {% for entrenador in entrenadores %}
+                        <option value="{{ entrenador.value }}">{{ entrenador.text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mt-2 col-12 col-md-auto" style="min-width:170px">
+                    <select id="categoriaFiltro"
+                            class="select2 form-select form-select-sm w-100"
+                            data-placeholder="Categoría"
+                            data-allow-clear="true">
+                        <option value=""></option>
+                        {% for cat in categorias %}
+                        <option value="{{ cat.value }}">{{ cat.text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mt-2 col-12 col-md-auto" style="min-width:170px">
+                    <select id="ramaFiltro"
+                            class="select2 form-select form-select-sm w-100"
+                            data-placeholder="Rama"
+                            data-allow-clear="true">
+                        <option value=""></option>
+                        {% for r in ramas %}
+                        <option value="{{ r.value }}">{{ r.text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mt-2 col-12 col-md-auto" style="min-width:170px">
+                    <select id="divisionFiltro"
+                            class="select2 form-select form-select-sm w-100"
+                            data-placeholder="División"
+                            data-allow-clear="true">
+                        <option value=""></option>
+                        {% for d in division %}
+                        <option value="{{ d.value }}">{{ d.text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button id="btnFiltrar" class="btn btn-primary" style="height:48px">Filtrar</button>
+            </div>
+            <div class="table-responsive">
+            <table id="tablaEstadisticas" class="table w-100">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Responsable</th>
+                  <th>Fecha Carga</th>
+                  <th>Fecha Partido</th> 
+                  <th>Partido</th> 
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+        <br>
+        <br>
+
+    </div>
+</div>
+<script src="../static/js/config.js"></script>   
+<script src="../static/js/charts-apex.js"></script>
+<script src="../static/js/charts-chartjs.js"></script>
+
+
+<script>
+  var tablaEstadisticas;
+
+$(document).ready(function() {
+
+ tablaEstadisticas = $('#tablaEstadisticas').DataTable({
+  data: [],  // arranca vacía
+  autoWidth: true,
+  rowId: function(a) {
+    return 'fila-' + a.id;
+  },
+  scrollX: false,
+  responsive: false,
+  columns: [
+    { data: 'id' },
+    { data: 'responsable' },
+    { data: 'fechaCarga' },
+    { data: 'fechaPartido' },
+    { data: 'partido' },
+    {
+      data: null,
+      orderable: false,
+      searchable: false,
+      render: function (data, type, row) {
+        let acciones = `
+          <div class="dropdown">
+            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="ri-more-2-line"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarEstadistica(${row.id})">
+                <i class="ri-delete-bin-7-line me-1"></i> Eliminar
+              </a>`;
+
+        // 👉 solo mostrar si hay rutaArchivo
+        if (row.rutaArchivo && row.rutaArchivo !== '') {
+          acciones += `
+              <a class="dropdown-item" href="javascript:void(0);" onclick="descargarEstadistica(${row.id})">
+                <i class="ri-download-line me-1"></i> Ver planilla
+              </a>`;
+        }
+
+        acciones += `
+            </div>
+          </div>
+        `;
+
+        return acciones;
+      }
+    }
+  ],
+
+  paging: true,
+  pageLength: 10,                 // filas por página
+  lengthMenu: [10, 25, 50, 100],  // opciones del selector
+  info: true,
+  searching: false,
+  ordering: true,
+  pagingType: 'simple',           // o 'full_numbers' si querés primero/último
+  autoWidth: false,
+  dom: 'frtip',
+
+  language: {
+    emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    zeroRecords: '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
+    lengthMenu:  "Mostrar _MENU_",
+    info:        "Mostrando _START_ a _END_ de _TOTAL_",
+    infoEmpty:   "Mostrando 0 a 0 de 0",
+    infoFiltered:"(filtrado de _MAX_ en total)",
+    paginate: {
+      previous: '<i class="ri-arrow-left-s-line"></i>',
+      next:     '<i class="ri-arrow-right-s-line"></i>',
+      first:    'Primero',
+      last:     'Último'
+    }
+  },
+
+  initComplete: function () {
+    $('#tablaEstadisticas')
+      .removeClass('dataTable no-footer stripe hover')
+      .addClass('table');
+  }
+});
+
+  // --- ELEMENTOS ---
+  const $btnFiltrar = $('#btnFiltrar');
+  const $categoriaFiltro = $('#categoriaFiltro');
+  const $ramaFiltro = $('#ramaFiltro');
+  const $divisionFiltro = $('#divisionFiltro');;
+  const $fechaFiltro = $('#fechaFiltro');
+  const $entrenadorFiltro = $('#entrenadorFiltro');
+  // --- INICIALIZAR SELECT2 ---
+  $('#entrenadorFiltro').select2({
+    dropdownParent: $('#entrenadorFiltro').parent(),
+    width: '100%',
+    placeholder: $('#entrenadorFiltro').data('placeholder'),
+    allowClear: true,
+    minimumResultsForSearch: Infinity
+  }).val(null).trigger('change');
+
+  $('#categoriaFiltro').select2({
+    dropdownParent: $('#categoriaFiltro').parent(),
+    width: 'resolve',
+    placeholder: $('#categoriaFiltro').data('placeholder'),
+    allowClear: true,
+    minimumResultsForSearch: Infinity,
+  }).val(null).trigger('change');
+
+  $('#ramaFiltro').select2({
+    dropdownParent: $('#ramaFiltro').parent(),
+    allowClear: true,
+    width: 'resolve',
+    placeholder: $('#ramaFiltro').data('placeholder')
+  }).val(null).trigger('change');
+
+  $('#divisionFiltro').select2({
+    dropdownParent: $('#divisionFiltro').parent(),
+    allowClear: true,
+    width: 'resolve',
+    placeholder: $('#divisionFiltro').data('placeholder')
+  }).val(null).trigger('change');
+
+  flatpickr("#fechaFiltro", {
+    locale: "es",
+    dateFormat: "d-m-Y",
+    maxDate: "today", // no permite seleccionar fechas futuras
+    mode: "range"
+  });
+
+  // --- CLICK EN BUSCAR: CARGAR GRÁFICOS ---
+  $btnFiltrar.on('click', function() {
+  const data = {
+    fecha: $fechaFiltro.val(),
+    categoria: $categoriaFiltro.val(),
+    rama: $ramaFiltro.val(),
+    division: $divisionFiltro.val(),
+    entrenador: $entrenadorFiltro.val() || ''
+  };
+
+  $.post('/estadisticas/listar_estadisticas', data, function(res) {
+    if (res.estado !== 'ok') {
+      Swal.fire("Error", res.mensaje, "error");
+      return;
+    }
+
+    // 👉 actualizar tabla
+    tablaEstadisticas.clear();
+    tablaEstadisticas.rows.add(res.data);
+    tablaEstadisticas.draw();
+  }, 'json'); 
+});
+
+});
+
+
+function eliminarEstadistica(id) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "Esta acción no se puede deshacer.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    didOpen: function() {
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+      }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.post('/estadisticas/eliminar_estadistica', { id }, function(res) {
+        if (res.estado !== 'ok') {
+          Swal.fire("Error", res.mensaje, "error");
+          return;
+        }
+
+        // 👉 actualizar tabla
+        tablaEstadisticas.row($('#fila-' + id)).remove().draw();
+        Swal.fire("Eliminado", "La estadística ha sido eliminada.", "success");
+      }, 'json');
+    }
+  });
+}
+
+function descargarEstadistica(id) {
+  fetch('/estadisticas/descargar_estadistica/' + id)
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          Swal.fire("Error", err.mensaje || "No se pudo descargar la estadística", "error");
+          throw new Error(err.mensaje);
+        });
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      // Crear un enlace temporal para descargar
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `estadisticas_${id}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Swal de éxito
+      Swal.fire("Descarga iniciada", "La estadística se está descargando.", "success");
+    })
+    .catch(err => console.error(err));
+}
+
+</script>
+{% endblock %}

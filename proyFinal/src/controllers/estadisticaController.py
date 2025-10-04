@@ -1,5 +1,5 @@
 from datetime import date
-from flask import current_app, render_template, url_for
+from flask import current_app, render_template, url_for,jsonify
 from flask_mail import Message
 from src.models.usuario import Usuario
 from src.utils.enums import generalEnum
@@ -222,3 +222,62 @@ def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idU
 
     return resumen_dict
 
+def obtenerEstadisticasCargadas(data):
+    query = EstadisticaPorPartido.query
+
+    # Filtros dinámicos
+    if data.get("categoria") not in (None, "", "null"):
+        query = query.filter(EstadisticaPorPartido.IdCategoria == int(data["categoria"]))
+
+    if data.get("rama") not in (None, "", "null"):
+        query = query.filter(EstadisticaPorPartido.IdRama == int(data["rama"]))
+
+    if data.get("division") not in (None, "", "null"):
+        query = query.filter(EstadisticaPorPartido.IdDivision == int(data["division"]))
+
+    if data.get("entrenador") not in (None, "", "null"):
+        query = query.filter(EstadisticaPorPartido.IdEntrenador == int(data["entrenador"]))
+
+    # Filtro fechas → lo dejamos tal cual (funcionaba bien)
+    if data.get("fecha_desde") and data.get("fecha_hasta"):
+        query = query.filter(
+            EstadisticaPorPartido.Fecha.between(data["fecha_desde"], data["fecha_hasta"])
+        )
+
+    resultados = query.all()
+
+    return jsonify({
+        "estado": "ok",
+        "data": [
+            {
+                "id": e.Id,
+                "partido": f'{p.Titulo}' if (p := Evento.query.get(e.IdPartido)) else "N/A",
+                "fechaCarga": e.FechaSubida.strftime("%d-%m-%Y") if e.FechaSubida else None,
+                "responsable": f'{r.Nombre} {r.Apellido}' if (r := Usuario.query.get(e.IdEntrenador)) else "N/A",
+                "fechaPartido": e.Fecha.strftime("%d-%m-%Y") if e.Fecha else None,
+                'rutaArchivo': e.RutaArchivo or ''
+            }
+            for e in resultados
+        ]
+    })
+
+def eliminarEstadistica(idEstadistica):
+    estadistica = EstadisticaPorPartido.query.get(idEstadistica)
+    if not estadistica:
+        return jsonify({"estado": "error", "mensaje": "Estadística no encontrada."}), 404
+
+    try:
+        EstadisticaUsuarioPartido.query.filter_by(IdEstadisticaPorPartido=idEstadistica).delete()
+        partido = Evento.query.get(estadistica.IdPartido)
+        if partido:
+            partido.TieneEstadistica = False
+            db.session.add(partido)
+
+        # Borrar la estadística
+        db.session.delete(estadistica)
+        
+        db.session.commit()
+        return jsonify({"estado": "ok", "mensaje": "Estadística eliminada correctamente."})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"estado": "error", "mensaje": f"Error al eliminar la estadística: {str(e)}"}), 500
