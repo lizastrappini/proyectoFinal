@@ -216,19 +216,19 @@ function mostrarCamposSegunTipo(forceTipo = null, ocultarTipo = false) {
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
-    case '4': // Torneo
+    case '4': // Suspension
       [wrappers.titulo, wrappers.eventStartDate, wrappers.categoria, wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
-    case '5': // Recaudación
+    case '5': // Torneo
       [wrappers.titulo, wrappers.eventStartDate, wrappers.eventEndDate,
        wrappers.categoria, wrappers.rama, wrappers.division, wrappers.localidad]
         .forEach(w => w && (w.style.display = 'block'));
       break;
 
-    case '6': // Suspensión
-      [wrappers.titulo, wrappers.eventStartDate, wrappers.categoria, wrappers.localidad, wrappers.descripcion]
+    case '6': // Recaudación
+      [wrappers.titulo, wrappers.eventStartDate, wrappers.categoria, wrappers.descripcion,wrappers.rama, wrappers.division]
         .forEach(w => w && (w.style.display = 'block'));
       break;
   }
@@ -606,7 +606,10 @@ eventBorderColor: null,
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
       editable: true,
       dragScroll: true,
-      dayMaxEvents: 2,
+      dayMaxEvents: 1,
+      moreLinkText: function(n) {
+        return "+ ver " + n + " más";
+      },
       eventResizableFromStart: true,
       customButtons: {
         sidebarToggle: {
@@ -797,7 +800,7 @@ if (eventForm && typeof FormValidation !== 'undefined') {
         if (btnSubmit.classList.contains('btn-add-event')) {
           if (isFormValid) {
             let newEvent = {
-              id: calendar.getEvents().length + 1,
+              
               title: eventTitle.value,
               start: eventStartDate.value,
               end: eventEndDate.value,

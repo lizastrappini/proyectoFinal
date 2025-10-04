@@ -1,5 +1,5 @@
 from datetime import date
-from sqlalchemy import or_, and_
+from sqlalchemy import func, or_, and_
 from flask import current_app, render_template, url_for
 from flask_mail import Message
 from src.controllers.usuarioController import enviar_mail_categoria
@@ -19,7 +19,8 @@ def obtener_deportistas(buscar=None, categoria=None, division=None, rama=None , 
             or_(
                 Usuario.Apellido.ilike(like_pattern),
                 Usuario.Nombre.ilike(like_pattern),
-                Usuario.Dni.ilike(like_pattern)
+                Usuario.Dni.ilike(like_pattern),
+                func.concat(Usuario.Nombre, " ", Usuario.Apellido).ilike(like_pattern)
             )
         )
         
@@ -148,9 +149,7 @@ def calcular_categoria_por_fecha(fecha_nacimiento):
     
     hoy = date.today()
     edad = hoy.year - fecha_nacimiento.year
-    # - (
-    #     (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day)
-    # )
+
 
     if edad <= 12:
         return CategoriaEnum.Sub12.value

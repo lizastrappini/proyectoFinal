@@ -30,6 +30,7 @@ class LocalidadEnum(enum.IntEnum):
     Carcaraña = 12
     CañadaDeGomez = 13
     SanNicolas = 14 
+    SanJorge = 15
     
 
 
@@ -41,7 +42,7 @@ class CategoriaEnum(enum.IntEnum):
     Sub18 = 5
     Sub21 = 6
     Primera = 7
-    SinCategoria = 0
+
     
 class DivisionEnum(enum.IntEnum):
     A = 1

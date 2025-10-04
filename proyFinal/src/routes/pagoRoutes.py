@@ -186,14 +186,14 @@ def agregar_pago():
             mes = fechaVencimiento.month
             anio = fechaVencimiento.year
 
-            pago_existente = Pago.query.filter(
-                Pago.IdUsuario == int(usuario_id),
-                db.extract('month', Pago.FechaVencimiento) == mes,
-                db.extract('year', Pago.FechaVencimiento) == anio
-            ).first()
+        pago_existente = Pago.query.filter(
+            Pago.IdUsuario == int(usuario_id),
+            db.extract('month', Pago.FechaVencimiento) == mes,
+            db.extract('year', Pago.FechaVencimiento) == anio
+        ).first()
 
-            if pago_existente:
-                raise ValueError("Ya existe un pago para este deportista en el mismo mes y año.")
+        if pago_existente:
+            raise ValueError("Ya existe un pago para este deportista en el mismo mes y año.")
 
 
        
@@ -315,6 +315,18 @@ def importar_pagos():
 
                 # Importe
                 # importe = Decimal(str(importe_val))
+                # Antes de crear el pago
+                existe_pago = Pago.query.filter(
+                    Pago.IdUsuario == usuario.Id,
+                    db.extract('month', Pago.FechaVencimiento) == fecha_vencimiento.month,
+                    db.extract('year', Pago.FechaVencimiento) == fecha_vencimiento.year
+                ).first()
+
+                if existe_pago:
+                    errores.append(f"Fila {fila}: El deportista ya tiene un pago para {fecha_vencimiento.strftime('%m/%Y')}")
+                    fila += 1
+                    continue
+
 
                 nuevo_pago = Pago(
                     FechaPago=fecha_pago,
