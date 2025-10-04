@@ -80,6 +80,16 @@ def nuevo_evento():
     Rama = int(rama[0]) if rama else None
     Division = int(division[0]) if division else None
     
+    eventos_requieren_rama_division = [
+        generalEnum.TipoEventoEnum.Entrenamiento.value,
+        generalEnum.TipoEventoEnum.Partido.value,
+        generalEnum.TipoEventoEnum.Torneo.value
+    ]
+
+    if IdTipoEvento in eventos_requieren_rama_division and (Rama is None or Division is None):
+        flash("⚠️ Debe seleccionar una rama y una división para este tipo de evento.", "danger")
+        return redirect(url_for('calendario.index'))
+    
     if IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value:
         evento_existente = Evento.query.filter(
             Evento.IdTipoEvento == generalEnum.TipoEventoEnum.Entrenamiento.value,
@@ -207,6 +217,7 @@ def evento_detalle(evento_id):
             "rama": generalEnum.RamaEnum(evento.IdRama).name if evento.IdRama else None,
             "division": generalEnum.DivisionEnum(evento.IdDivision).name if evento.IdDivision else None,
             "localidad" : generalEnum.LocalidadEnum(evento.IdLocalidad).name if evento.IdLocalidad else None,
+            "descripcion": evento.Descripcion 
         })
 
     elif tipo == generalEnum.TipoEventoEnum.SuspensionEntrenamiento.value:

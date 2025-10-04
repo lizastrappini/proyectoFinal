@@ -46,28 +46,7 @@ def obtener_respuesta():
 
     return jsonify({"respuesta": pregunta.Respuesta})
 
-# @chatbot_bp.route("/chatbot", methods=["POST"])
-# @login_required
-# def procesar_pregunta():
-#     data = request.get_json()
-#     pregunta_usuario = data.get("pregunta", "").lower()
 
-#     if not pregunta_usuario:
-#         return jsonify({"respuesta": "No entendí tu pregunta, probá elegir un tema 👇"})
-
-#     # Traigo todas las preguntas
-#     preguntas = Pregunta.query.all()
-
-#     for p in preguntas:
-#         # Palabras clave separadas por coma
-#         claves = [k.strip().lower() for k in (p.PalabrasClave or "").split(",")]
-
-#         # Si alguna palabra clave aparece en la pregunta del usuario
-#         if any(clave in pregunta_usuario for clave in claves):
-#             return jsonify({"respuesta": p.Respuesta})
-
-#     # Si no encuentra coincidencias
-#     return jsonify({"respuesta": None})
 
 
 def limpiar_texto(texto):

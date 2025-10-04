@@ -24,8 +24,37 @@ def obtener_pagos(estado= None, fecha_desde=None, fecha_hasta=None):
         except ValueError:
             return []
         
-    # Filtrar por fecha desde
-    if fecha_desde:
+    # # Filtrar por fecha desde
+    # if fecha_desde:
+    #     fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
+    #     query = query.filter(
+    #         or_(
+    #             and_(Pago.FechaPago != None, Pago.FechaPago >= fecha_desde_dt),
+    #             and_(Pago.FechaPago == None, Pago.FechaVencimiento >= fecha_desde_dt)
+    #         )
+    #     )
+
+    # # Filtrar por fecha hasta
+    # if fecha_hasta:
+    #     fecha_hasta_dt = datetime.datetime.strptime (fecha_hasta, "%Y-%m-%d")
+    #     query = query.filter(
+    #         or_(
+    #             and_(Pago.FechaPago != None, Pago.FechaPago <= fecha_hasta_dt),
+    #             and_(Pago.FechaPago == None, Pago.FechaVencimiento <= fecha_hasta_dt)
+    #         )
+    #     )
+    if fecha_desde and fecha_hasta:
+        fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
+        fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
+
+        query = query.filter(
+            or_(
+                and_(Pago.FechaPago != None, Pago.FechaPago.between(fecha_desde_dt, fecha_hasta_dt)),
+                and_(Pago.FechaPago == None, Pago.FechaVencimiento.between(fecha_desde_dt, fecha_hasta_dt))
+            )
+        )
+
+    elif fecha_desde:
         fecha_desde_dt = datetime.datetime.strptime(fecha_desde, "%Y-%m-%d")
         query = query.filter(
             or_(
@@ -34,15 +63,15 @@ def obtener_pagos(estado= None, fecha_desde=None, fecha_hasta=None):
             )
         )
 
-    # Filtrar por fecha hasta
-    if fecha_hasta:
-        fecha_hasta_dt = datetime.datetime.strptime (fecha_hasta, "%Y-%m-%d")
+    elif fecha_hasta:
+        fecha_hasta_dt = datetime.datetime.strptime(fecha_hasta, "%Y-%m-%d")
         query = query.filter(
             or_(
                 and_(Pago.FechaPago != None, Pago.FechaPago <= fecha_hasta_dt),
                 and_(Pago.FechaPago == None, Pago.FechaVencimiento <= fecha_hasta_dt)
             )
         )
+
     
     resultados = query.all()
     pagos = []

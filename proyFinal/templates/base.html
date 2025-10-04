@@ -182,7 +182,7 @@
     
                 <!-- Seccion entrenadores -->
                 <li class="menu-header mt-2">
-                  <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección para entrenadores</span>
+                  <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección Estadísticas</span>
                 </li>
                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin or current_user.IdRol == RolEnum.Entrenador %}
                 <li class="menu-item">
@@ -479,8 +479,7 @@
     
 
 
-      <!-- jQuery (primero siempre, solo una vez) -->
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
       
       <!-- Bootstrap Bundle JS (con Popper incluido, no hace falta Popper aparte) -->
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
@@ -521,6 +520,8 @@
       <script src="../static/js/config.js"></script>   
       <script src="../static/js/charts-apex.js"></script>
       <script src="../static/js/charts-chartjs.js"></script>
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const chatLog = document.getElementById("chat-log");
@@ -531,49 +532,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sendBtn = document.getElementById("send-btn");
   const input = document.getElementById("chat-input");
 
-  // Mostrar chatbot
-  openBtn.addEventListener("click", () => {
-    chatbotBox.style.display = "flex";
-    openBtn.style.display = "none";
-    label.style.display = "none";
-
-    mostrarMensajeBot("¡Hola! Soy VoleyChat 👋 ¿Sobre qué tema querés consultar?");
-
-
-    cargarTemas();
-  });
-
-  // Cerrar chatbot
-  closeBtn.addEventListener("click", () => {
-    chatbotBox.style.display = "none";
-    openBtn.style.display = "block";
-    label.style.display = "block";
-
-    chatLog.innerHTML = "";
-
-  });
-
-  // Enviar mensaje escrito
-  sendBtn.addEventListener("click", () => {
-    const msg = input.value.trim();
-    if (!msg) return;
-
-    mostrarMensajeUsuario(msg);
-    input.value = "";
-
-    fetch("/chatbot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pregunta: msg })
-    })
-      .then(res => res.json())
-      .then(data => {
-        mostrarMensajeBot(data.respuesta || "No encontré nada, elegí un tema 👇");
-        if (!data.respuesta) cargarTemas();
-      });
-  });
-
-  // Mostrar mensaje usuario
+  // Función para mostrar mensaje del usuario
   function mostrarMensajeUsuario(texto) {
     const msg = document.createElement("div");
     msg.className = "user-msg";
@@ -582,29 +541,97 @@ document.addEventListener("DOMContentLoaded", function () {
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
-  // Mostrar mensaje bot
+  // Función para mostrar mensaje del bot
   function mostrarMensajeBot(texto) {
     const msg = document.createElement("div");
     msg.className = "bot-msg";
     msg.innerText = texto;
     chatLog.appendChild(msg);
-   
     chatLog.scrollTop = chatLog.scrollHeight;
   }
-  
+
+  // Función para enviar pregunta al bot
+  function enviarPreguntaAlBot(texto) {
+    if (!texto) return;
+
+    
+
+    fetch("/chatbot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pregunta: texto })
+    })
+      .then(res => res.json())
+      .then(data => {
+        mostrarMensajeBot(data.respuesta || "Ups, lo siento no entendí tu pregunta 🤔. Probá elegir un tema de la lista 👇");
+        if (!data.respuesta) cargarTemas();
+      });
+  }
+
+  // Función para procesar mensaje del usuario
+ function procesarMensaje(mensaje) {
+    const texto = mensaje.trim();
+    if (!texto) return;
+
+    // Mostramos siempre el mensaje del usuario
+    mostrarMensajeUsuario(texto);
+
+    const saludos = ["hola","buenas","holaa","buen dia"];
+
+    if (saludos.includes(texto.toLowerCase())) {
+        mostrarMensajeBot("¡Hola! 👋 Bienvenido al asistente de Vóley. Elegí un tema para empezar:");
+        cargarTemas();
+        return;
+    }
+
+    enviarPreguntaAlBot(texto);
+}
+
+
+  // Enviar mensaje al presionar Enter
+  input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault(); 
+          sendBtn.click(); 
+      }
+  });
+
+  // Botón enviar
+  sendBtn.addEventListener("click", () => {
+    const msg = input.value.trim();
+    input.value = "";
+    procesarMensaje(msg);
+  });
+
+  // Mostrar chatbot
+  openBtn.addEventListener("click", () => {
+    chatbotBox.style.display = "flex";
+    openBtn.style.display = "none";
+    label.style.display = "none";
+
+    mostrarMensajeBot("¡Hola! Soy VoleyChat 👋 ¿Sobre qué tema querés preguntar?");
+    cargarTemas();
+  });
+
+  // Cerrar chatbot
+  closeBtn.addEventListener("click", () => {
+    chatbotBox.style.display = "none";
+    openBtn.style.display = "block";
+    label.style.display = "block";
+    chatLog.innerHTML = "";
+  });
 
   // Cargar lista de temas
   function cargarTemas() {
-    
-    
-
     fetch("/chatbot/temas")
       .then(res => res.json())
       .then(data => {
         if (!data.temas || data.temas.length === 0) {
-          mostrarMensajeBot("No hay temas disponibles.");
+          mostrarMensajeBot("Todavía no hay temas disponibles para mostrar 📭");
           return;
         }
+
+        mostrarMensajeBot("Podés elegir algunos de estos temas o escribir una pregunta 👇");
 
         const opciones = document.createElement("div");
         opciones.className = "bot-msg";
@@ -619,19 +646,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         chatLog.appendChild(opciones);
         chatLog.scrollTop = chatLog.scrollHeight;
-        
       });
   }
 
   // Cargar preguntas de un tema
   function cargarPreguntas(tema) {
-    mostrarMensajeBot(`Preguntas sobre: ${tema}`);
+    mostrarMensajeBot(`Acá tenés algunas preguntas sobre *${tema}* 👇`);
 
     fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
       .then(res => res.json())
       .then(data => {
         if (!data.preguntas || data.preguntas.length === 0) {
-          mostrarMensajeBot("No hay preguntas en este tema.");
+          mostrarMensajeBot("Ups, este tema todavía no tiene preguntas cargadas 🙈");
           return;
         }
 
@@ -652,7 +678,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Botón volver
         const back = document.createElement("button");
         back.className = "chat-back";
-        back.innerText = "⬅ Volver a temas";
+        back.innerText = "⬅ Volver a los temas";
         back.onclick = cargarTemas;
         opciones.appendChild(back);
 
@@ -662,6 +688,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 </script>
+
+
 
 <style>
 

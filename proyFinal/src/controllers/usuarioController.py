@@ -55,7 +55,7 @@ def miCuenta(id):
         'localidad': enum_name(generalEnum.LocalidadEnum, usuario.Localidad),
         'localidad_valor': usuario.Localidad or 0,
         'estado': enum_name(generalEnum.EstadoEnum, usuario.IdEstado),
-        'direccion': usuario.Direccion,
+        'direccion': usuario.Direccion if usuario.Direccion else "-",
         'telefono': usuario.Telefono,
         'rol': enum_name(generalEnum.RolEnum, usuario.IdRol),
         'idEstado': usuario.IdEstado,

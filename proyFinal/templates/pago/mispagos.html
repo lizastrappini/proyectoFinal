@@ -369,6 +369,19 @@ tabla = $('#tablaPagos').DataTable({
 $(window).on('resize orientationchange', () => tabla.columns.adjust());
 });
 
+$('#modalComprobante').on('hidden.bs.modal', function () {
+    // Resetear el formulario
+    $('#formComprobante')[0].reset();
+
+    // Limpiar cualquier error visual o mensaje
+    $('#formComprobante .is-invalid').removeClass('is-invalid');
+    $('#formComprobante .invalid-feedback').remove();
+
+    // Limpiar variable global del pago seleccionado
+    pagoIdSeleccionado = null;
+});
+
+
 
 function editarComprobante(idPago, nuevoArchivo, nuevoEstado) {
   const dt = $('#tablaPagos').DataTable();

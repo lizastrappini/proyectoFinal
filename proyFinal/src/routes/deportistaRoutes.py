@@ -149,6 +149,9 @@ def agregar_deportista():
          raise ValueError(f"Ya existe un usuario con el mismo email")
         
         arg = pytz.timezone("America/Argentina/Buenos_Aires")
+        
+        caracteres = string.ascii_letters + string.digits  # letras + números
+        password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  # 10 caracteres
 
         nuevo_deportista = Usuario(
             Dni= dni,
@@ -159,7 +162,7 @@ def agregar_deportista():
             IdCategoria = categoria_id_seleccionada,
             IdRama = rama_id,
             IdDivision = division_id,
-            Password = generate_password_hash(dni),
+            Password = generate_password_hash(password_plana),
             NombreUsuario=f"{nombre}_{dni}",
             Localidad= localidad_id,
             IdEstado=1,
@@ -174,7 +177,7 @@ def agregar_deportista():
             FechaAlta = datetime.now(arg)
         )
         deportistaController.agregarDeportista(nuevo_deportista)
-        deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)
+        deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'message': 'Deportista creado exitosamente'}), 200
@@ -395,8 +398,7 @@ def importar_deportistas():
         archivo = request.files.get("archivoExcel")
         if not archivo:
             raise ValueError("Debe subir un archivo Excel")
-            
-        
+
         # ---------- ABRIR ARCHIVO ----------
         try:
             wb = openpyxl.load_workbook(archivo)
@@ -408,16 +410,15 @@ def importar_deportistas():
         fila = 2
         registros_creados = 0
         errores = []
+
         if not ws.cell(row=2, column=1).value:
             raise ValueError("El archivo se encuentra vacío")
 
         while True:
             dni = ws.cell(row=fila, column=1).value
-            
             if not dni:  # fin del archivo
                 break
-                    
-          
+
             try:
                 nombre_val = ws.cell(row=fila, column=2).value
                 apellido_val = ws.cell(row=fila, column=3).value
@@ -432,20 +433,15 @@ def importar_deportistas():
                 localidad_val = ws.cell(row=fila, column=12).value
 
                 # ---------- Validaciones ----------
-                # DNI
-                # if not dni or not str(dni).isdigit() or len(str(dni)) != 8:
-                #     raise ValueError(f"DNI inválido en fila {fila}")
-
                 usuario_existente = Usuario.query.filter_by(Dni=dni).first()
                 if usuario_existente:
                     raise ValueError(f"Ya existe un usuario con el DNI {dni}")
 
-                # Email duplicado
                 mail_usuario = Usuario.query.filter_by(Email=email_val).first()
                 if mail_usuario:
                     raise ValueError(f"Ya existe un usuario con el mismo email")
 
-                # Fecha
+                # Fecha de nacimiento
                 if not fecha_nac_val:
                     raise ValueError("La fecha de nacimiento es obligatoria")
 
@@ -486,7 +482,7 @@ def importar_deportistas():
                     raise ValueError(f"Localidad inválida en fila {fila}")
                 localidad_id = generalEnum.LocalidadEnum[localidad_val].value
 
-                # Categoria Extra (puede venir como string separado por comas)
+                # Categoria Extra
                 categoriaExtraIds = []
                 if categoria_extra_val:
                     try:
@@ -498,20 +494,23 @@ def importar_deportistas():
                         ]
                     except Exception:
                         raise ValueError(f"Categoría Extra inválida en fila {fila}")
-                #validar que las cat extras no sean menores a la cat principal
+
+                # Validar que las cat extras no sean menores a la cat principal
                 cat_principal_val = generalEnum.CategoriaEnum[categoria_val].value
                 for cat_extra in categoriaExtraIds:
                     if cat_extra <= cat_principal_val:
                         raise ValueError("Las categorías extras deben ser mayores a la categoría principal")
-                
+
                 categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria_val].value
                 categoria_id_calculada = deportistaController.calcular_categoria_por_fecha(fecha_nac_val)
 
-                
-
                 if categoria_id_seleccionada != categoria_id_calculada:
                     raise ValueError(f"La categoría seleccionada ({categoria_val}) no corresponde con la edad del deportista. Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}")
-                
+
+                # Generar password
+                caracteres = string.ascii_letters + string.digits
+                password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))
+
                 arg = pytz.timezone("America/Argentina/Buenos_Aires")
 
                 # ---------- Crear objeto ----------
@@ -528,19 +527,18 @@ def importar_deportistas():
                     IdDivision=division_id,
                     CategoriaExtra=",".join(map(str, categoriaExtraIds)) if categoriaExtraIds else None,
                     Federado=federado_id,
-                    Password=generate_password_hash(dni),
+                    Password=generate_password_hash(password_plana),
                     NombreUsuario=f"{nombre_val}_{dni}",
                     IdEstado=1,
                     IdRol=2,
                     Token=None,
                     TokenEnviado=False,
                     FechaVencimientoToken=None,
-                    FechaAlta = datetime.now(arg)
-                    
+                    FechaAlta=datetime.now(arg)
                 )
 
                 deportistaController.agregarDeportista(nuevo_deportista)
-                deportistaController.enviar_mail_alta_deportista(nuevo_deportista, dni)
+                deportistaController.enviar_mail_alta_deportista(nuevo_deportista, password_plana)
                 registros_creados += 1
 
             except Exception as e:
@@ -548,26 +546,26 @@ def importar_deportistas():
 
             fila += 1
 
-            # ---------- RESPUESTA ----------
-            if errores:
-                preview = errores[:5]
-                extra = len(errores) - len(preview)
-                mensaje = f"Se importaron {registros_creados} deportistas.\nErrores:\n" + "\n".join(preview)
-                if extra > 0:
-                    mensaje += f"\n... y {extra} más"
+        # ---------- RESPUESTA (fuera del bucle) ----------
+        if errores:
+            preview = errores[:5]
+            extra = len(errores) - len(preview)
+            mensaje = f"Se importaron {registros_creados} deportistas.\nErrores:\n" + "\n".join(preview)
+            if extra > 0:
+                mensaje += f"\n... y {extra} más"
 
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return jsonify({'success': False, 'message': mensaje}), 400
-                else:
-                    flash(mensaje, 'danger')
-                    return redirect(url_for('deportista.index'))
-
-            mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'success': True, 'message': mensaje_ok}), 200
+                return jsonify({'success': False, 'message': mensaje}), 400
             else:
-                flash(mensaje_ok, 'success')
+                flash(mensaje, 'danger')
                 return redirect(url_for('deportista.index'))
+
+        mensaje_ok = f"Se importaron {registros_creados} deportistas correctamente"
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': mensaje_ok}), 200
+        else:
+            flash(mensaje_ok, 'success')
+            return redirect(url_for('deportista.index'))
 
     except Exception as e:
         mensaje_error = str(e)
