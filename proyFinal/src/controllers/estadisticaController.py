@@ -252,7 +252,7 @@ def obtenerEstadisticasCargadas(data):
             {
                 "id": e.Id,
                 "partido": f'{p.Titulo}' if (p := Evento.query.get(e.IdPartido)) else "N/A",
-                "fechaCarga": e.FechaSubida.strftime("%d-%m-%Y") if e.FechaSubida else None,
+                "fechaCarga": e.FechaCarga.strftime("%d-%m-%Y") if e.FechaCarga else None,
                 "responsable": f'{r.Nombre} {r.Apellido}' if (r := Usuario.query.get(e.IdEntrenador)) else "N/A",
                 "fechaPartido": e.Fecha.strftime("%d-%m-%Y") if e.Fecha else None,
                 'rutaArchivo': e.RutaArchivo or ''

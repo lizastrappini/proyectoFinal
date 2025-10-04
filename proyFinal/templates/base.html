@@ -107,8 +107,15 @@
                 <!-- Secciones menu -->
                  
                 <li class="menu-item">
-                  <a href="/miCuenta" class="menu-link">
+                  <a href="{{ url_for('usuarios.listar_usuarios') }}" class="menu-link">
                     <i class="menu-icon tf-icons ri-home-smile-line"></i>
+                    <div data-i18n="Inicio">Inicio</div>
+                  </a>
+                </li>
+
+                <li class="menu-item">
+                  <a href="/miCuenta" class="menu-link">
+                    <i class="menu-icon tf-icons ri-user-line"></i>
                     <div data-i18n="Mi Cuenta">Mi Cuenta</div>
                   </a>
                 </li>

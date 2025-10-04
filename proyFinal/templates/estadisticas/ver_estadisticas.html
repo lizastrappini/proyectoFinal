@@ -1,11 +1,9 @@
 
 {% extends "base.html" %}
-{% block title %}Estadisticas{% endblock %}
+{% block title %}Ver Estadísticas{% endblock %}
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
   <h1>Estadísticas</h1>
-
-
 <div class="card mt-5">
   <div class="card-body">
     <h5 class="card-title">Selecciona filtros para ver estadísticas</h5>
@@ -134,19 +132,36 @@
   </div>
 
 
-  <div class="col-xxl-4 col-md-4 col-sm-12">
-    <div class="card h-100">
-      <div class="card-header">
-        <h5 class="mb-0">Recepciones</h5>
-      </div>
-      <div class="card-body">
-              <div id="recepcionesPartidos" class="row g-4"></div>
-      </div>
+  <div class="col-xxl-6 col-md-6 col-sm-12">
+  <div class="card h-100">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="mb-0">Recepciones</h5>
+      <a class="avatar avatar-sm avatar-initial bg-label-primary rounded-3 d-inline-flex justify-content-center align-items-center"
+         href="javascript:void(0);" 
+         data-bs-toggle="modal" 
+         data-bs-target="#modalScrollable"
+         data-tipo="recepciones">
+        <i class="tf-icons ri-question-line ri-20px"></i>
+      </a>
+    </div>
+    <div class="card-body">
+      <div id="recepcionesPartidos" class="row g-4"></div>
     </div>
   </div>
+</div>
 
   <div class="col-xxl-6 col-md-6 col-sm-12">
   <div class="card h-100">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="mb-0"></h5>
+      <a class="avatar avatar-sm avatar-initial bg-label-primary rounded-3 d-inline-flex justify-content-center align-items-center"
+        href="javascript:void(0);" 
+        data-bs-toggle="modal" 
+        data-bs-target="#modalScrollable"
+        data-tipo="bloqueosSaques">
+        <i class="tf-icons ri-question-line ri-20px"></i>
+      </a>
+    </div>
     <div class="card-body" style="margin-top: 6%">
       <div class="row">
         <!-- Bloqueos -->
@@ -169,8 +184,15 @@
 <!-- Ataques combinados -->
 <div class="col-xxl-12 col-md-12 col-sm-12">
   <div class="card h-100">
-    <div class="card-header">
+    <div class="card-header d-flex align-items-center justify-content-between">
       <h5 class="mb-0">Ataques</h5>
+      <a class="avatar avatar-sm avatar-initial bg-label-primary rounded-3 d-inline-flex justify-content-center align-items-center"
+                href="javascript:void(0);" 
+                data-bs-toggle="modal" 
+                data-bs-target="#modalScrollable"
+                data-tipo="ataques">
+                <i class="tf-icons ri-question-line ri-20px"></i>
+              </a>
     </div>
     <div class="card-body">
       <div class="row">
@@ -210,6 +232,20 @@
 </div>
 </div>
 
+
+<div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitulo">Leyenda</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalContenido">
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="../static/js/config.js"></script>   
 <script src="../static/js/charts-apex.js"></script>
 <script src="../static/js/charts-chartjs.js"></script>
@@ -217,6 +253,66 @@
 
 <script>
 $(document).ready(function() {
+
+  $('#modalScrollable').on('show.bs.modal', function (event) {
+    var trigger = $(event.relatedTarget);   
+    var tipo = trigger.data('tipo');        
+    var titulo = $("#modalTitulo");
+    var contenido = $("#modalContenido");
+
+    switch (tipo) {
+      case "recepciones":
+        titulo.text("Cómo leer los gráficos de recepciones");
+        contenido.html(`
+          <ul class="list-unstyled">
+            <li class="mb-2">👉 <b>Doble positiva</b>: representa el pase perfecto a la cabeza del armador. Se simboliza con <b>#</b> o <b>3</b> en la planilla.</li>
+            <li class="mb-2">👉 <b>Positiva</b>: pase a más de un metro del armador. Se simboliza con <b>+</b> o <b>2</b> en la planilla.</li>
+            <li class="mb-2">👉 <b>Exclamativa</b>: pase a la altura de la línea de 3 metros. Se simboliza con <b>!</b> o <b>1</b> en la planilla.</li>
+            <li class="mb-2">👉 <b>Negativa</b> y <b>Doble negativa</b>: errores con punto directo al rival o pelotas vendidas para el otro equipo. Se simboliza como <b>-</b>, <b>=</b> y <b>0</b> en la planilla.</li>
+          </ul>
+        `);
+        break;
+      case "bloqueosSaques":
+        titulo.text("Cómo leer los gráficos de saques y bloqueos");
+        contenido.html(`
+          <h6>🎯 Saque</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">👉 <b>Doble positiva</b>: pase perfecto a la cabeza del armador. Se simboliza con <b>#</b> o <b>4</b>.</li>
+            <li class="mb-2">👉 <b>Positiva</b>: pase a más de un metro del armador. Se simboliza con <b>+</b> o <b>3</b>.</li>
+            <li class="mb-2">👉 <b>Exclamativa</b>: pase a la altura de la línea de 3 metros. Se simboliza con <b>!</b> o <b>2</b>.</li>
+            <li class="mb-2">👉 <b>Negativa</b>: el rival devuelve la pelota como <i>free ball</i>. Se simboliza con <b>-</b> o <b>1</b>.</li>
+            <li class="mb-2">👉 <b>Doble negativa</b>: punto directo de saque para el equipo contrario. Se simboliza con <b>=</b> o <b>0</b>.</li>
+          </ul>
+
+          <h6>🛡️ Bloqueo</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">👉 <b>Puntos o Positivos</b>: bloqueo que da punto directo. Se simboliza con <b>P</b>.</li>
+            <li class="mb-2">👉 <b>Neutros</b>: el bloqueo no es punto y el juego continúa. Se simboliza con <b>N+</b>.</li>
+          </ul>
+        `);
+        break;
+      case "ataques":
+        titulo.text("Cómo leer los gráficos de ataques");
+        contenido.html(`
+          <p>📊 Los ataques se registran como <b>“De rotación”</b> y <b>“De transición”</b>.</p>
+          <p>➡️ <b>Rotación</b>: ataque luego de la defensa.<br>
+            ➡️ <b>Transición</b>: ataque luego de la recepción.</p>
+
+          <h6>⚡ Tipos de ataque</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">👉 <b>Doble positiva</b>: punto directo para nuestro equipo. Se simboliza con <b>#</b> o <b>4</b>.</li>
+            <li class="mb-2">👉 <b>Positiva</b>: termina en punto pero más de una jugadora toca la pelota. Se simboliza con <b>+</b> o <b>3</b>.</li>
+            <li class="mb-2">👉 <b>Exclamativa</b>: el ataque no hace punto pero la pelota vuelve como <i>FreeBall</i>. Se simboliza con <b>!</b> o <b>2</b>.</li>
+            <li class="mb-2">👉 <b>Negativa</b>: el equipo contrario logra un contraataque. Se simboliza con <b>-</b> o <b>1</b>.</li>
+            <li class="mb-2">👉 <b>Doble negativa</b>: punto para el rival (error de ataque, afuera, red o bloqueo). Se simboliza con <b>=</b> o <b>0</b>.</li>
+          </ul>
+        `);
+        break;
+      default:
+        titulo.text("Leyenda");
+        contenido.html("<p>Información no disponible.</p>");
+    }
+  });
 
   // --- ELEMENTOS ---
   const $btnDescargar = $('#btnDescargar');

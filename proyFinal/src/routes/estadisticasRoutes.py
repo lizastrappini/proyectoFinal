@@ -236,7 +236,7 @@ def subir_estadisticas():
             Resultado=idResultado,
             IdPartido=partido.Id,
             IdEntrenador=session.get('_user_id'),
-            FechaSubida= datetime.now(arg)
+            FechaCarga= datetime.now(arg)
         )
         db.session.add(estadistica)
 
