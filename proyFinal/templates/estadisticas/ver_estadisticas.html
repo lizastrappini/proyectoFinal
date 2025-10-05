@@ -87,6 +87,7 @@
       </div>
 
       <!-- Switch -->
+    {% if current_user.IdRol == RolEnum.Deportista %}
       <div class="mt-3">
         <label class="switch switch-success">
           <input type="checkbox" id="misEstadisticas" class="switch-input">
@@ -97,6 +98,7 @@
           <span class="switch-label"><b>Sólo mis estadísticas</b></span>
         </label>
       </div>
+    {% endif %}
     </div>
   </div>
 </div>

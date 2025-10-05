@@ -216,6 +216,8 @@ def getUsuarioByCategoriaYRama(categoria, rama, division, ids_seleccionados=None
     query = Usuario.query.filter(
         Usuario.IdRama == rama,
         Usuario.IdDivision == division,
+        Usuario.Federado == 1,
+        Usuario.IdEstado == 1,
         or_(
             Usuario.IdCategoria == cat_buscar,
             and_(Usuario.CategoriaExtra.isnot(None), Usuario.CategoriaExtra != '')

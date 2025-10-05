@@ -390,6 +390,7 @@ def usuarios_por_categoria():
         return jsonify({"estado": "error", "mensaje": "No se seleccionó filtros"}), 400
 
     usuarios = usuarioController.getUsuarioByCategoriaYRama(categoria, rama, division)
+    
 
     return jsonify({"estado": "ok", "usuarios": usuarios})
 
