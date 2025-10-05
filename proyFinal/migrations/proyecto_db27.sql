@@ -277,7 +277,8 @@ INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`, `Tema`, `Rol`
 (26, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 3),
 (27, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 2),
 (30, '¿Dónde puedo cargar los entranamientos?', 'Andá a “Calendario” en el menú lateral. Ahí podés crear eventos del tipo \'Entrenamientos\' para las categorias que desees.', 'entrenadores, entrenamientos, dias, clases', 'Entrenamientos', 1);
-
+(31, '¿Cómo doy de alta a un deportista?', 'Andá a “Deportistas” en el menú lateral. Ahí podés crear los deportistas que desees. Podés crearlos de forma individual o masivamente. ', 'deportista, crear, alta, nuevo, agregar', 'Usuario', 1),
+(32, '¿Cómo doy de alta a un entrenador?', 'Andá a “Entrenadores” en el menú lateral. Ahí podés crear los entrenadores que desees. También podrás ver el lsitado de los mismos.', 'entrenadores, entrenador, crear, alta, nuevo, agregar', 'Usuario', 1);
 -- --------------------------------------------------------
 
 --
