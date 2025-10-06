@@ -41,7 +41,7 @@ CREATE TABLE `EstadisticaPorPartido` (
   `Resultado` int NOT NULL,
   `FechaCarga` datetime NOT NULL,
   `IdEntrenador` int NOT NULL,
-  `RutaArchivo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `RutaArchivo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
