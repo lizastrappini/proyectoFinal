@@ -138,6 +138,7 @@ def nuevo_evento():
     )
 
     calendarioController.crearEvento(nuevo_evento)
+    flash("✅ Evento creado correctamente", "success")
     return redirect(url_for('calendario.index'))
 
 
