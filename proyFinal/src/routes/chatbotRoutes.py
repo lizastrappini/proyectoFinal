@@ -2,12 +2,11 @@ import re
 import unicodedata
 from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_required
-from src.models.pregunta import Pregunta  # Tu tabla FAQ
+from src.models.pregunta import Pregunta  
 from src import db
 
 chatbot_bp = Blueprint("chatbot", __name__)
 
-# 1) Obtener lista de temas (DISTINCT)
 @chatbot_bp.route("/chatbot/temas", methods=["GET"])
 @login_required
 def obtener_temas():
@@ -16,7 +15,6 @@ def obtener_temas():
     return jsonify({"temas": temas_lista})
 
 
-# 2) Obtener preguntas de un tema
 @chatbot_bp.route("/chatbot/preguntas", methods=["GET"])
 @login_required
 def obtener_preguntas():
@@ -27,12 +25,10 @@ def obtener_preguntas():
         Pregunta.Tema == tema,
         (Pregunta.Rol == current_user.IdRol) | (Pregunta.Rol == None)
      ).all()
-    # preguntas = Pregunta.query.filter_by(Tema=tema).all()
     data = [{"id": p.Id, "pregunta": p.Pregunta, "respuesta": p.Respuesta} for p in preguntas]
     return jsonify({"preguntas": data})
 
 
-# 3) (Opcional) Obtener la respuesta de una pregunta puntual por id
 @chatbot_bp.route("/chatbot/respuesta", methods=["GET"])
 @login_required
 def obtener_respuesta():
@@ -50,9 +46,7 @@ def obtener_respuesta():
 
 
 def limpiar_texto(texto):
-    # Quita acentos y pasa a minúsculas
     texto = unicodedata.normalize("NFKD", texto).encode("ASCII", "ignore").decode("utf-8")
-    # Quita signos de puntuación
     texto = re.sub(r'[^\w\s]', '', texto)
     return texto.lower()
 
@@ -72,7 +66,6 @@ def procesar_pregunta():
     for p in preguntas:
         claves = [limpiar_texto(k) for k in (p.PalabrasClave or "").split(",")]
 
-        # Contar cuántas palabras clave coinciden con la pregunta
         matches = sum(1 for clave in claves if clave in pregunta_usuario)
 
         if matches > max_matches:

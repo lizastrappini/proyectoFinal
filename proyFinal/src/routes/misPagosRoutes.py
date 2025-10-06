@@ -61,13 +61,11 @@ def allowed_file(filename):
 @mispago_bp.route("/subir_comprobante/<int:id_pago>", methods=["POST"])
 @login_required
 def subir_comprobante(id_pago):
-    # Buscar el pago
     # pago = Pago.query.get(pago_id)
     pago = pagosController.obtener_pago_por_id(id_pago)
     if not pago:
         return jsonify({"success": False, "message": "Pago no encontrado"}), 404
 
-    # Revisar si hay archivo en el request
     if 'file' not in request.files:
         return jsonify({"success": False, "message": "No se envió ningún archivo"}), 400
 
@@ -77,16 +75,13 @@ def subir_comprobante(id_pago):
         return jsonify({"success": False, "message": "Archivo vacío"}), 400
 
     if file and allowed_file(file.filename):
-        # Crear nombre seguro y carpeta de uploads si no existe
         filename = secure_filename(f"comprobante_{pago.Id}_{file.filename}")
         upload_folder = os.path.join(current_app.root_path, 'static','uploads')
         os.makedirs(upload_folder, exist_ok=True)
 
-        # Guardar archivo
         file_path = os.path.join(upload_folder, filename)
         file.save(file_path)
 
-        # Guardar ruta en la DB
         pago.Comprobante = f"uploads/{filename}"
         pago.IdEstado = generalEnum.EstadoPagoEnum.Pendiente.value
         pagosController.actualizar_pago(pago)

@@ -49,37 +49,34 @@ def filtrar():
     fecha_desde = request.args.get('fechaDesde')
     fecha_hasta = request.args.get('fechaHasta')
     filtrado_manual = request.args.get('filtrado_manual', 'false') == 'true'  # nuevo
-    # ⚠️ Solo mostrar mensaje si el filtrado es manual
+
     if not fecha_desde or not fecha_hasta:
         if filtrado_manual:
             return jsonify({'data': [], 'message': 'Debe seleccionar ambas fechas'})
         else:
-            return jsonify({'data': [], 'message': '', 'estadisticas': {}})  # tabla vacía sin alerta
+            return jsonify({'data': [], 'message': '', 'estadisticas': {}})  
 
     if estado and estado.isdigit():
         estado = int(estado)
 
-    # --- 1) Data para la tabla ---
     data = pagosController.obtener_pagos(
         estado=estado,
         fecha_desde=fecha_desde,
         fecha_hasta=fecha_hasta
     )
 
-    # --- 2) Data para estadísticas ---
     fecha_desde_dt = datetime.strptime(fecha_desde, "%Y-%m-%d")
     fecha_hasta_dt = datetime.strptime(fecha_hasta, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
 
     pagos_filtrados = Pago.query.filter(
         Pago.FechaPago >= fecha_desde_dt.date(),
         Pago.FechaPago <= fecha_hasta_dt.date(),
-        Pago.IdEstado == generalEnum.EstadoPagoEnum.Pago.value  # ✅ solo pagados
+        Pago.IdEstado == generalEnum.EstadoPagoEnum.Pago.value  
     ).all()
 
-    # ✅ Cantidad de cuotas pagas por categoría (mostrar todas aunque tengan 0)
     cuotas_por_categoria = []
     for cat in generalEnum.CategoriaEnum:
-        if cat.value == 0:  # 🚫 saltar NoEspecificada
+        if cat.value == 0:  
             continue
         cantidad = sum(
             1 for p in pagos_filtrados
@@ -87,7 +84,6 @@ def filtrar():
         )
         cuotas_por_categoria.append({"nombre": cat.name, "cantidad": cantidad})
 
-    # ✅ Cuotas pagas por mes (año actual completo)
     ahora = datetime.now()
     year = ahora.year
     cuotas_por_mes = [0] * 12
@@ -102,19 +98,18 @@ def filtrar():
         if p.FechaPago:
             cuotas_por_mes[p.FechaPago.month - 1] += 1
 
-    # ✅ Comparativa mes actual vs anterior
+    
     max_mes_index = max(range(12), key=lambda i: cuotas_por_mes[i])
     max_mes_total = cuotas_por_mes[max_mes_index]
     
 
-    # mes anterior al de máximo
     mes_anterior_index = max_mes_index - 1 if max_mes_index > 0 else 11
     total_mes_anterior = cuotas_por_mes[mes_anterior_index]
 
     if total_mes_anterior > 0:
         variacion = ((max_mes_total - total_mes_anterior) / total_mes_anterior) * 100
     elif max_mes_total > 0:
-        variacion = 100.0  # antes era 0, ahora hay pagos
+        variacion = 100.0  
     else:
         variacion = 0.0
     
@@ -136,8 +131,8 @@ def filtrar():
         "data": data,
         "estadisticas": {
             "totalPagas": sum(c["cantidad"] for c in cuotas_por_categoria),
-            "porCategoria": cuotas_por_categoria,   # 🔹 siempre todas las categorías
-            "porMes": cuotas_por_mes,               # 🔹 12 números
+            "porCategoria": cuotas_por_categoria,   
+            "porMes": cuotas_por_mes,
             "mesMax": {
                 "nombre": comparativa["mes_actual"],
                 "comparacion": f'{comparativa["variacion_pct"]:.1f}%',
@@ -181,7 +176,7 @@ def agregar_pago():
             fechaVencimiento = datetime.strptime(fechaVencimiento_str, "%Y-%m-%d")
         else:
             fechaVencimiento = None
-        # Antes de crear el nuevo pago
+        
         if fechaVencimiento:
             mes = fechaVencimiento.month
             anio = fechaVencimiento.year
@@ -201,13 +196,13 @@ def agregar_pago():
         if fechaPago is None:
                 if estado_nombre not in ["Pendiente", "NoPago"]:
                     raise ValueError("Si no hay fecha de pago, el estado solo puede ser 'Pendiente' o 'NoPago'")
-        # Caso 1: No hay fecha de pago
+        
         if fechaPago is None:
             if fechaVencimiento and fechaVencimiento.date() < hoy:
-                # Si venció y no se pagó, debe ser NoPago
+                
                 if estado_nombre != "NoPago":
                     raise ValueError("El estado debe ser 'NoPago' porque la cuota está vencida y no tiene fecha de pago")
-         # Caso 2: Hay fecha de pago
+         
         if fechaPago is not None: 
             if estado_nombre != "Pago":
                 raise ValueError("Si hay fecha de pago, el estado debe ser 'Pago'")
@@ -224,7 +219,7 @@ def agregar_pago():
             IdUsuario =int(usuario_id),
         )
         
-        # --- Envío de mail si corresponde ---
+        
         if fechaPago is None and fechaVencimiento and fechaVencimiento.date() < hoy and estado_nombre == "NoPago":
             deportista = Usuario.query.get(int(usuario_id))
             pagosController.enviar_recordatorio_individual(deportista, nuevo_pago)
@@ -305,7 +300,6 @@ def importar_pagos():
                 # if not importe_val:
                 #     raise ValueError("El importe es obligatorio")
 
-                # Parseo fechas si vienen en string
                 fecha_pago = fecha_pago_val
                 fecha_vencimiento = fecha_venc_val
                 if isinstance(fecha_pago_val, str):
@@ -314,8 +308,6 @@ def importar_pagos():
                     fecha_vencimiento = datetime.datetime.strptime(fecha_venc_val, "%d-%m-%Y")
 
                 # Importe
-                # importe = Decimal(str(importe_val))
-                # Antes de crear el pago
                 existe_pago = Pago.query.filter(
                     Pago.IdUsuario == usuario.Id,
                     db.extract('month', Pago.FechaVencimiento) == fecha_vencimiento.month,
@@ -387,7 +379,7 @@ def editar_pago(id):
             fechaPago = datetime.strptime(fechaPago_str, "%Y-%m-%d")
     else:
             fechaPago = None 
-    # Actualiza campos
+    
     pago.FechaPago = fechaPago
     pago.FechaVencimiento = fechaVencimiento
     # pago.Importe = importe
@@ -457,18 +449,16 @@ def pagar_seleccionados():
 @pago_bp.route('/actualizar_cuota', methods=['POST'])
 def actualizar_cuota():
     try:
-        # Obtener el nuevo valor desde el formulario o JSON
-        nuevo_valor = request.form.get('importe')  # o request.json.get('nuevo_valor')
+        
+        nuevo_valor = request.form.get('importe')  
         if not nuevo_valor:
             raise ValueError("Debe indicar el nuevo valor de la cuota")
 
-        # Buscar el parámetro ValorCuota
         parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
         if not parametro:
             raise ValueError("No se encontró el parámetro ValorCuota")
 
-        # Actualizar el valor
-        parametro.Valor = str(nuevo_valor)  # ⚠️ convertir a string si es Text
+        parametro.Valor = str(nuevo_valor) 
        
         parametroController.actualizar_parametro(parametro)
         pagos_no_pago = Pago.query.filter_by(IdEstado=generalEnum.EstadoPagoEnum['NoPago'].value).all()
@@ -477,21 +467,22 @@ def actualizar_cuota():
 
         db.session.commit()
        
-        deportistas = Usuario.query.filter_by(IdRol=2).all()  # rol 2 = deportista
+        deportistas = Usuario.query.filter_by(IdRol=2).all()  
         enviados = parametroController.enviar_mail_actualizacion(deportistas, parametro)
 
         mensaje = f'Cuota actualizada exitosamente. Correos enviados a {enviados} deportistas.'
-        
+
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': True, 'message': mensaje}), 200
+            return jsonify({'estado': 'ok','success': True, 'message': mensaje}), 200
         else:
             flash('Cuota actualizada exitosamente', 'success')
             return redirect(url_for('pago.index'))
+        
     except Exception as e:
         mensaje_error = str(e)
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': mensaje_error}), 400
+            return jsonify({'estado': 'error','success': False, 'message': mensaje_error}), 400
         else:
             flash(f'Error al actualizar cuota: {mensaje_error}', 'danger')
             return redirect(url_for('pago.index'))

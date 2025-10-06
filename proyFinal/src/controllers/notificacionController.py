@@ -81,7 +81,6 @@ def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None
 
     query = Notificacion.query
 
-    # --- Filtrado solo para deportistas ---
     if current_user.IdRol == 2:  # Deportistas
         filtros = [Notificacion.FechaEnvio > current_user.FechaAlta]
 
@@ -97,7 +96,6 @@ def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None
 
         query = query.filter(and_(*filtros))
 
-    # --- Filtros del front ---
     if buscar:
         like_pattern = f"%{buscar}%"
         query = query.filter(
@@ -113,7 +111,6 @@ def obtener_notificaciones(buscar=None, categoria=None, division=None, rama=None
     if division is not None:
         query = query.filter(Notificacion.IdDivision == division)
 
-    # --- Ordenar y obtener ---
     resultados = query.order_by(Notificacion.Id.desc()).all()
 
     notificaciones = []
@@ -162,7 +159,7 @@ def enviar_mail(destinatario,titulo,descripcion):
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[destinatario]
     )
-    link = f"http://127.0.0.1:5002/notificacion" # aca despues va la url del servidor
+    link = f"http://127.0.0.1:5002/notificacion" 
     
     # link = url_for('usuarios.login', _external=True)
     # msg.html = render_template("notificacion/emailNotif.html", titulo=titulo, descripcion=descripcion)

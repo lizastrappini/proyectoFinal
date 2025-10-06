@@ -128,8 +128,7 @@ def enviar_mail_alta_deportista(deportista, password):
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[deportista.Email]
     )
-    link = f"http://127.0.0.1:5002" # aca despues va la url del servidor
-    
+    link = f"http://127.0.0.1:5002"     
     # link = url_for('usuarios.login', _external=True)
     msg.html = render_template("deportista/emailAlta.html", deportista=deportista, password=password, link=link)
 
@@ -144,7 +143,6 @@ def enviar_mail_alta_deportista(deportista, password):
 def calcular_categoria_por_fecha(fecha_nacimiento):
     
     if not fecha_nacimiento:
-        # Si no hay fecha, devolver "NoDefinido" o el valor que uses
         return generalEnum.CategoriaEnum.NoEspecificada.value
     
     hoy = date.today()

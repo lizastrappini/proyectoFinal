@@ -278,7 +278,6 @@ def nuevoEventoMasivo():
         flash("La fecha de fin debe ser mayor o igual a la fecha de inicio", "danger")
         return redirect(url_for('calendario.index'))
     
-    # Parsear hora de inicio (HH:mm)
     hora, minuto = map(int, hora_inicio_str.split(":"))
     
     dias_int = [int(d) for d in dias_seleccionados]

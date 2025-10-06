@@ -94,8 +94,7 @@ def editUsuario():
             if email_usuario:
                 raise ValueError(f"Ya existe un usuario con el mismo email")
 
-    
-        # Actualiza campos
+
         usuario.Email = email
         usuario.Direccion = direccion
         usuario.Localidad = generalEnum.LocalidadEnum[localidad].value
@@ -186,7 +185,7 @@ def cambiarPass():
         flash("La contraseña debe contener al menos una letra mayúscula.", "danger")
         return render_template('usuario/nuevaPass.html', token=token)
        
-    # Validación: al menos un símbolo
+
     elif not any(c in string.punctuation for c in password):
         flash("La contraseña debe contener al menos un símbolo (por ejemplo: !, @, #, etc).", "danger")
         return render_template('usuario/nuevaPass.html', token=token)

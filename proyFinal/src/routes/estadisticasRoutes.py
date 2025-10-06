@@ -22,6 +22,7 @@ from src import db
 from sqlalchemy.engine.row import Row
 from src.models.notificacion import Notificacion
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import NotFound
 
 estadisticas_bp = Blueprint('estadisticas', __name__, url_prefix='/estadisticas')
 
@@ -68,7 +69,6 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
     rama_texto      = generalEnum.RamaEnum(int(rama)).name.replace("_", " ").title()
     division_texto  = generalEnum.DivisionEnum(int(division)).name.replace("_", " ").title()
 
-    # --- NUEVAS CELDAS ---
     # D3
     ws.cell(row=3, column=4, value=f"Rosario Central - {categoria_texto} - {rama_texto} - {division_texto}")
 
@@ -79,10 +79,9 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
     fecha_str = partido.FechaInicio.strftime("%d-%m-%Y")
     ws.cell(row=5, column=16, value=fecha_str)
 
-    # AE3 -> idPartido (siempre presente)
+    # AE3 -> idPartido 
     ws.cell(row=3, column=31, value=partido.Id)
 
-    # --- RELLENAR USUARIOS ---
     usuarios = usuarioController.getUsuarioByCategoriaYRama(categoria, rama, division, ids_seleccionados)
     start_row = 11
     for i, u in enumerate(usuarios, start=start_row):
@@ -145,7 +144,6 @@ def get_cell_value(ws, row, col):
     cell = ws.cell(row=row, column=col)
     if cell.value is not None:
         return cell.value
-    # si está dentro de un rango mergeado, agarro la esquina superior izquierda
     for merged_range in ws.merged_cells.ranges:
         if cell.coordinate in merged_range:
             min_col, min_row, _, _ = range_boundaries(str(merged_range))
@@ -215,7 +213,6 @@ def subir_estadisticas():
         }), 400
 
     try:
-        # como ya sabemos que es string con guiones
         fecha = datetime.strptime(fecha_excel_value.strip(), "%d-%m-%Y").date()
     except ValueError:
         return jsonify({
@@ -298,13 +295,12 @@ def subir_estadisticas():
                 generalEnum.ContrincantesEnum(int(partido.IdContrincante)).name
             )
 
-        #guardo el archivo
         UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads_estadisticas")
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
         nombre_archivo = f"estadisticas_{estadistica.Id}.xlsx"
         ruta_guardado = os.path.join(UPLOAD_FOLDER, nombre_archivo)
-        archivo.stream.seek(0)     # 👈 esto es clave
+        archivo.stream.seek(0)     
         archivo.save(ruta_guardado)
 
         estadistica.RutaArchivo = nombre_archivo
@@ -536,9 +532,12 @@ def descargar_estadistica(id):
     if not estadistica or not estadistica.RutaArchivo:
         return jsonify({"estado": "error", "mensaje": "Archivo no encontrado"}), 404
 
-    return send_from_directory(
-        "uploads_estadisticas",        
-        estadistica.RutaArchivo,       
-        as_attachment=True,
-        download_name=f"estadisticas_{id}.xlsx"
-    )
+    try:
+        return send_from_directory(
+            "uploads_estadisticas",
+            estadistica.RutaArchivo,
+            as_attachment=True,
+            download_name=f"estadisticas_{id}.xlsx"
+        )
+    except NotFound:
+        return jsonify({"estado": "error", "mensaje": "El archivo no existe en el servidor"}), 404

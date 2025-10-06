@@ -25,6 +25,7 @@ def obtener_entrenadores(buscar=None):
             categoria_nombre = cat_enum.name 
         except (ValueError, KeyError):
             categoria_nombre = 'Desconocido'
+
         # Division
         if e.IdDivision is not None:
             try:
@@ -99,7 +100,7 @@ def enviar_mail_alta_entrenador(entrenador, password):
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[entrenador.Email]
     )
-    link = f"http://127.0.0.1:5002" # aca despues va la url del servidor
+    link = f"http://127.0.0.1:5002" 
     
     # link = url_for('usuarios.login', _external=True)
     msg.html = render_template("entrenador/emailAlta.html", entrenador=entrenador, password=password, link=link)

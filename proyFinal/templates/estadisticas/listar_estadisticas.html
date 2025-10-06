@@ -275,17 +275,36 @@ function eliminarEstadistica(id) {
 
 function descargarEstadistica(id) {
   fetch('/estadisticas/descargar_estadistica/' + id)
-    .then(response => {
+    .then(async response => {
       if (!response.ok) {
-        return response.json().then(err => {
-          Swal.fire("Error", err.mensaje || "No se pudo descargar la estadística", "error");
-          throw new Error(err.mensaje);
+        // Intentamos parsear JSON; si falla, tomamos texto plano
+        let mensaje = "No se pudo descargar la estadística";
+        try {
+          const err = await response.json();
+          mensaje = err.mensaje || mensaje;
+        } catch {
+          const texto = await response.text();
+          if (texto && texto.trim() !== "")
+            mensaje = texto;
+        }
+
+        Swal.fire({
+          title: "Error",
+          text: mensaje,
+          icon: "error",
+          didOpen: function() {
+            document.querySelector('.swal2-container').style.zIndex = 20000;
+            document.querySelector('.swal2-popup').style.zIndex = 20001;
+          }
         });
+
+        throw new Error(mensaje);
       }
-      return response.blob();
-    })
-    .then(blob => {
-      // Crear un enlace temporal para descargar
+
+      // Si todo ok -> blob
+      const blob = await response.blob();
+
+      // Crear enlace temporal para descarga
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -295,11 +314,19 @@ function descargarEstadistica(id) {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      // Swal de éxito
-      Swal.fire("Descarga iniciada", "La estadística se está descargando.", "success");
+      Swal.fire({
+        title: "Descarga iniciada",
+        text: "La estadística se está descargando.",
+        icon: "success",
+        didOpen: function() {
+          document.querySelector('.swal2-container').style.zIndex = 20000;
+          document.querySelector('.swal2-popup').style.zIndex = 20001;
+        }
+      });
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("Error en la descarga:", err));
 }
+
 
 </script>
 {% endblock %}

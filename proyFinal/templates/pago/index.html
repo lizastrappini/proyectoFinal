@@ -72,7 +72,7 @@
           {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Admin %}
           <div class="d-flex flex-wrap gap-2">
             <button id="btnPagarSeleccionados" class="btn btn-outline-primary btn-sm" disabled>Pagar</button>
-            <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;"  data-bs-target="#actualizarCuota" data-bs-toggle="modal">
+            <a href="javascript:;" class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light" style="padding:10px;font-size:small;" id="btnAbrirSwal">
               Actualizar Cuota
             </a>
             <!-- <button class="btn btn-secondary buttons-collection btn-label-primary waves-effect waves-light btn-export" style="padding:10px;font-size:small;" type="button">
@@ -286,53 +286,7 @@
                   </div>
                 </div>
                 <!--/  Modal Importar Masivo -->
-                <!-- /Modal -->
 
-                 <!-- Modal Actualizar Cuota-->
-                <!--   Modal -->
-                <div class="modal fade" id="actualizarCuota" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-md modal-simple modal-edit-user">
-                    <div class="modal-content">
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      <div class="modal-body p-0">
-                        <div class="text-center mb-6">
-                          <h4 class="mb-2" id="tituloAdd">Actulizar Cuota</h4>
-                        </div>
-                        <form id="actualizarCuotaForm" class="row g-5" method="POST" action="{{ url_for('pago.actualizar_cuota') }}" >
-                         
-                         
-                            <div class="form-floating form-floating-outline">
-                              <input
-                                type="number"
-                                id="importe"
-                                name="importe"
-                                step="0.01"
-                                class="form-control"
-                                value=""
-                                placeholder=""
-                                required />
-                              <label for="modalEditUserLastName">Importe</label>
-                            </div>
-                          
-                          <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
-                            <button
-                              type="reset"
-                              class="btn btn-outline-secondary"
-                              data-bs-dismiss="modal"
-                              aria-label="Close">
-                              Cancelar
-                            </button>
-                          </div>
-                        </form>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!--/  Modal Actualizar Cuota -->
-                <!-- /Modal -->
-             
 
           
         </div>
@@ -1125,6 +1079,97 @@ function renderEstadisticas(est) {
 });
   }
 }
+
+$('#btnAbrirSwal').on('click', function() {
+  Swal.fire({
+    title: 'Actualizar Cuota',
+    html: `
+      <div class="form-floating form-floating-outline mb-4">
+        <input type="number" id="importe" step="0.01" class="form-control" placeholder="Importe" required>
+        <label for="importe">Importe</label>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Guardar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#7367F0',
+    focusConfirm: false,
+    didOpen: function() {
+      document.querySelector('.swal2-container').style.zIndex = 20000;
+      document.querySelector('.swal2-popup').style.zIndex = 20001;
+      inputImporte = Swal.getPopup().querySelector('#importe');
+    },
+    preConfirm: () => {
+      
+      const importe = inputImporte.value.trim();
+      console.log("importe ingresado:", importe);
+      if (!importe || parseFloat(importe) <= 0) {
+        Swal.showValidationMessage('Ingresá un importe válido');
+        return false;
+      }
+      return { importe };
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append('importe', result.value.importe);
+
+      $.ajax({
+        url: "{{ url_for('pago.actualizar_cuota') }}",
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+          Swal.fire({
+            title: 'Actualizando...',
+            text: 'Esto puede tardar unos segundos',
+            allowOutsideClick: false,
+            didOpen: function() {
+              Swal.showLoading();
+              document.querySelector('.swal2-container').style.zIndex = 20000;
+              document.querySelector('.swal2-popup').style.zIndex = 20001;
+            }
+          });
+        },
+        success: function(res) {
+          if (res.estado === 'ok') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Actualizado',
+              text: 'La cuota se actualizó correctamente',
+              didOpen: function() {
+                document.querySelector('.swal2-container').style.zIndex = 20000;
+                document.querySelector('.swal2-popup').style.zIndex = 20001;
+              }
+            }).then(() => location.reload());
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: res.mensaje || 'No se pudo actualizar la cuota',
+              didOpen: function() {
+                document.querySelector('.swal2-container').style.zIndex = 20000;
+                document.querySelector('.swal2-popup').style.zIndex = 20001;
+              }
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un problema al comunicarse con el servidor',
+            didOpen: function() {
+              document.querySelector('.swal2-container').style.zIndex = 20000;
+              document.querySelector('.swal2-popup').style.zIndex = 20001;
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
   </script>
   <!-- DataTables Buttons CSS -->

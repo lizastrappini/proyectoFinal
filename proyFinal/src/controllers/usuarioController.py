@@ -33,11 +33,9 @@ def miCuenta(id):
         if valor is None:
             return default
         try:
-            # Si es numérico, lo convierto
             valor_int = int(valor)
             return enum_class(valor_int).name
         except (ValueError, TypeError):
-            # Si no, busco por nombre directo (si guardaste el nombre en la DB)
             try:
                 return enum_class[valor].name
             except (KeyError, TypeError):

@@ -18,7 +18,6 @@ def index():
   
     contactos = Parametro.query.all()
 
-    # Convertirlos a un diccionario con clave = título (por ej: 'telefono') y valor = valor
     contacto_dict = {c.Titulo.lower(): c.Valor for c in contactos}
 
     return render_template('contacto/contacto.html', contacto=contacto_dict)

@@ -128,7 +128,6 @@ def enviar_recordatorios_cuotas():
     arg = pytz.timezone("America/Argentina/Buenos_Aires")
     hoy = datetime.now(arg).date()
 
-    # Buscar pagos vencidos sin fecha de pago y que no estén marcados como Pagados
     pagos_vencidos = (
         Pago.query
         .filter(

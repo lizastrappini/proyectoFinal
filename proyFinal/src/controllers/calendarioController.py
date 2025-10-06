@@ -33,20 +33,17 @@ def obtenerEventos(inicio, fin, tipos, mi_categoria=None):
         filtros.append(Evento.IdTipoEvento.in_(tipos))
 
     if mi_categoria == "1" or mi_categoria is True:
-        # Parsear categorías extra
         categorias_extra = []
         if getattr(current_user, "categoriaExtra", None):
             categorias_extra = [
                 int(x.strip()) for x in current_user.categoriaExtra.split(",") if x.strip().isdigit()
             ]
 
-        # Condición de categoría válida (IdCategoria del user o en extras)
         filtro_categoria = or_(
             Evento.IdCategoria == current_user.IdCategoria,
             Evento.IdCategoria.in_(categorias_extra) if categorias_extra else False
         )
 
-        # Filtro completo: rama + división + (categoría válida)
         filtro_final = and_(
             Evento.IdRama == current_user.IdRama,
             Evento.IdDivision == current_user.IdDivision,
@@ -80,7 +77,6 @@ def obtenerEventos(inicio, fin, tipos, mi_categoria=None):
 
 def getPartidosByCategoria(rango_fechas, categoria, rama, division):
     try:
-        # separar las fechas: "01-09-2025 a 19-09-2025"
         inicio_str, fin_str = [f.strip() for f in rango_fechas.split("a")]
 
         fecha_inicio = datetime.strptime(inicio_str, "%d-%m-%Y").date()
@@ -127,7 +123,6 @@ def getPartidosByCategoriaMostrar(fechas, categoria, rama, division):
         Evento.IdDivision == int(division)
     )
 
-    # Si es rango, usar between
     if inicio != fin:
         query = query.filter(func.date(Evento.FechaInicio).between(inicio, fin))
     else:

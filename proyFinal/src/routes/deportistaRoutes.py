@@ -101,13 +101,11 @@ def agregar_deportista():
             except Exception:
                 raise ValueError("Categoría Extra inválida")
             
-        # Validar que sean mayores a la categoría principal
         cat_principal_val = generalEnum.CategoriaEnum[categoria_nombre].value
         for cat_extra in categoriaExtraIds:
             if cat_extra <= cat_principal_val:
                 raise ValueError("Las categorías extras deben ser mayores a la categoría principal")
-            
-        # Validar que categoria_nombre esté y sea válido
+
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
         
@@ -122,7 +120,7 @@ def agregar_deportista():
         if not fechaNacimiento:
             raise ValueError("La fecha de nacimiento es requerida")
 
-        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  # Convertir string a datetime
+        fecha_nacimiento_dt = datetime.strptime(fechaNacimiento, "%Y-%m-%d")  
         #categoria_id = deportistaController.calcular_categoria_por_fecha(fecha_nacimiento_dt)
         #categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         categoria_id_seleccionada = generalEnum.CategoriaEnum[categoria_nombre].value
@@ -150,8 +148,8 @@ def agregar_deportista():
         
         arg = pytz.timezone("America/Argentina/Buenos_Aires")
         
-        caracteres = string.ascii_letters + string.digits  # letras + números
-        password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  # 10 caracteres
+        caracteres = string.ascii_letters + string.digits  
+        password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  
 
         nuevo_deportista = Usuario(
             Dni= dni,
@@ -229,7 +227,7 @@ def editar_deportista(dni):
             except Exception:
                 raise ValueError("Categoría Extra inválida")
         
-            # Validar que sean mayores a la categoría principal
+
             cat_principal_val = generalEnum.CategoriaEnum[categoria].value
             for cat_extra in categoriaExtraIds:
                 if cat_extra <= cat_principal_val:
@@ -263,7 +261,6 @@ def editar_deportista(dni):
                 f"Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}"
                 )
     
-        # Actualiza campos
         deportista.Dni = nuevo_dni
         deportista.Nombre = nombre
         deportista.Apellido = apellido
@@ -341,7 +338,6 @@ def cambiar_estado(dni):
     if not deportista:
         return jsonify({'success': False, 'message': 'Deportista no encontrado'}), 404
 
-    # Alternar estado
     if int(deportista.IdEstado) == generalEnum.EstadoEnum.Activo:
         deportista.IdEstado = generalEnum.EstadoEnum.Inactivo
     else:
@@ -370,14 +366,12 @@ def getDeportista(dni):
         "apellido": deportista.Apellido,
         "email": deportista.Email,
         "telefono": deportista.Telefono,
-        # devolvemos los nombres porque tus selects usan .text
         "categoria": generalEnum.CategoriaEnum(deportista.IdCategoria).name if deportista.IdCategoria else None,
         "localidad": generalEnum.LocalidadEnum(int(deportista.Localidad)).name if deportista.Localidad else None,
         "division": generalEnum.DivisionEnum(deportista.IdDivision).name if deportista.IdDivision else None,
         "rama": generalEnum.RamaEnum(deportista.IdRama).name if deportista.IdRama else None,
         "fechaNacimiento": deportista.FechaNacimiento.strftime("%Y-%m-%d") if deportista.FechaNacimiento else None,
         "federado": generalEnum.FederadoEnum(deportista.Federado).name if deportista.Federado else None,
-        # categorías extra como lista de nombres
         "categoriaExtra": [
             generalEnum.CategoriaEnum(int(x)).name for x in deportista.CategoriaExtra.split(",")
         ] if deportista.CategoriaExtra else []
@@ -441,7 +435,6 @@ def importar_deportistas():
                 if mail_usuario:
                     raise ValueError(f"Ya existe un usuario con el mismo email")
 
-                # Fecha de nacimiento
                 if not fecha_nac_val:
                     raise ValueError("La fecha de nacimiento es obligatoria")
 
@@ -461,7 +454,6 @@ def importar_deportistas():
                 else:
                     raise ValueError(f"Fecha de nacimiento inválida en fila {fila}")
 
-                # Enums obligatorios
                 if not categoria_val or categoria_val not in generalEnum.CategoriaEnum.__members__:
                     raise ValueError(f"Categoría inválida en fila {fila}")
                 categoria_id = generalEnum.CategoriaEnum[categoria_val].value
@@ -482,7 +474,6 @@ def importar_deportistas():
                     raise ValueError(f"Localidad inválida en fila {fila}")
                 localidad_id = generalEnum.LocalidadEnum[localidad_val].value
 
-                # Categoria Extra
                 categoriaExtraIds = []
                 if categoria_extra_val:
                     try:
@@ -495,7 +486,6 @@ def importar_deportistas():
                     except Exception:
                         raise ValueError(f"Categoría Extra inválida en fila {fila}")
 
-                # Validar que las cat extras no sean menores a la cat principal
                 cat_principal_val = generalEnum.CategoriaEnum[categoria_val].value
                 for cat_extra in categoriaExtraIds:
                     if cat_extra <= cat_principal_val:
@@ -507,13 +497,11 @@ def importar_deportistas():
                 if categoria_id_seleccionada != categoria_id_calculada:
                     raise ValueError(f"La categoría seleccionada ({categoria_val}) no corresponde con la edad del deportista. Debería ser {generalEnum.CategoriaEnum(categoria_id_calculada).name}")
 
-                # Generar password
                 caracteres = string.ascii_letters + string.digits
                 password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))
 
                 arg = pytz.timezone("America/Argentina/Buenos_Aires")
 
-                # ---------- Crear objeto ----------
                 nuevo_deportista = Usuario(
                     Dni=dni,
                     FechaNacimiento=fecha_nac,
@@ -546,7 +534,6 @@ def importar_deportistas():
 
             fila += 1
 
-        # ---------- RESPUESTA (fuera del bucle) ----------
         if errores:
             preview = errores[:5]
             extra = len(errores) - len(preview)

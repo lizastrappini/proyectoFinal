@@ -58,17 +58,14 @@ def agregar_entrenador():
         categoriaExtra = request.form.getlist('categoriaExtra')
        
         
-
-        # Validar que categoria_nombre esté y sea válido
         if not categoria_nombre or categoria_nombre not in generalEnum.CategoriaEnum.__members__:
             raise ValueError("Categoría inválida o no seleccionada")
-        # Rama (puede ser nula)
+
         if rama_nombre and rama_nombre in generalEnum.RamaEnum.__members__:
             rama_id = generalEnum.RamaEnum[rama_nombre].value
         else:
             rama_id = None
 
-        # División (puede ser nula)
         if division_nombre and division_nombre in generalEnum.DivisionEnum.__members__:
             division_id = generalEnum.DivisionEnum[division_nombre].value
         else:
@@ -89,10 +86,8 @@ def agregar_entrenador():
 
         categoria_id = generalEnum.CategoriaEnum[categoria_nombre].value
         
-        
-        # Generar contraseña aleatoria segura
-        caracteres = string.ascii_letters + string.digits  # letras + números
-        password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  # 10 caracteres
+        caracteres = string.ascii_letters + string.digits  
+        password_plana = ''.join(secrets.choice(caracteres) for _ in range(10))  
 
         usuario_existente = Usuario.query.filter_by(Dni=dni).first()
         if usuario_existente:
@@ -191,9 +186,7 @@ def editar_entrenador(dni):
             if email_usuario:
                 raise ValueError(f"Ya existe un usuario con el mismo email")
             
-       
-        # Actualiza campos
-       
+
         if rama_nombre and rama_nombre in generalEnum.RamaEnum.__members__:
             entrenador.IdRama = generalEnum.RamaEnum[rama_nombre].value
         else:
@@ -291,11 +284,9 @@ def getEntrenador(dni):
         "apellido": entrenador.Apellido,
         "email": entrenador.Email,
         "telefono": entrenador.Telefono,
-        # si los entrenadores también usan categorías:
         "categoria": generalEnum.CategoriaEnum(entrenador.IdCategoria).name if entrenador.IdCategoria else None,
         "rama": generalEnum.RamaEnum(entrenador.IdRama).name if entrenador.IdRama else None,
         "division": generalEnum.DivisionEnum(entrenador.IdDivision).name if entrenador.IdDivision else None,
-        # categorías extra como lista de nombres
         "categoriaExtra": [
             generalEnum.CategoriaEnum(int(x)).name for x in entrenador.CategoriaExtra.split(",")
         ] if entrenador.CategoriaExtra else [],
