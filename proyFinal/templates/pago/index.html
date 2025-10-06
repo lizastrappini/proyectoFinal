@@ -1053,16 +1053,38 @@ function renderEstadisticas(est) {
   const visitorBarChartEl = document.querySelector('#reviewsChart');
   if (visitorBarChartEl) {
     visitorBarChartEl.innerHTML = ''; // resetear
+    const indexMax = est.mesMax.indice;
+    const colors = est.porMes.map((_, i) =>
+    i === indexMax ? "#72e128" : "#72e12829"
+    );
+    const nombresMeses = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
     const visitorBarChart = new ApexCharts(visitorBarChartEl, {
       chart: { height: 125, type: 'bar', toolbar: { show: false } },
       plotOptions: {
         bar: { barHeight: '75%', columnWidth: '40%', borderRadius: 5, distributed: true }
       },
       grid: { show: false, padding: { top: 0, bottom: 0, left: 0, right: 0 } },
-      colors: ["#72e12829","#72e12829","#72e12829","#72e12829","#72e128",
-               "#72e12829","#72e12829","#72e12829","#72e12829","#72e12829",
-               "#72e12829","#72e12829"],
+      colors: colors,
       dataLabels: { enabled: false },
+      tooltip: {
+        x: {
+        formatter: function (_, { dataPointIndex }) {
+          return nombresMeses[dataPointIndex]; 
+          }
+        },
+        y: {
+          formatter: function (val) {
+            return `Pagos: ${val}`;
+          },
+          title: {
+            formatter: () => ''
+          }
+        }
+      },
       series: [{ data: est.porMes }],   // <- acá va lo que viene del backend
       legend: { show: false },
       xaxis: {

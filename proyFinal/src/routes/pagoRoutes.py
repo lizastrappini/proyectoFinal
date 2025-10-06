@@ -137,7 +137,8 @@ def filtrar():
                 "nombre": comparativa["mes_actual"],
                 "comparacion": f'{comparativa["variacion_pct"]:.1f}%',
                 "positivo": comparativa["variacion_pct"] >= 0,
-                "comparadoCon": comparativa["mes_anterior"]
+                "comparadoCon": comparativa["mes_anterior"],
+                "indice": max_mes_index
             }
         }
     })
