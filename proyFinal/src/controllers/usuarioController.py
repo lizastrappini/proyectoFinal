@@ -13,7 +13,7 @@ from src.utils.Mail import mail
 from datetime import datetime, timezone, timedelta
 from flask import jsonify, render_template
 from werkzeug.security import check_password_hash
-from sqlalchemy import and_, cast, Date, or_, and_
+from sqlalchemy import and_, cast, Date, or_, and_, extract
 from datetime import date
 
 
@@ -176,18 +176,16 @@ def actualizar_contraseña(usuario_id, nueva_contraseña):
 
 def usuario_tiene_cuota_al_dia(usuario_id):
     hoy = date.today()
-    ultimo_pago = Pago.query.filter(
+    cuota_pagada = Pago.query.filter(
         and_(
             Pago.IdUsuario == usuario_id,
-            Pago.IdEstado == 1,
-            cast(Pago.FechaPago, Date) <= hoy
+            Pago.IdEstado == 1,  # 1 = Pagado
+            extract('month', Pago.FechaVencimiento) == hoy.month,
+            extract('year', Pago.FechaVencimiento) == hoy.year
         )
-    ).order_by(Pago.FechaPago.desc()).first()
-    
-    if ultimo_pago:
-        return ultimo_pago.FechaPago.month == hoy.month and ultimo_pago.FechaPago.year == hoy.year
+    ).first()
 
-    return False
+    return cuota_pagada is not None
 
 def enviar_mail_categoria(usuario_email, nombre, categoria_nueva):
     msg = Message(

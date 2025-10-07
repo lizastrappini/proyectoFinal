@@ -526,10 +526,15 @@ function editarFila(rowIndex) {
   $('#addPago').modal('show');
 }
 
-function eliminarFila(rowIndex) {
-  const dt  = $('#tablaPagos').DataTable();
-  const data = dt.row(rowIndex).data();
-  if (!data) return;
+function eliminarFila(btn) {
+  const dt = $('#tablaPagos').DataTable();
+  const row = $(btn).closest('tr');
+  const data = dt.row(row).data();
+
+  if (!data) {
+    console.error('No se encontró data para la fila seleccionada');
+    return;
+  }
 
   Swal.fire({
     title: '¿Estás segura/o?',
@@ -538,9 +543,9 @@ function eliminarFila(rowIndex) {
     confirmButtonText: 'Sí, eliminar',
     cancelButtonText: 'Cancelar',
     didOpen: function() {
-        document.querySelector('.swal2-container').style.zIndex = 20000;
-        document.querySelector('.swal2-popup').style.zIndex = 20001;
-          }
+      document.querySelector('.swal2-container').style.zIndex = 20000;
+      document.querySelector('.swal2-popup').style.zIndex = 20001;
+    }
   }).then((result) => {
     if (!result.isConfirmed) return;
 
@@ -552,34 +557,35 @@ function eliminarFila(rowIndex) {
       }
     })
     .then(async response => {
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error desconocido');
-      }
-      return response.json();
+      const res = await response.json();
+      if (!response.ok || !res.success) throw new Error(res.message || 'Error desconocido');
+      return res;
     })
-    .then(data => {
-      Swal.fire({ icon: 'success', 
-      title: 'Eliminado', 
-      text: data.message, 
-      showConfirmButton: false, 
-      timer: 2000,
-      didOpen: function() {
-        document.querySelector('.swal2-container').style.zIndex = 20000;
-        document.querySelector('.swal2-popup').style.zIndex = 20001;
-          }
-        });
-      dt.ajax ? dt.ajax.reload() : filtrar(); // si no hay ajax, recargar con filtrar()
+    .then(res => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Eliminado',
+        text: res.message,
+        timer: 2000,
+        showConfirmButton: false,
+        didOpen: function() {
+      document.querySelector('.swal2-container').style.zIndex = 20000;
+      document.querySelector('.swal2-popup').style.zIndex = 20001;
+    }
+      });
+
+      dt.row(row).remove().draw();
     })
     .catch(error => {
-      Swal.fire({ icon: 'error', 
-      title: 'Error', 
-      text: error.message || 'Hubo un error al intentar eliminar el pago.',
-      didOpen: function() {
-        document.querySelector('.swal2-container').style.zIndex = 20000;
-        document.querySelector('.swal2-popup').style.zIndex = 20001;
-          }
-     });
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Hubo un error al intentar eliminar el pago.',
+        didOpen: function() {
+      document.querySelector('.swal2-container').style.zIndex = 20000;
+      document.querySelector('.swal2-popup').style.zIndex = 20001;
+    }
+      });
     });
   });
 }
@@ -749,9 +755,9 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
                 <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
                   <i class="ri-pencil-line me-1"></i> Editar
                 </a>
-                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(this)">
                   <i class="ri-delete-bin-7-line me-1"></i> Eliminar
-                </a>
+                </a>  
               </div>
             </div>`;
         }

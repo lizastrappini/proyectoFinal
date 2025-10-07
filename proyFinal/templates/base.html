@@ -189,7 +189,11 @@
     
                 <!-- Seccion entrenadores -->
                 <li class="menu-header mt-2">
-                  <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección Estadísticas</span>
+                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Entrenador or current_user.IdRol == RolEnum.Admin %}
+                  <span class="menu-header-text" data-i18n="Sección para entrenadores">Sección para entrenadores</span>
+                  {% elif current_user.is_authenticated and current_user.IdRol == RolEnum.Deportista %}
+                  <span class="menu-header-text" data-i18n="Sección Estadísticas">Sección Estadísticas</span>
+                  {% endif %}
                 </li>
                  {% if current_user.is_authenticated and current_user.IdRol == RolEnum.Entrenador %}
                 <li class="menu-item">
@@ -433,10 +437,11 @@
                     <!-- Enlaces rápidos (en fila) -->
                     <div class="col-12 col-lg-6 text-center">
                       <ul class="list-unstyled d-flex flex-wrap justify-content-start gap-3 mb-0">
+                        
                         <li><a href="{{ url_for('usuarios.listar_usuarios') }}" class="text-secondary text-decoration-none small">Inicio</a></li>
                         <li><a href="/contacto" class="text-secondary text-decoration-none small">Medios de Contacto</a></li>
                         <li><a href="/miCuenta" class="text-secondary text-decoration-none small">Datos Personales</a></li>
-                        <li><a href="/estadisticas" class="text-secondary text-decoration-none small">Estadísticas</a></li>
+                        <li><a href="/estadisticas/ver" class="text-secondary text-decoration-none small">Estadísticas</a></li>
                         <li><a href="/calendario" class="text-secondary text-decoration-none small">Calendario</a></li>
                       </ul>
                     </div>
@@ -808,7 +813,7 @@ document.addEventListener("DOMContentLoaded", function () {
   display: flex;
   flex-direction: column;
   width: 320px;
-  max-height: 450px;
+  max-height: 550px;
   background: #ffffff;
   border-radius: 16px;
   overflow: hidden;

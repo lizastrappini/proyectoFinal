@@ -213,7 +213,7 @@ def evento_detalle(evento_id):
             "tipoEvento": generalEnum.TipoEventoEnum(tipo).name,
             "titulo": evento.Titulo,
             "fechaInicio": evento.FechaInicio.strftime("%d-%m-%Y %H:%M"),
-            "fechaFin": evento.FechaFin.strftime("%d-%m-%Y %H:%M") if evento.FechaFin else None,
+            "fechaFin": evento.FechaFin.strftime("%d-%m-%Y %H:%M") if (evento.FechaFin and tipo == generalEnum.TipoEventoEnum.Torneo.value) else None,
             "categoria": generalEnum.CategoriaEnum(evento.IdCategoria).name if evento.IdCategoria else None,
             "rama": generalEnum.RamaEnum(evento.IdRama).name if evento.IdRama else None,
             "division": generalEnum.DivisionEnum(evento.IdDivision).name if evento.IdDivision else None,
