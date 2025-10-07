@@ -471,7 +471,7 @@ def actualizar_cuota():
         deportistas = Usuario.query.filter_by(IdRol=2).all()  
         enviados = parametroController.enviar_mail_actualizacion(deportistas, parametro)
 
-        mensaje = f'Cuota actualizada exitosamente. Correos enviados a {enviados} deportistas.'
+        mensaje = f'Cuota actualizada exitosamente.Correos enviados a {enviados} deportistas.'
 
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
