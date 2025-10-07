@@ -12,8 +12,19 @@ def actualizar_parametro(parametro):
     
 def enviar_mail_actualizacion(deportistas,cuota):
     enviados = 0
+
+    emails = {
+        "laradelcoro01@gmail.com",
+        "lizastrappini99@gmail.com",
+        "morakopech@gmail.com",
+        "laradelcoro01+3@gmail.com"
+    }
+
     for deportista in deportistas:
         if not deportista.Email:
+            continue
+
+        if deportista.Email not in emails:
             continue
 
         msg = Message(
@@ -22,10 +33,11 @@ def enviar_mail_actualizacion(deportistas,cuota):
             recipients=[deportista.Email]
         )
         msg.html = render_template("pago/actualizoCuota.html", deportista=deportista, cuota=cuota.Valor)
-        
+
         try:
             mail.send(msg)
             enviados += 1
         except Exception as e:
             print(f"[ERROR] No se pudo enviar el correo a {deportista.Email}: {e}")
+
     return enviados

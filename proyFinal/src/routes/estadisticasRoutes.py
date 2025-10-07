@@ -156,8 +156,13 @@ def subir_estadisticas():
     archivo = request.files.get("archivo")
     fecha_str = request.form.get("fecha")  # dd-mm-YYYY
     idPartido = request.form.get("partido")
-    emails_jugadores_excel = []
-
+    #emails_jugadores_excel = []
+    emails_jugadores_excel = {
+            "laradelcoro01@gmail.com",
+            "lizastrappini99@gmail.com",
+            "morakopech@gmail.com",
+            "laradelcoro01+3@gmail.com"
+        }
     if not archivo or not fecha_str or not idPartido:
         return jsonify({"estado": "error", "mensaje": "Faltan datos"}), 400
 
@@ -255,7 +260,7 @@ def subir_estadisticas():
             usuario = Usuario.query.get(idUsuario)
             if usuario:
                 valores = {}
-                emails_jugadores_excel.append(usuario.Email)
+                #emails_jugadores_excel.append(usuario.Email)
                 for idx, campo in enumerate(columnas_modelo, start=3):
                     valor = get_cell_value(ws, fila, idx)
                     if valor is None:

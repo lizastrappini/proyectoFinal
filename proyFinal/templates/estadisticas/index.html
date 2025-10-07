@@ -318,6 +318,8 @@ flatpickr("#fechaSubir", {
         text: 'Esto puede tardar unos segundos',
         allowOutsideClick: false,
         didOpen: () => {
+          document.querySelector('.swal2-container').style.zIndex = 20000;
+          document.querySelector('.swal2-popup').style.zIndex = 20001;
           Swal.showLoading(); 
         }
       });

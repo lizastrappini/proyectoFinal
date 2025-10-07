@@ -67,6 +67,14 @@ def filtrar():
 
 @notificacion_bp.route('/nueva_notificacion', methods=['POST'])
 def nueva_notificacion():
+
+    emails = {
+    "laradelcoro01@gmail.com",
+    "lizastrappini99@gmail.com",
+    "morakopech@gmail.com",
+    "laradelcoro01+3@gmail.com"
+    }
+
     try:
         titulo = request.form.get('titulo')
         descripcion = request.form.get('descripcion')
@@ -128,8 +136,10 @@ def nueva_notificacion():
 
        
         if usuarios_destino:
-            for usuario in usuarios_destino:
-                notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
+            for email in emails:
+                notificacionController.enviar_mail(email, titulo, descripcion)
+            #for usuario in usuarios_destino:
+            #    notificacionController.enviar_mail(usuario.Email, titulo, descripcion)
         else:
             pass
 
