@@ -101,42 +101,42 @@ def rellenar_excel(categoria, rama, division, idPartido, ids_seleccionados=None)
 
 
 columnas_modelo = {
-    "REE": "REE",
-    "REV": "REV",
-    "RE0": "RE0",   
-    "RE1": "RE1",
-    "RE2": "RE2",
-    "RE3": "RE3",
-    "RETOTAL": "RETOTAL",
+    "REE": "Recepcion E",
+    "REV": "Recepcion V",
+    "RE0": "Recepcion 0",
+    "RE1": "Recepcion 1",
+    "RE2": "Recepcion 2",
+    "RE3": "Recepcion 3",
+    "RETOTAL": "Recepcion Total",
 
-    "ROE": "ROE",
-    "ROB": "ROB",
-    "RO0": "RO0",
-    "RO1": "RO1",
-    "RO2": "RO2",
-    "RO3": "RO3",
-    "RO4": "RO4",
-    "ROTOTAL": "ROTOTAL",
+    "ROE": "Rotacion E",
+    "ROB": "Rotacion B",
+    "RO0": "Rotacion 0",
+    "RO1": "Rotacion 1",
+    "RO2": "Rotacion 2",
+    "RO3": "Rotacion 3",
+    "RO4": "Rotacion 4",
+    "ROTOTAL": "Rotacion Total",
 
-    "TRE": "TRE",
-    "TRB": "TRB",
-    "TR0": "TR0",
-    "TR1": "TR1",
-    "TR2": "TR2",
-    "TR3": "TR3",
-    "TR4": "TR4",
-    "TRTOTAL": "TRTOTAL",
+    "TRE": "Transicion E",
+    "TRB": "Transicion B",
+    "TR0": "Transicion 0",
+    "TR1": "Transicion 1",
+    "TR2": "Transicion 2",
+    "TR3": "Transicion 3",
+    "TR4": "Transicion 4",
+    "TRTOTAL": "Transicion Total",
 
-    "SA0": "SA0",
-    "SA1": "SA1",
-    "SA2": "SA2",
-    "SA3": "SA3",
-    "SA4": "SA4",
-    "SATOTAL": "SATOTAL",
+    "SA0": "Saque 0",
+    "SA1": "Saque 1",
+    "SA2": "Saque 2",
+    "SA3": "Saque 3",
+    "SA4": "Saque 4",
+    "SATOTAL": "Saque Total",
 
-    "BLP": "BLP",
-    "BLN": "BLN",
-    "BLTOTAL": "BLTOTAL"
+    "BLP": "Bloqueo P",
+    "BLN": "Bloqueo N+",
+    "BLTOTAL": "Bloqueo Total"
 }
 
 
@@ -264,7 +264,8 @@ def subir_estadisticas():
                 for idx, campo in enumerate(columnas_modelo, start=3):
                     valor = get_cell_value(ws, fila, idx)
                     if valor is None:
-                        raise ValueError(f"Campo {campo} nulo en fila {fila}")
+                        nombre_legible = columnas_modelo[campo]
+                        raise ValueError(f"El campo '{nombre_legible}' está vacío en la fila {fila}")
                     valores[campo] = int(valor)
 
                 rel = EstadisticaUsuarioPartido(
