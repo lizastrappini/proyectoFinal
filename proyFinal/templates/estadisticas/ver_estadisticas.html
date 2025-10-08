@@ -164,7 +164,7 @@
         <i class="tf-icons ri-question-line ri-20px"></i>
       </a>
     </div>
-    <div class="card-body" style="margin-top: 6%">
+    <div class="card-body">
       <div class="row">
         <!-- Bloqueos -->
         <div class="col-md-6 col-12 d-flex flex-column align-items-center">
@@ -253,6 +253,18 @@
 <script src="../static/js/charts-chartjs.js"></script>
 
 
+<style>
+  #recepcionesPartidos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+#recepcionesPartidos > div {
+  flex: 0 1 30%;
+}
+</style>
+
 <script>
 $(document).ready(function() {
 
@@ -297,8 +309,8 @@ $(document).ready(function() {
         titulo.text("Cómo leer los gráficos de ataques");
         contenido.html(`
           <p>📊 Los ataques se registran como <b>“De rotación”</b> y <b>“De transición”</b>.</p>
-          <p>➡️ <b>Rotación</b>: ataque luego de la defensa.<br>
-            ➡️ <b>Transición</b>: ataque luego de la recepción.</p>
+          <p>➡️ <b>Transición</b>: ataque luego de la defensa.<br>
+            ➡️ <b>Rotación</b>: ataque luego de la recepción.</p>
 
           <h6>⚡ Tipos de ataque</h6>
           <ul class="list-unstyled">

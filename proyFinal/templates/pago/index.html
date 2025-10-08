@@ -102,6 +102,11 @@
 
           <!-- Filtros (derecha) -->
           <div class="d-flex align-items-center gap-2">
+            <div>
+            <input type="text" class="form-control form-control-sm mr-2" id="deportistaFiltro"
+                  name="deportistaFiltro" placeholder="Buscar..." style="width:150px;" autocomplete="off">
+            </div>
+
             <div style="min-width: 140px !important;">
             <select id="estadoFiltro"
                     class="select2 form-select form-select-sm"
@@ -113,7 +118,7 @@
                 <option value="{{ estado.value }}">{{ estado.text }}</option>
               {% endfor %}
             </select>
-        </div>
+            </div>
             <input type="text" class="form-control form-control-sm" id="fechaDesdeFiltro"
                   name="fechaDesdeFiltro" placeholder="Fecha Desde" style="width:150px;" autocomplete="off">
 
@@ -364,6 +369,10 @@
   min-height: 100px !important;
   height: 100px !important;
 }
+
+#tablaPagos_filter {
+  display: none !important;
+}
 </style>
 
   {% block scripts %}
@@ -593,6 +602,10 @@ function eliminarFila(btn) {
 
 $(document).ready(function () {
 
+$('#deportistaFiltro').on('keyup', function() {
+  tabla.column(1).search(this.value).draw();
+});
+
   if ($.fn.select2) {
   $('#estadoFiltro').select2({
   dropdownParent: $('#estadoFiltro').parent(),
@@ -763,11 +776,11 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
         }
       }
     ],
-    paging: false,
-    info: false,
-    searching: false,
+    paging: true,
+    info: true,
+    searching: true,
     ordering: true,
-    dom: 'frtip',
+    dom: 'rtip',
     autoWidth: false,  
     buttons: [
       {
@@ -787,7 +800,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
 
   // Footer al estilo «info a la izquierda, paginador a la derecha»
   // (si tu tema ya lo arma así, podés dejar 'lfrtip')
-  dom: "frtip", // o "lfrtip" si querés también el selector de cantidad arriba
+  dom: "rtip", // o "lfrtip" si querés también el selector de cantidad arriba
 
   language: {
     emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
@@ -804,7 +817,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
     }
   },
     initComplete: function () {
-      // limpiar clases extras si tu tema las agrega
+
       $('#tablaPagos')
         .removeClass('dataTable no-footer stripe hover')
         .addClass('table');

@@ -176,7 +176,10 @@
     word-wrap: break-word;           /* fuerza quiebre de palabras largas */
     max-width: 300px;                /* ancho máximo de la columna */
 }
-
+#tablaNotificaciones_filter {
+  display: none !important;
+  visibility: hidden !important;
+}
 </style>
 
  <script>
@@ -203,15 +206,16 @@
       { data: 'division' },
       { data: 'fechaEnvio'}
     ],
-    searching: false,
+    searching: true,
     ordering: true,
     paging: true,
+    info: true,
     pageLength: 10,                 // filas por página
     lengthMenu: [10, 25, 50, 100],  // opciones del selector
     info: true,
     pagingType: 'simple',   // o 'full_numbers' para «primero/último»
     autoWidth: false,
-    dom: "frtip",
+    dom: "rtip",
 
     language: {
       emptyTable:  '<div class="text-center">Ningún dato disponible. Intente filtrar</div>',
@@ -229,6 +233,7 @@
     },
 
     initComplete: function () {
+
       $('#tablaNotificaciones')
         .removeClass('dataTable no-footer stripe hover')
         .addClass('table');
@@ -247,12 +252,27 @@
     const rama = $('#ramaFiltro').val();
     const buscar = $('#filtroBuscar').val();
 
-    const url = `/notificacion/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&buscar=${encodeURIComponent(buscar || '')}`;
+    const url = `/notificacion/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&buscar=${encodeURIComponent('')}`;
 
     tabla.ajax.url(url).load(); // ✅ actualiza la tabla existente
   }
 
-  
+  $('#filtroBuscar').on('keyup', function() {
+  const valor = this.value.toLowerCase().trim();
+
+  // limpiar filtros previos
+  $.fn.dataTable.ext.search = [];
+
+  if (valor) {
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+      // columnas 1 = titulo, 2 = descripcion
+      const columnas = [1, 2];
+      return columnas.some(i => (data[i] || '').toLowerCase().includes(valor));
+    });
+  }
+
+  tabla.draw();
+});
   
 </script>
 

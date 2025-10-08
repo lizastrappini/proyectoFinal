@@ -305,14 +305,14 @@ CREATE TABLE `faq` (
 -- Volcado de datos para la tabla `faq`
 --
 
-INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`, `Tema`, `Rol`) VALUES
+INSERT INTO faq (Id, Pregunta, Respuesta, PalabrasClave, Tema, Rol) VALUES
 (1, '¿Cómo me registro en Voley App?', 'Solo los administradores pueden crear usuarios. Una vez creado, vas a recibir un mail con tus credenciales para ingresar.', 'registro, alta', 'Usuario', NULL),
 (2, 'Olvidé mi contraseña, ¿qué hago?', 'Hacé clic en “Recuperar contraseña” en la pantalla de inicio de sesión. Te vamos a enviar un mail con las instrucciones para crear una nueva.', 'recuperar, olvide, contraseña', 'Usuario', NULL),
-(3, '¿Qué funciones tiene un entrenador en la app?', 'Como entrenador podés ver tus deportistas asignados, consultar estadísticas, recibir notificaciones importantes y actualizar tus datos de contacto.', 'entrenador, funciones, rol', 'Entrenadores', 3),
+(3, '¿Qué funciones tiene un entrenador en la app?', 'Como entrenador podés ver tus deportistas asignados, consultar estadísticas, recibir notificaciones importantes y actualizar tus datos de contacto.', 'entrenador, funciones, rol', 'Usuario', 3),
 (4, '¿Dónde puedo ver los eventos?', 'Ingresá al módulo “Calendario” desde el menú lateral. Ahí vas a encontrar todos los entrenamientos, partidos y eventos existentes. \nSi sos deportista podrás consultar tus eventos con el filtro \"Mi Categoría\".\nSólo Los entrenadores y la subcomisión tiene acceso a crear eventos como partidos, torneos, entrenamientos, suspensión de entrenamientos, entre otros  atreves del los botones \"Nuevo Evento\" o \"Evento Masivo\".', 'calendario, evento, entrenamiento, partido', 'Calendario', NULL),
-(6, '¿Quién puede ver las cuotas de los deportistas?', 'Los administradores pueden ver y gestionar todas las cuotas en la sección “Pagos”. Si sos deportista, podés ver tus propios pagos desde “Mis Pagos”.', 'cuotas, pagos, mensualidad', 'Cuota Deportiva', 1),
+(6, '¿Quién puede ver las cuotas de los deportistas?', 'Los administradores pueden ver y gestionar todas las cuotas en la sección “Pagos”. Si sos deportista, podés ver tus propios pagos desde “Mis Pagos”.', 'cuotas, pagos, mensualidad', 'Cuota Deportiva', NULL),
 (8, '¿Dónde veo mi información personal?', 'Ingresá a “Mi Cuenta” en el menú lateral. Ahí podés ver todos tus datos personales.', 'cuenta, datos, personales, información', 'Usuario', NULL),
-(9, '¿Cómo cambio mi contraseña?', 'Podés cambiar tu contraseña desde la sección “Mi Cuenta” en el menú lateral.', 'cambiar, contraseña, clave', 'Usuario', NULL),
+(9, '¿Cómo cambio mi contraseña?', 'Podés cambiar tu contraseña desde la sección “Mi Cuenta” en el menú lateral.', 'contraseña, cambio, cambiar,clave', 'Usuario', NULL),
 (10, '¿Cómo veo mis pagos deportivos?', 'Ingresá a “Mis Pagos” en el menú lateral. Ahí podés consultar el estado de tus pagos y cuotas.', 'pagos, cuota, mensualidad', 'Cuota Deportiva', 2),
 (11, '¿Cómo consulto mis estadísticas?', 'Entrá en “Ver Estadísticas” desde el menú lateral. Ahí vas a ver los resultados y estadísticas de tus partidos.', 'estadísticas, rendimiento, partidos', 'Estadísticas', 2),
 (12, '¿Dónde subo las estadísticas del partido?', 'Andá a “Cargar Estadísticas” en el menú lateral. Ahí podés descargar la planilla en Excel, completarla y volver a subirla.', 'subir, cargar, planilla, excel, estadísticas, cargo, subo', 'Estadísticas', 3),
@@ -320,18 +320,19 @@ INSERT INTO `faq` (`Id`, `Pregunta`, `Respuesta`, `PalabrasClave`, `Tema`, `Rol`
 (17, '¿Cómo me entero de los próximos partidos?', 'Ingresá al “Calendario” y vas a ver todos los partidos programados para tu categoría.', 'partido, fixture, próximo, calendario', 'Calendario', 2),
 (18, '¿Puedo recibir notificaciones en mi mail?', 'Sí, cuando el administrador o el entrenador envie una notificación, la vas a recibir en tu correo. ', 'mail, correo, notificaciones, recibir', 'Usuario', 2),
 (19, '¿Dónde veo mi categoría?', 'Tu categoría aparece en “Mi Cuenta”. También podés verla en la sección “Deportistas” si sos entrenador o admin.', 'categoría, división, nivel', 'Usuario', 2),
-(20, '¿Dónde puedo cargar los entranamientos?', 'Andá a “Calendario” en el menú lateral. Ahí podés crear eventos del tipo \'Entrenamientos\' para las categorias que desees.', 'asistencia, presente, entrenadores', 'Entrenamientos', 3),
-(21, '¿Puedo enviar un mensaje a todos mis jugadores?', 'Sí, desde “Notificaciones” podés mandar un aviso general que le llega a todos tus deportistas.', 'mensaje, avisar, comunicar, enviar', 'Entrenadores', 3),
+(20, '¿Dónde puedo cargar los entranamientos?', 'Andá a “Calendario” en el menú lateral. Ahí podés crear eventos del tipo \'Entrenamientos\' para las categorias que desees.', 'asistencia, presente, entrenadores', 'Calendario', 3),
+(21, '¿Puedo enviar un mensaje a todos mis jugadores?', 'Sí, desde “Notificaciones” podés mandar un aviso general que le llega a todos tus deportistas.', 'mensaje, avisar, comunicar, enviar', 'Usuario', 3),
 (22, '¿Cómo creo un nuevo torneo?', 'Ingresá a “Torneos” en el menú lateral y usá la opción “Nuevo Torneo” para cargar el fixture.', 'torneo, crear, campeonato, fixture', 'Calendario', 1),
-(23, '¿Cómo asigno un entrenador a un equipo?', 'Desde la sección “Equipos”, elegí el equipo y usá la opción “Asignar Entrenador”.', 'asignar, entrenador, equipo', 'Entrenadores', 1),
-(24, '¿Cómo descargo la lista de pagos?', 'Andá a “Pagos” y usá el botón “Exportar” para descargar la planilla en Excel.', 'descargar, pagos, excel, cuotas', 'Cuota Deportiva', 1),
-(25, '¿Cómo consulto estadísticas de los partidos?', 'Entrá en “Ver Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver los resultados y estadísticas de los partidos.', 'ver, estadísticas, deportistas, partidos', 'Estadísticas', 3),
-(26, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 3),
+(23, '¿Cómo asigno un entrenador a un equipo?', 'Desde la sección “Equipos”, elegí el equipo y usá la opción “Asignar Entrenador”.', 'asignar, entrenador, equipo', 'Usuario', 1),
+(24, '¿Cómo descargo la lista de pagos?', 'Andá a “Pagos” y presioná el botón “Exportar” y seleccioná la opcion \'Descargar Pagos\' para descargar la planilla en formato Excel.', 'descargar, pagos, excel, cuotas', 'Cuota Deportiva', 1),
+(25, '¿Cómo consulto estadísticas de los partidos?', 'Entrá en “Ver Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver los resultados y estadísticas de los partidos.', 'ver, estadísticas, deportistas, partidos', 'Estadísticas', NULL),
+(26, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 1),
 (27, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 2),
-(30, '¿Dónde puedo cargar los entranamientos?', 'Andá a “Calendario” en el menú lateral. Ahí podés crear eventos del tipo \'Entrenamientos\' para las categorias que desees.', 'entrenadores, entrenamientos, dias, clases', 'Entrenamientos', 1),
+(30, '¿Dónde puedo cargar los entranamientos?', 'Andá a “Calendario” en el menú lateral. Ahí podés crear eventos del tipo \'Entrenamientos\' para las categorias que desees.', 'entrenadores, entrenamientos, dias, clases', 'Calendario', 1),
 (31, '¿Cómo doy de alta a un deportista?', 'Andá a “Deportistas” en el menú lateral. Ahí podés crear los deportistas que desees. Podés crearlos de forma individual o masivamente. ', 'deportista, crear, alta, nuevo, agregar', 'Usuario', 1),
-(32, '¿Cómo doy de alta a un entrenador?', 'Andá a “Entrenadores” en el menú lateral. Ahí podés crear los entrenadores que desees. También podrás ver el lsitado de los mismos.', 'entrenadores, entrenador, crear, alta, nuevo, agregar', 'Usuario', 1);
-
+(32, '¿Cómo doy de alta a un entrenador?', 'Andá a “Entrenadores” en el menú lateral. Ahí podés crear los entrenadores que desees. También podrás ver el listado de los mismos.', 'entrenadores, entrenador, crear, alta, nuevo, agregar', 'Usuario', 1),
+(33, '¿Donde veo el listado de estadísticas cargadas?', 'Entrá en “Listar Estadísticas” desde el menú lateral. Aplicá los filtros que desee y podrás ver todas las planillas excel cargadas por los demás entrenadores y podrás descargar la que desees.', 'lista, descarga, planillas, excel, estadisticas, anteriores, entrenadores.', 'Estadísticas', 3),
+(34, '¿Dónde subo las estadísticas del partido?', 'Solo los entrenadores tienen acceso a cargar estadisticas. Si desea ver el listado de esdisticas cargadas por los entrenadores vé a \"Listar Estadisticas\" en el menú. ', 'subir, cargar, planilla, excel, estadísticas, cargo, subo', 'Estadísticas', 1);
 -- --------------------------------------------------------
 
 --

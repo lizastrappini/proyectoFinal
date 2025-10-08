@@ -358,11 +358,13 @@
                             <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">FAQ</span>
                           </a>
                         </li>
+                        {% if current_user.is_authenticated and (current_user.IdRol == RolEnum.Admin) %}
                         <li>
                           <a class="dropdown-item waves-effect" href="/parametro">
                             <i class="ri-tools-line ri-22px me-3"></i><span class="align-middle">Parámetros</span>
                           </a>
                         </li>
+                        {% endif %}
                         <li>
                           <div class="d-grid px-4 pt-2 pb-1">
                             <a class="btn btn-sm btn-label-primary d-flex waves-effect waves-light" href="/logout">

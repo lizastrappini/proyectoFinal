@@ -25,7 +25,7 @@
 
               <div class="form-floating form-floating-outline" style="min-width: 200px;">
                 <input type="text" id="filtroBuscar" class="form-control" placeholder="Buscar...">
-                <label for="filtroBuscar">Buscar</label>
+                <label for="filtroBuscar">Buscar...</label>
               </div>
 
               <div class="form-floating form-floating-outline" style="min-width: 180px;">
@@ -403,6 +403,24 @@
   let tabla = null;
   let firstLoad = true;
 $(document).ready(function () {
+
+  $('#filtroBuscar').on('keyup', function() {
+  const valor = this.value.toLowerCase();
+
+  // filtrado personalizado para varias columnas
+  $.fn.dataTable.ext.search = []; // limpiar cualquier filtro previo
+
+  if (valor) {
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+      // columnas: 0=dni, 1=nombre, 2=apellido, 3=email, 4=telefono
+      const columnas = [0, 1, 2, 3, 4];
+      return columnas.some(i => (data[i] || '').toLowerCase().includes(valor));
+    });
+  }
+
+  tabla.draw();
+});
+
   // Inicializar la tabla vacía
   tabla = $('#tablaDeportista').DataTable({
     ajax: {
@@ -461,10 +479,10 @@ $(document).ready(function () {
       }
     ],
     paging: false,
-    info: false,
-    searching: false,
+    info: true,
+    searching: true,
     ordering: true,
-    dom: 'frtip',
+    dom: 'rtip',
     buttons: [
       {
         extend: 'excelHtml5',
@@ -568,8 +586,7 @@ const labelColor = "#a8aab4";
     const division = $('#divisionFiltro').val();
     const rama = $('#ramaFiltro').val();
     const dni = $('#deportistaFiltro').val();
-    const buscar = $('#filtroBuscar').val();
-    const url = `/deportista/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&dni=${encodeURIComponent(dni || '')}&buscar=${encodeURIComponent(buscar || '')}`;
+    const url = `/deportista/filtrar?categoria=${encodeURIComponent(categoria || '')}&division=${encodeURIComponent(division || '')}&rama=${encodeURIComponent(rama || '')}&dni=${encodeURIComponent(dni || '')}&buscar=${encodeURIComponent('')}`;
     tabla.ajax.url(url).load();
   }
 
