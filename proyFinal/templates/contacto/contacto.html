@@ -7,71 +7,56 @@
   <p class="text-center mb-5 text-muted">
     En caso de dudas o consultas no dudes en comunicarte con nosotros a través de los siguientes medios:
   </p>
-  <!-- <div class="text-right mb-4">
-  <a href="" class="btn btn-outline-primary">
-    <i class="ri-edit-line ri-18px me-2"></i> Editar contacto
-  </a>
-</div> -->
 
-  <div class="row text-center g-4">
-    <div class="col-md-3">
-      <div class="card card-tel h-100 shadow-sm">
-         <a href="tel:{{ contacto['teléfono'] }}" target="_blank" 
-            class="text-decoration-none text-black"> 
-        <div class="card-body">
-          <div class="icon-circle icon-tel mb-3 mx-auto">
-            <i class="fas fa-phone fa-2x text-white"></i>
-          </div>
-          <h5 class="card-title">Teléfono</h5>
-          <p class="card-text"> {{ contacto['teléfono'] }} </p>
+  <div class="row justify-content-center g-4">
+    {% set medios = {
+      'teléfono': {
+        'icon': 'fas fa-phone',
+        'bg_class': 'icon-tel',
+        'link': 'tel:' ~ contacto['teléfono'],
+        'label': 'Teléfono'
+      },
+      'email': {
+        'icon': 'fas fa-envelope',
+        'bg_class': 'icon-email',
+        'link': 'https://mail.google.com/mail/?view=cm&fs=1&to=' ~ contacto['email'],
+        'label': 'Email'
+      },
+      'whatsapp': {
+        'icon': 'fab fa-whatsapp',
+        'bg_class': 'icon-wpp',
+        'link': 'https://wa.me/' ~ contacto['whatsapp'] | replace(' ', ''),
+        'label': 'WhatsApp'
+      },
+      'instagram': {
+        'icon': 'fab fa-instagram',
+        'bg_class': 'icon-instagram',
+        'link': contacto['instagram'],
+        'label': 'Instagram',
+        'display_text': '@voleycarc'
+      }
+    } %}
+
+    {% for key, medio in medios.items() %}
+      {% if contacto[key] %}
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm">
+          <a href="{{ medio.link }}" target="_blank" class="text-decoration-none text-black">
+            <div class="card-body text-center">
+              <div class="icon-circle {{ medio.bg_class }} mb-3 mx-auto">
+                <i class="{{ medio.icon }} fa-2x text-white"></i>
+              </div>
+              <h5 class="card-title">{{ medio.label }}</h5>
+              <p class="card-text">{{ medio.display_text if medio.display_text is defined else contacto[key] }}</p>
+            </div>
+          </a>
         </div>
-        </a>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-email h-100 shadow-sm">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ contacto['email'] }}" target="_blank" 
-            class="text-decoration-none text-black">
-        <div class="card-body">
-          <div class="icon-circle icon-email mb-3 mx-auto">
-            <i class="fas fa-envelope fa-2x text-white"></i>
-          </div>
-          <h5 class="card-title">Email</h5>
-          <p class="card-text"> {{ contacto['email'] }}</p>
-        </div>
-        </a>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-wpp h-100 shadow-sm">
-           <a href="https://wa.me/{{ contacto['whatsapp'] | replace(' ', '') }}" target="_blank" 
-            class="text-decoration-none text-black">
-        <div class="card-body">
-          <div class="icon-circle icon-wpp mb-3 mx-auto">
-            <i class="fab fa-whatsapp fa-2x text-white"></i>
-          </div>
-          <h5 class="card-title">WhatsApp</h5>
-          <p class="card-text">{{ contacto['whatsapp'] }}   </p>
-        </div>
-        </a>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-instagram h-100 shadow-sm">
-          <a href="{{ contacto['instagram'] }}" target="_blank" 
-            class="text-decoration-none text-black">
-        <div class="card-body">
-          <div class="icon-circle icon-instagram mb-3 mx-auto">
-            <i class="fab fa-instagram fa-2x text-white"></i>
-          </div>
-          <h5 class="card-title">Instagram</h5>
-          <p class="card-text"> @voleycarc</p>
-        </div>
-        </a>
-      </div>
-    </div>
+      {% endif %}
+    {% endfor %}
   </div>
 </section>
+
 
 <style>
   .icon-circle {

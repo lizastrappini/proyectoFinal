@@ -26,6 +26,7 @@ from src.routes.notificacionRoutes import notificacion_bp
 from src.routes.contactoRoutes import contacto_bp
 from src.routes.chatbotRoutes import chatbot_bp
 from src.routes.faqRoutes import faq_bp
+from src.routes.parametroRoutes import parametro_bp
 from src.utils.Mail import mail
 
 app = Flask(__name__)
@@ -46,6 +47,7 @@ app.register_blueprint(deportista_bp, url_prefix='/deportista')
 app.register_blueprint(notificacion_bp, url_prefix='/notificacion')
 app.register_blueprint(contacto_bp, url_prefix='/contacto')
 app.register_blueprint(faq_bp, url_prefix='/faq')
+app.register_blueprint(parametro_bp, url_prefix='/parametro')
 app.register_blueprint(estadisticas_bp)  # monta en /estadisticas
 app.register_blueprint(chatbot_bp)
 
