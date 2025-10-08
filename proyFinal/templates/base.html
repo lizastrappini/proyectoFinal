@@ -355,6 +355,11 @@
                           </a>
                         </li>
                         <li>
+                          <a class="dropdown-item waves-effect" href="/parametro">
+                            <i class="ri-tools-line ri-22px me-3"></i><span class="align-middle">Parámetros</span>
+                          </a>
+                        </li>
+                        <li>
                           <div class="d-grid px-4 pt-2 pb-1">
                             <a class="btn btn-sm btn-label-primary d-flex waves-effect waves-light" href="/logout">
                               <small class="align-middle">Cerrar Sesión</small>
@@ -402,7 +407,7 @@
                 <div class="container py-3">
                   <div class="row gy-3 align-items-center">
                     <!-- Contacto -->
-                    <div class="col-12 col-lg-2">
+                    <!-- <div class="col-12 col-lg-2">
                       <div class="d-flex justify-content-center justify-content-lg-start gap-4">
                         <a href="tel:{{ contacto['teléfono'] }}" class="link-body-emphasis" aria-label="Teléfono">
                           <i class="fas fa-phone fs-4"></i>
@@ -417,7 +422,48 @@
                           <i class="fab fa-instagram fs-4"></i>
                         </a>
                       </div>
+                    </div> -->
+                    <div class="col-12 col-lg-2">
+                      <div class="d-flex justify-content-center justify-content-lg-start gap-4">
+                        {% set medios_footer = {
+                          'teléfono': {
+                            'icon': 'fas fa-phone',
+                            'link': 'tel:' ~ contacto['teléfono'],
+                            'aria': 'Teléfono'
+                          },
+                          'email': {
+                            'icon': 'fas fa-envelope',
+                            'link': 'https://mail.google.com/mail/?view=cm&fs=1&to=' ~ contacto['email'],
+                            'aria': 'Email',
+                            'target': '_blank'
+                          },
+                          'whatsapp': {
+                            'icon': 'fab fa-whatsapp',
+                            'link': 'https://wa.me/' ~ contacto['whatsapp'] | replace(' ', ''),
+                            'aria': 'WhatsApp',
+                            'target': '_blank'
+                          },
+                          'instagram': {
+                            'icon': 'fab fa-instagram',
+                            'link': contacto['instagram'],
+                            'aria': 'Instagram',
+                            'target': '_blank'
+                          }
+                        } %}
+
+                        {% for key, medio in medios_footer.items() %}
+                          {% if contacto[key] %}
+                            <a href="{{ medio.link }}" 
+                              class="link-body-emphasis" 
+                              aria-label="{{ medio.aria }}"
+                              {% if medio.target %}target="{{ medio.target }}"{% endif %}>
+                              <i class="{{ medio.icon }} fs-4"></i>
+                            </a>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
                     </div>
+
 
                     <!-- Mapa (oculto en xs/sm para no ocupar altura) -->
                     <!-- Mapa -->
@@ -552,7 +598,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function mostrarMensajeBot(texto) {
     const msg = document.createElement("div");
     msg.className = "bot-msg";
-    msg.innerText = texto;
+    msg.innerHTML = texto;
     chatLog.appendChild(msg);
     chatLog.scrollTop = chatLog.scrollHeight;
   }
@@ -584,8 +630,12 @@ document.addEventListener("DOMContentLoaded", function () {
     mostrarMensajeUsuario(texto);
 
     const saludos = ["hola","buenas","holaa","buen dia"];
+    
+     const esSaludo = saludos.some(saludo => 
+        texto.startsWith(saludo.slice(0, 3)) || saludo.startsWith(texto.slice(0, 3))
+    );
 
-    if (saludos.includes(texto.toLowerCase())) {
+    if (esSaludo) {
         mostrarMensajeBot("¡Hola! 👋 Bienvenido al asistente de Vóley. Elegí un tema para empezar:");
         cargarTemas();
         return;
@@ -658,7 +708,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Cargar preguntas de un tema
   function cargarPreguntas(tema) {
-    mostrarMensajeBot(`Acá tenés algunas preguntas sobre *${tema}* 👇`);
+    mostrarMensajeBot(`Acá tenés algunas preguntas sobre <strong>${tema}</strong>👇`);
 
     fetch(`/chatbot/preguntas?tema=${encodeURIComponent(tema)}`)
       .then(res => res.json())

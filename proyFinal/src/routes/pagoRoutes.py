@@ -258,7 +258,7 @@ def importar_pagos():
             raise ValueError("No se pudo abrir el archivo Excel")
 
         # ---------- VALIDAR ENCABEZADOS ----------
-        encabezados = ["DNI Deportista", "Fecha Pago", "Fecha Vencimiento", "IdEstado"]
+        encabezados = ["DNI Deportista", "Fecha Pago", "Fecha Vencimiento"]
         for idx, esperado in enumerate(encabezados, start=1):
             valor = str(ws.cell(row=1, column=idx).value).strip() if ws.cell(row=1, column=idx).value else ""
             if valor != esperado:
@@ -290,17 +290,10 @@ def importar_pagos():
             try:
                 fecha_pago_val = ws.cell(row=fila, column=2).value
                 fecha_venc_val = ws.cell(row=fila, column=3).value
-                # importe_val = ws.cell(row=fila, column=4).value
-                id_estado = ws.cell(row=fila, column=4).value
-
               
-                if not id_estado:
-                    raise ValueError("Estado inválido o no seleccionado")
                 if not fecha_venc_val:
                     raise ValueError("Las fechas son obligatorias")
-                # if not importe_val:
-                #     raise ValueError("El importe es obligatorio")
-
+               
                 fecha_pago = fecha_pago_val
                 fecha_vencimiento = fecha_venc_val
                 if isinstance(fecha_pago_val, str):
@@ -314,6 +307,13 @@ def importar_pagos():
                     db.extract('month', Pago.FechaVencimiento) == fecha_vencimiento.month,
                     db.extract('year', Pago.FechaVencimiento) == fecha_vencimiento.year
                 ).first()
+                
+                 # Determinar estado del pago según si tiene fecha de pago
+                if fecha_pago:
+                    id_estado = generalEnum.EstadoPagoEnum.Pago
+                else:
+                    id_estado = generalEnum.EstadoPagoEnum.NoPago
+
 
                 if existe_pago:
                     errores.append(f"Fila {fila}: El deportista ya tiene un pago para {fecha_vencimiento.strftime('%m/%Y')}")
@@ -325,7 +325,7 @@ def importar_pagos():
                     FechaPago=fecha_pago,
                     FechaVencimiento=fecha_vencimiento,
                     Importe=importe,
-                    IdEstado=int(id_estado),
+                    IdEstado=id_estado,
                     IdUsuario=usuario.Id
                 )
                 pagosController.agregarPago(nuevo_pago)
@@ -381,11 +381,18 @@ def editar_pago(id):
     else:
             fechaPago = None 
     
+     # Cambiar automáticamente el estado según si hay fecha de pago
+    if fechaPago:
+        pago.IdEstado = generalEnum.EstadoPagoEnum.Pago.value
+    else:
+        pago.IdEstado = generalEnum.EstadoPagoEnum.NoPago.value
+    
     pago.FechaPago = fechaPago
     pago.FechaVencimiento = fechaVencimiento
     # pago.Importe = importe
-    pago.IdEstado = generalEnum.EstadoPagoEnum[estado_nombre].value
+    # pago.IdEstado = generalEnum.EstadoPagoEnum[estado_nombre].value
     pago.IdUsuario= usuario_id
+    
     
 
     pagosController.actualizar_pago(pago)

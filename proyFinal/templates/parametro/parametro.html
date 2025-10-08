@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Parámetro{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y d-flex justify-content-center">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body text-center">
+          
+          <!-- Título -->
+          <h2 class="text-center mb-4">Parámetros</h2>
+
+          <form id="formParametros" method="POST" action="{{ url_for('parametro.editarParametro') }}">
+            <div class="row g-4">
+              {% for p in parametros %}
+                {% if p.Titulo != "ValorCuota" %}
+                <div class="col-md-6">
+                  <div class="form-floating form-floating-outline">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="parametro_{{ p.Id }}"
+                      name="{{ p.Id }}"
+                      value="{{ p.Valor }}"
+                      
+                    />
+                    <label for="parametro_{{ p.Id }}">{{ p.Titulo }}</label>
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="mt-5 text-center">
+              <button type="submit" class="btn btn-primary me-3">
+                Actualizar
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
