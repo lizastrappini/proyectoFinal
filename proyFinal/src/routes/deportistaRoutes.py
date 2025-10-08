@@ -325,7 +325,7 @@ def eliminar_deportista(dni):
     deportistaController.borrar_deportista(deportista)
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({'success': True, 'message': 'Entrenador eliminado'})
+        return jsonify({'success': True, 'message': 'Deportista eliminado'})
     else:
         flash('Deportista eliminado exitosamente', 'success')
         return redirect(url_for('deportista.index'))

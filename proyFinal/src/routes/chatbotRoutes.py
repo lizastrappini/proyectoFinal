@@ -67,7 +67,6 @@ def procesar_pregunta():
         claves = [limpiar_texto(k) for k in (p.PalabrasClave or "").split(",")]
 
         matches = sum(1 for clave in claves if clave in pregunta_usuario)
-
         if matches > max_matches:
             max_matches = matches
             mejor_coincidencia = p

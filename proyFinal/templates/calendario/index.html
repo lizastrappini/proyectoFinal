@@ -202,8 +202,9 @@
                   <label for="localidad">Localidad</label>
                 </div>
                 
+
                 <div class="form-floating form-floating-outline mb-5" id="descripcion-wrapper">
-                  <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+                  <textarea class="form-control" name="descripcion" id="descripcion" style="height: 120px;"></textarea>
                   <label for="descripcion">Descripción</label>
                 </div>
 
@@ -393,6 +394,11 @@
 .fc .fc-list {
   max-height: 600px;   /* 👈 límite */
   overflow-y: auto;    /* 👈 scroll */
+}
+
+.fc-event-main:hover{
+  cursor: pointer;
+  opacity: 0.5;
 }
   </style>
 

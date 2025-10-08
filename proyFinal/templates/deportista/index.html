@@ -449,9 +449,9 @@ $(document).ready(function () {
                 <a class="dropdown-item" href="javascript:void(0);" onclick="editarFila(${meta.row})">
                   <i class="ri-pencil-line me-1"></i> Editar
                 </a>
-                <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
+                ${/*<a class="dropdown-item" href="javascript:void(0);" onclick="eliminarFila(${meta.row})">
                   <i class="ri-delete-bin-7-line me-1"></i> Eliminar
-                </a>
+                </a>*/''}
                 <a class="dropdown-item cambiar-estado" href="javascript:void(0);" data-dni="${row.dni || ''}">
                   <i class="ri-refresh-line me-1"></i> ${accion}
                 </a>
@@ -644,7 +644,12 @@ const labelColor = "#a8aab4";
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`/deportista/eliminar/${data.dni}`, {
@@ -659,11 +664,23 @@ const labelColor = "#a8aab4";
             return r.json();
           })
           .then(data => {
-            Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 });
+            Swal.fire({ icon: 'success', title: 'Eliminado', text: data.message, showConfirmButton: false, timer: 2000 ,
+              didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
+            });
             tabla.ajax.reload();
           })
           .catch(err => {
-            Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Hubo un error al intentar eliminar el deportista.' });
+            Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Hubo un error al intentar eliminar el deportista.',
+              didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
+             });
           });
       }
     });
@@ -689,13 +706,24 @@ const labelColor = "#a8aab4";
           icon: 'success',
           title: 'Estado actualizado',
           text: `Nuevo estado: ${data.nuevo_estado}`,
+          didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
           timer: 2000,
           showConfirmButton: false
         });
         tabla.ajax.reload(null, false);
       })
       .catch(err => {
-        Swal.fire({ icon: 'error', title: 'Error al cambiar estado', text: err.message || 'Ocurrió un error inesperado' });
+        Swal.fire({ icon: 'error', title: 'Error al cambiar estado', text: err.message || 'Ocurrió un error inesperado' ,
+          didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
+        });
       });
   });
 
@@ -725,7 +753,12 @@ const labelColor = "#a8aab4";
           title: data.message.includes('creado') ? 'Deportista creado' : 'Deportista actualizado',
           text: data.message,
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
+          didOpen: function() {
+
+        document.querySelector('.swal2-container').style.zIndex = 20000;
+        document.querySelector('.swal2-popup').style.zIndex = 20001;
+    },
         });
         $('#addUser').modal('hide');
         $('#editDeportistaForm')[0].reset();

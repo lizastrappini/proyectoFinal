@@ -305,7 +305,16 @@ if (eventDetails) {
   html += renderField('División', data.division);
   html += renderField('Localidad', data.localidad);
   html += renderField('Contrincante', data.contrincante);
-  html += renderField('Descripción', data.descripcion);
+  if (data.descripcion) {
+  html += `
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <span class="fw-semibold me-2">Descripción</span>
+      <span class="text-end" style="white-space: pre-line; max-width: 65%;">
+        ${data.descripcion}
+      </span>
+    </li>
+  `;
+}
 
   // cerramos la lista
   html += '</ul>';
@@ -453,7 +462,15 @@ if (deleteBtn) {
           method: "POST"  // o DELETE si tu backend lo soporta
         })
         .then(() => {
-          Swal.fire("Eliminado", "El evento fue eliminado correctamente.", "success");
+          Swal.fire({
+          title: "Eliminado",
+          text: "El evento fue eliminado correctamente.",
+          icon: "success",
+          didOpen: function() {
+
+            document.querySelector('.swal2-container').style.zIndex = 20000;
+            document.querySelector('.swal2-popup').style.zIndex = 20001;
+        },})
           calendar.refetchEvents();
           bsAddEventSidebar.hide();
         })
@@ -604,13 +621,13 @@ eventBorderColor: null,
     }
   },
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
-      editable: true,
-      dragScroll: true,
+      editable: false,
+      dragScroll: false,
       dayMaxEvents: 1,
       moreLinkText: function(n) {
         return "+ ver " + n + " más";
       },
-      eventResizableFromStart: true,
+      eventResizableFromStart: false,
       customButtons: {
         sidebarToggle: {
           text: 'Sidebar'
@@ -879,6 +896,17 @@ function resetValues() {
   // hidden id
   const inputId = document.getElementById('eventoId');
   if (inputId) inputId.value = '';
+
+  const form = document.getElementById('eventForm');
+  if (form) form.action = '/nuevoEvento';
+
+  if (btnSubmit) {
+    btnSubmit.innerHTML = 'Agregar';
+    btnSubmit.classList.remove('btn-update-event');
+    btnSubmit.classList.add('btn-add-event');
+  }
+
+  eventToUpdate = null;
 }
 addEventSidebar.addEventListener('hidden.bs.offcanvas', function () {
   resetValues();
