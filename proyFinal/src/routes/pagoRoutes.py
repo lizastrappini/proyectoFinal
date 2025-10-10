@@ -500,3 +500,7 @@ def actualizar_cuota():
 def descargar_planilla():
     carpeta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datos"))
     return send_from_directory(carpeta, "planilla_pagos.xlsx", as_attachment=True)
+
+
+
+## agregar: un pago en estado pago no debe poder eliminarse
