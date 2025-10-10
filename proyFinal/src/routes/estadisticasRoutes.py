@@ -294,7 +294,7 @@ def subir_estadisticas():
         notificacionController.agregarNotificacion(nueva_notif)
 
         for email in emails_jugadores_excel:
-            notificacionController.enviar_mail(
+            estadisticasController.enviar_mail(
                 email,
                 "Estadísticas disponibles",
                 "Ya podes ver tus estadísticas del partido vs " +
