@@ -195,9 +195,10 @@
       </div>
     </a>
   </div>
-  {% else %}
+  {% endif %}
+  {% if usuario.IdRol == 1 %}
   <div class="col-md-3 mb-3">
-    <a href="{{ url_for('estadisticas.cargar_estadisticas') }}" class="text-decoration-none text-reset d-block h-100">
+    <a href="/estadisticas/ver" class="text-decoration-none text-reset d-block h-100">
       <div class="card h-100 customer-card">
         <div class="card-body">
           <div class="card-icon mb-2">
@@ -210,14 +211,34 @@
           <div class="card-info">
             <h3 class="card-title mb-2">Estadísticas</h3>
           </div>
-          <span class="fw-bold">Cargá estadísticas de los partidos</span>
+          <span class="fw-bold">Mirá estadísticas de los partidos</span>
         </div>
       </div>
     </a>
   </div>
   {% endif %}
-
-  {% if usuario.IdRol == 2 %}
+  {% if usuario.IdRol == 3 %}
+  <div class="col-md-3 mb-3">
+    <a href="/estadisticas/ver" class="text-decoration-none text-reset d-block h-100">
+      <div class="card h-100 customer-card">
+        <div class="card-body">
+          <div class="card-icon mb-2">
+            <div class="avatar">
+              <div class="avatar-initial rounded-3 bg-label-warning">
+                <i class="ri-bar-chart-2-line ri-24px"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title mb-2">Estadísticas</h3>
+          </div>
+          <span class="fw-bold">Mirá estadísticas de los partidos</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
+  {% if usuario.IdRol == 3 %}
   <div class="col-md-3 mb-3">
     <a href="/mipago" class="text-decoration-none text-reset d-block h-100">
       <div class="card h-100 customer-card">
