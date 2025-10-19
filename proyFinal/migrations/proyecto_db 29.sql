@@ -1612,7 +1612,7 @@ TRUNCATE TABLE `Parametro`;
 
 INSERT INTO `Parametro` (`Id`, `Titulo`, `Valor`) VALUES
 (1, 'Email', 'voley@rosariocentral.com'),
-(2, 'WhatsApp', ''),
+(2, 'WhatsApp', '3471607768'),
 (3, 'Instagram', 'https://www.instagram.com/voleycarc?igsh=MTZ0aHpiMDJmNTdnNg%3D%3D&utm_source=qr'),
 (4, 'Teléfono', '3471607768'),
 (5, 'ValorCuota', '18050');
