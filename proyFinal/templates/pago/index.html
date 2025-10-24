@@ -168,9 +168,8 @@
                         <form id="editPagosForm" class="row g-5" method="POST" action="{{ url_for('pago.agregar_pago') }}">
                            <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="1">
-                            <label for="usuario_id" class="form-label">Deportista</label>
-                            <select class="select2 form-select" id="deportista" name="deportista" required>
-                              <option value="0" disabled selected hidden >Seleccione un deportista</option>
+                            <select class="select2 form-select" id="deportista" name="deportista" required data-placeholder="Deportista" >
+                            <option value=""></option>
                               {% for deportista in deportistas %}
                                 <option value="{{ deportista.id }}">{{ deportista.nombre }}{{ deportista.apellido }}</option>
                               {% endfor %}
@@ -218,9 +217,8 @@
                          
                           <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline form-floating-select2" data-select2-id="2">
-                            <label for="estado" class="form-label">Estado</label>
-                            <select class="select2 form-select" id="estado" name="estado" required >
-                              <option value="0" disabled selected hidden>Seleccione un estado</option>
+                            <select class="select2 form-select" id="estado" name="estado" required data-placeholder="Estado" >
+                            <option value=""></option>
                               {% for estado in estados %}
                                 <option value="{{ estado.text }}">{{ estado.text }}</option>
                               {% endfor %}
@@ -612,17 +610,18 @@ $('#deportistaFiltro').on('keyup', function() {
   width: '140px',
   minimumResultsForSearch: Infinity,
   placeholder: 'Estado'
-}).on('select2:open', function() {
-  // fuerza el alto cuando se abre
-  $('.select2-selection--single').css('height', '38px');
-  $('.select2-selection__rendered').css('line-height', '38px'); 
-  $('.select2-selection__arrow').css('height', '38px');
+})
+$('#estadoFiltro').next('.select2').find('.select2-selection--single').css({
+  'height': '38px',
+  'display': 'flex',
+  'align-items': 'center'
 });
-
-// también lo forzamos al cargar
-$('.select2-selection--single').css('height', '38px');
-$('.select2-selection__rendered').css('line-height', '38px'); 
-$('.select2-selection__arrow').css('height', '38px');
+$('#estadoFiltro').next('.select2').find('.select2-selection__rendered').css({
+  'line-height': '38px',
+  'padding-left': '8px',
+  'font-size': '0.875rem'
+});
+$('#estadoFiltro').next('.select2').find('.select2-selection__arrow').css('height', '38px');
   // Ajustar altura de la caja
   $('.select2-selection').css({
     'display': 'flex',
@@ -1121,7 +1120,32 @@ function renderEstadisticas(est) {
   }
 }
 
-$('#btnAbrirSwal').on('click', function() {
+$('#btnAbrirSwal').on('click', async function() {
+
+  let importeInicial = ''; // valor por defecto vacío
+
+  try {
+    const response = await fetch('/pago/obtenerCuota', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.importe) {
+        importeInicial = data.importe; // sólo si devuelve algo válido
+      }
+    }
+    // si no hay response.ok o no hay data.importe => queda vacío
+  } catch (error) {
+    // no mostrar nada; simplemente dejamos el valor vacío
+    console.warn('No se encontró la cuota, el campo quedará vacío.');
+  }
+
+
   Swal.fire({
     title: 'Actualizar Cuota',
     html: `
@@ -1139,11 +1163,11 @@ $('#btnAbrirSwal').on('click', function() {
       document.querySelector('.swal2-container').style.zIndex = 20000;
       document.querySelector('.swal2-popup').style.zIndex = 20001;
       inputImporte = Swal.getPopup().querySelector('#importe');
+      inputImporte.value = importeInicial;
     },
     preConfirm: () => {
       
       const importe = inputImporte.value.trim();
-      console.log("importe ingresado:", importe);
       if (!importe || parseFloat(importe) <= 0) {
         Swal.showValidationMessage('Ingresá un importe válido');
         return false;

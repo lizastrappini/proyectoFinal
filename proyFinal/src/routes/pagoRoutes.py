@@ -338,7 +338,14 @@ def importar_pagos():
 
         # ---------- RESPUESTA ----------
         if errores:
-            mensaje = f"Se importaron {registros_creados} pagos, con errores en algunas filas: {errores}"
+            if registros_creados > 0:
+                mensaje = (
+                    f"Se importaron {registros_creados} pagos correctamente, "
+                    f"Algunas filas no pudieron procesarse:\n- " + "\n- ".join(errores)
+                )
+            else:
+                mensaje = "❌ No se pudieron importar los pagos debido a errores:\n- " + "\n- ".join(errores)
+
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({'success': False, 'message': mensaje}), 400
             else:
@@ -463,8 +470,12 @@ def actualizar_cuota():
             raise ValueError("Debe indicar el nuevo valor de la cuota")
 
         parametro = Parametro.query.filter_by(Titulo='ValorCuota').first()
+        
         if not parametro:
             raise ValueError("No se encontró el parámetro ValorCuota")
+
+        if(nuevo_valor == parametro.Valor):
+            return { "estado": "error", "mensaje": "El valor debe ser distinto del anterior" }
 
         parametro.Valor = str(nuevo_valor) 
        
@@ -500,3 +511,13 @@ def actualizar_cuota():
 def descargar_planilla():
     carpeta = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datos"))
     return send_from_directory(carpeta, "planilla_pagos.xlsx", as_attachment=True)
+
+
+
+@pago_bp.route('/obtenerCuota', methods=['GET'])
+def obtenerCuota():
+    valor = Parametro.query.filter_by(Titulo='ValorCuota').first()
+    if valor:
+        return jsonify({'importe': float(valor.Valor)})
+    else:
+        return jsonify({}), 200
