@@ -636,10 +636,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mostramos siempre el mensaje del usuario
     mostrarMensajeUsuario(texto);
 
+    const textoMinuscula = texto.toLowerCase();
+
     const saludos = ["hola","buenas","holaa","buen dia"];
     
      const esSaludo = saludos.some(saludo => 
-        texto.startsWith(saludo.slice(0, 3)) || saludo.startsWith(texto.slice(0, 3))
+        textoMinuscula.startsWith(saludo.slice(0, 3)) || saludo.startsWith(textoMinuscula.slice(0, 3))
     );
 
     if (esSaludo) {

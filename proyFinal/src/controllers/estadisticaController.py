@@ -10,6 +10,8 @@ from src.models.estadisticaPorPartido import EstadisticaPorPartido
 from src.models.estadisticaUsuarioPartido import EstadisticaUsuarioPartido
 from datetime import datetime
 from sqlalchemy import func, and_, case
+from src.utils.Mail import mail
+
 
 def armarEstadisticas(categoria, rama, division, fechaHasta, idPartido=None, idUsuario=None, contrincante=None, misEstadisticas=False):
     filtros_partidos = []
@@ -279,3 +281,31 @@ def eliminarEstadistica(idEstadistica):
     except Exception as e:
         db.session.rollback()
         return jsonify({"estado": "error", "mensaje": f"Error al eliminar la estadística: {str(e)}"}), 500
+    
+    
+def enviar_mail(destinatario,titulo,descripcion):
+    if not destinatario:
+        print("[ERROR] El usuario no tiene correo electrónico.")
+        return False
+
+    msg = Message(
+        subject="Voley App - Nueva Estadística",
+        sender=current_app.config['MAIL_USERNAME'],
+        recipients=[destinatario]
+    )
+    link = f"http://127.0.0.1:5003/estadisticas/ver" 
+    
+   
+    msg.html = render_template(
+        "estadisticas/emailEstadistica.html",
+        notificacion={'Titulo': titulo, 'Descripcion': descripcion},
+        link=link
+    )
+    try:
+        mail.send(msg)
+        return True
+    
+    except Exception as e:
+        print(f"[ERROR] No se pudo enviar el correo al deportista: {e}")
+        return False
+    
