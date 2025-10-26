@@ -279,10 +279,11 @@ $(document).ready(function() {
         titulo.text("Cómo leer los gráficos de recepciones");
         contenido.html(`
           <ul class="list-unstyled">
-            <li class="mb-2">👉 <b>Doble positiva</b>: representa el pase perfecto a la cabeza del armador. Se simboliza con <b>#</b> o <b>3</b> en la planilla.</li>
-            <li class="mb-2">👉 <b>Positiva</b>: pase a más de un metro del armador. Se simboliza con <b>+</b> o <b>2</b> en la planilla.</li>
-            <li class="mb-2">👉 <b>Exclamativa</b>: pase a la altura de la línea de 3 metros. Se simboliza con <b>!</b> o <b>1</b> en la planilla.</li>
-            <li class="mb-2">👉 <b>Negativa</b> y <b>Doble negativa</b>: errores con punto directo al rival o pelotas vendidas para el otro equipo. Se simboliza como <b>-</b>, <b>=</b> y <b>0</b> en la planilla.</li>
+            <li class="mb-2">👉 <b>Error</b>: recepción fallida que termina en punto directo para el rival.</li>
+            <li class="mb-2">👉 <b>Vendida</b>: recepción que pasa al campo contrario y puede ser aprovechada por el rival.</li>
+            <li class="mb-2">👉 <b>Exclamativa</b>: recepción a la altura de la línea de 3 metros, obliga al armador a desplazarse y reduce las opciones de ataque.</li> 
+            <li class="mb-2">👉 <b>Positiva</b>: recepción a más de un metro del armador, se puede construir la jugada aunque con opciones limitadas.</li> 
+            <li class="mb-2">👉 <b>Doble positiva</b>: recepción perfecta, el pase llega directo a la cabeza del armador, permitiendo todas las opciones de ataque.</li> 
           </ul>
         `);
         break;
@@ -291,11 +292,11 @@ $(document).ready(function() {
         contenido.html(`
           <h6>🎯 Saque</h6>
           <ul class="list-unstyled">
-            <li class="mb-2">👉 <b>Doble positiva</b>: pase perfecto a la cabeza del armador. Se simboliza con <b>#</b> o <b>4</b>.</li>
-            <li class="mb-2">👉 <b>Positiva</b>: pase a más de un metro del armador. Se simboliza con <b>+</b> o <b>3</b>.</li>
-            <li class="mb-2">👉 <b>Exclamativa</b>: pase a la altura de la línea de 3 metros. Se simboliza con <b>!</b> o <b>2</b>.</li>
-            <li class="mb-2">👉 <b>Negativa</b>: el rival devuelve la pelota como <i>free ball</i>. Se simboliza con <b>-</b> o <b>1</b>.</li>
-            <li class="mb-2">👉 <b>Doble negativa</b>: punto directo de saque para el equipo contrario. Se simboliza con <b>=</b> o <b>0</b>.</li>
+            <li class="mb-2">👉 <b>Doble positiva</b>: pase perfecto a la cabeza del armador.</li>
+            <li class="mb-2">👉 <b>Positiva</b>: pase a más de un metro del armador.</li>
+            <li class="mb-2">👉 <b>Exclamativa</b>: pase a la altura de la línea de 3 metros.</li>
+            <li class="mb-2">👉 <b>Negativa</b>: el rival devuelve la pelota como <i>free ball</i>.</li>
+            <li class="mb-2">👉 <b>Doble negativa</b>: punto directo de saque para el equipo contrario.</li>
           </ul>
 
           <h6>🛡️ Bloqueo</h6>
@@ -314,11 +315,15 @@ $(document).ready(function() {
 
           <h6>⚡ Tipos de ataque</h6>
           <ul class="list-unstyled">
-            <li class="mb-2">👉 <b>Doble positiva</b>: punto directo para nuestro equipo. Se simboliza con <b>#</b> o <b>4</b>.</li>
-            <li class="mb-2">👉 <b>Positiva</b>: termina en punto pero más de una jugadora toca la pelota. Se simboliza con <b>+</b> o <b>3</b>.</li>
-            <li class="mb-2">👉 <b>Exclamativa</b>: el ataque no hace punto pero la pelota vuelve como <i>FreeBall</i>. Se simboliza con <b>!</b> o <b>2</b>.</li>
-            <li class="mb-2">👉 <b>Negativa</b>: el equipo contrario logra un contraataque. Se simboliza con <b>-</b> o <b>1</b>.</li>
-            <li class="mb-2">👉 <b>Doble negativa</b>: punto para el rival (error de ataque, afuera, red o bloqueo). Se simboliza con <b>=</b> o <b>0</b>.</li>
+            <li class="mb-2">👉 <b>E - Error</b>: el ataque termina en error nuestro (pelota afuera, red, o toque indebido).</li>
+            <li class="mb-2">👉 <b>B - Bloqueo</b>: el ataque es bloqueado directamente por el rival, sin posibilidad de continuar la jugada.</li>
+            <li class="mb-2">👉 <b>- - Negativa</b>: el equipo contrario logra un contraataque.</li>
+            <li class="mb-2">👉 <b>! - Exclamativa</b>: el ataque no hace punto pero la pelota vuelve como <i>FreeBall</i>.</li>
+            <li class="mb-2">👉 <b>+ - Positiva</b>: termina en punto pero más de una jugadora toca la pelota.</li>
+            <li class="mb-2">👉 <b># - Doble positiva</b>: punto directo para nuestro equipo.</li>
+            
+            
+            
           </ul>
         `);
         break;
@@ -916,26 +921,25 @@ function renderTransicionesChart(estadisticas) {
   const seriesData = [
     estadisticas.TRE ?? 0,
     estadisticas.TRB ?? 0,
-    estadisticas.TR0 ?? 0,
     estadisticas.TR1 ?? 0,
     estadisticas.TR2 ?? 0,
     estadisticas.TR3 ?? 0,
     estadisticas.TR4 ?? 0
   ];
 
-  const categories = ['E', 'B', '=', '-', '!', '+', '#'];
-  const etiquetasTooltip = ['Error', 'Bloqueo', 'Doble negativa', 'Negativa', 'Exclamativa', 'Positiva', 'Doble positiva'];
+  const categories = ['E', 'B', '-', '!', '+', '#'];
+  const etiquetasTooltip = ['Error', 'Bloqueo', 'Negativa', 'Exclamativa', 'Positiva', 'Doble positiva'];
 
   const transicionesChartEl = document.querySelector('#transicionesProgressList');
   transicionesChartEl.innerHTML = ''; // Limpia el contenedor
 
   const chartContainer = document.createElement('div');
-  chartContainer.style.height = '240px';
+  chartContainer.style.height = '250px';
   transicionesChartEl.appendChild(chartContainer);
 
   const chartConfig = {
     chart: {
-      height: 238,
+      height: 245,
       type: 'bar',
       parentHeightOffset: 0,
       toolbar: { show: false }
@@ -944,7 +948,7 @@ function renderTransicionesChart(estadisticas) {
       bar: {
         borderRadius: 12,
         distributed: true,
-        columnWidth: '50%',
+        columnWidth: '40%',
         endingShape: 'rounded',
         startingShape: 'rounded'
       }

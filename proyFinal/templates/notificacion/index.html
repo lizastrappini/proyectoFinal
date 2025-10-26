@@ -100,9 +100,9 @@
                           </div>
 
                           <div class="col-12">
-                            <div class="form-floating form-floating-outline">
-                              <select id="categoria" name="categoria" class="form-select">
-                                <option value="" disabled selected>Seleccioná una categoría</option>
+                            <div class="form-floating form-floating-outline form-floating-select2">
+                              <select id="categoria" name="categoria" class="select2 form-select" data-placeholder="Categoria">
+                                <option value=""></option>
                                 {% for cat in categorias %}
                                   <option value="{{ cat.value }}">{{ cat.text }}</option>
                                 {% endfor %}
@@ -111,9 +111,9 @@
                             </div>
                           </div>
                           <div class="col-12">
-                            <div class="form-floating form-floating-outline">
-                              <select id="division" name="division" class="form-select">
-                                  <option value="" disabled selected>Seleccioná una división</option>
+                            <div class="form-floating form-floating-outline form-floating-select2">
+                              <select id="division" name="division" class="select2 form-select" data-placeholder="Division">
+                                  <option value=""></option>
                                 {% for div in divisiones %}
                                   <option value="{{ div.value }}">{{ div.text }}</option>
                                 {% endfor %}
@@ -122,9 +122,9 @@
                             </div>
                           </div>
                           <div class="col-12">
-                            <div class="form-floating form-floating-outline">
-                              <select id="rama" name="rama" class="form-select">
-                                <option value="" disabled selected>Seleccioná una rama</option>
+                            <div class="form-floating form-floating-outline form-floating-select2">
+                              <select id="rama" name="rama" class="select2 form-select" data-placeholder="Rama">
+                                <option value=""></option>
                                 {% for rama in ramas %}
                                   <option value="{{ rama.value }}">{{ rama.text }}</option>
                                 {% endfor %}

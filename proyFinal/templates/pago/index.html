@@ -593,6 +593,13 @@ $('#estadoFiltro').next('.select2').find('.select2-selection__arrow').css('heigh
   }
 });
 
+$('#fechaPagoDisplay').on('input', function () {
+  if (!this.value.trim()) {
+    $('#fechaPagoIso').val('');
+  }
+});
+
+
 window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
   locale: flatpickr.l10ns.es,
   dateFormat: "d-m-Y",
@@ -763,10 +770,22 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
   $('#btnPagarSeleccionados').prop('disabled', true);
 
   $(document).on('change', '#selectAll', function () {
-    const checked = $(this).is(':checked');
-    $('.check-pago').prop('checked', checked);
-    actualizarBotonPagar();
+  const checked = $(this).is(':checked');
+
+  $('.check-pago').each(function () {
+    const estado = $(this).closest('tr').find('td:eq(5) .badge').text().trim();
+
+    // Sólo marcar si está habilitado y es Pendiente o NoPago
+    if ((estado === 'Pendiente' || estado === 'NoPago') && !$(this).is(':disabled')) {
+      $(this).prop('checked', checked);
+    } else {
+      $(this).prop('checked', false);
+    }
   });
+
+  actualizarBotonPagar();
+});
+
 
   $(document).on('change', '.check-pago', function () {
     actualizarBotonPagar();
@@ -819,7 +838,7 @@ window.fpVencimiento = flatpickr("#fechaVencimientoDisplay", {
           }
          });
         // recargar: si no usás ajax nativo, volvé a ejecutar filtrar()
-        filtrar();
+        filtrar(true);
       })
       .catch(error => {
         Swal.fire({ icon: 'error', title: 'Error', text: error.message,
@@ -903,7 +922,7 @@ $('.btn-export').on('click', function () {
       $('#submitBtn').text('Crear');
       $('#tituloAdd').text('Agregar Pago');
 
-      filtrar(); // refrescar datos
+      filtrar(true); // refrescar datos
     })
     .catch(error => {
       Swal.fire({ icon: 'error', title: 'Error', text: error.message,
@@ -952,7 +971,7 @@ $('#importarPagosForm').on('submit', function (e) {
           }
      });
     $('#importarPago').modal('hide');
-    filtrar(); // 🔑 refrescar la tabla con los filtros actuales
+    filtrar(true); // 🔑 refrescar la tabla con los filtros actuales
   })
   .catch(error => {
     Swal.fire({ icon: 'error', title: 'Error', text: error.message,
